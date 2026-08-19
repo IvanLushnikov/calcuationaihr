@@ -378,6 +378,83 @@
     .unit-cost .lbl { color: var(--muted); }
     .unit-cost .val { font-weight: 600; font-variant-numeric: tabular-nums; }
 
+    /* --- Конкуренты по CPA --- */
+    .market-compare {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .market-rows {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .market-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .market-card.best {
+      border-color: rgba(52, 211, 153, 0.45);
+      background: rgba(52, 211, 153, 0.06);
+    }
+
+    .market-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .market-title .name {
+      font-weight: 800;
+      font-size: 0.9rem;
+      letter-spacing: 0.01em;
+    }
+
+    .market-title .badge {
+      font-size: 0.72rem;
+      color: var(--success);
+      font-weight: 700;
+      display: none;
+    }
+
+    .market-card.best .market-title .badge { display: inline; }
+
+    .market-metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .market-metric .val {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .market-summary {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .market-summary strong { color: var(--text); }
+
     /* --- Сценарии --- */
     .card-scenarios {
       border-color: rgba(52, 211, 153, 0.2);
@@ -550,6 +627,44 @@
             <label for="saasPerEmployee">SaaS ₽/инт.</label>
             <input type="number" id="saasPerEmployee" value="149" min="0" step="1">
           </div>
+
+          <div class="section-label">Сравнение конкурентов (CPA)</div>
+          <div class="field">
+            <label for="marketContactDurationMin">Длительность контакта, мин</label>
+            <input type="number" id="marketContactDurationMin" value="10" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label for="marketContactsVolume">Объём контактов</label>
+            <input type="number" id="marketContactsVolume" value="10000" min="0" step="1">
+          </div>
+
+          <div class="field">
+            <label for="ccConvPct">КЦ: конверсия, %</label>
+            <input type="number" id="ccConvPct" value="8" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label for="botConvPct">Сценарный бот: конверсия, %</label>
+            <input type="number" id="botConvPct" value="2" min="0" step="0.1">
+          </div>
+
+          <div class="field">
+            <label for="aiConvPct">ИИ рекрутер: конверсия, %</label>
+            <input type="number" id="aiConvPct" value="5" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label for="botCostPerMin">Сценарный бот: ₽/мин</label>
+            <input type="number" id="botCostPerMin" value="3" min="0" step="0.1">
+          </div>
+
+          <div class="field">
+            <label for="aiCostPerMin">ИИ рекрутер: ₽/мин</label>
+            <input type="number" id="aiCostPerMin" value="8" min="0" step="0.1">
+          </div>
+
+          <div class="field span2">
+            <label for="dealValuePerConv">Ценность конверсии, ₽ (опционально)</label>
+            <input type="number" id="dealValuePerConv" value="0" min="0" step="100">
+          </div>
         </div>
       </div>
 
@@ -568,6 +683,8 @@
             <div class="block-title">Стоимость единицы</div>
             <div class="unit-costs" id="unitCosts"></div>
           </div>
+
+          <div class="market-compare" id="marketCompare"></div>
         </div>
       </div>
 
@@ -607,7 +724,16 @@
       workingHours: 160,
       aiControlMin: 3,
       hhPerVacancy: 17,
-      saasPerEmployee: 149
+      saasPerEmployee: 149,
+
+      marketContactDurationMin: 10,
+      marketContactsVolume: 10000,
+      ccConvPct: 8,
+      botConvPct: 2,
+      aiConvPct: 5,
+      botCostPerMin: 3,
+      aiCostPerMin: 8,
+      dealValuePerConv: 0
     };
 
     const fieldIds = {
@@ -619,7 +745,16 @@
       workingHours: 'workingHours',
       aiControlMin: 'aiControlMin',
       hhPerVacancy: 'hhPerVacancy',
-      saasPerEmployee: 'saasPerEmployee'
+      saasPerEmployee: 'saasPerEmployee',
+
+      marketContactDurationMin: 'marketContactDurationMin',
+      marketContactsVolume: 'marketContactsVolume',
+      ccConvPct: 'ccConvPct',
+      botConvPct: 'botConvPct',
+      aiConvPct: 'aiConvPct',
+      botCostPerMin: 'botCostPerMin',
+      aiCostPerMin: 'aiCostPerMin',
+      dealValuePerConv: 'dealValuePerConv'
     };
 
     // Excel: MATCH(minutes, thresholds, 1) — наибольший порог <= minutes
@@ -748,6 +883,117 @@
       `;
     }
 
+    function calculateMarket(v) {
+      const duration = Math.max(0, v.marketContactDurationMin);
+      const contacts = Math.max(0, v.marketContactsVolume);
+      const dealValue = Math.max(0, v.dealValuePerConv);
+
+      function mkChannel(convPct, costPerMin) {
+        const conv = convPct / 100;
+        const costPerContact = costPerMin * duration;
+        const conversions = contacts * conv;
+        const cpa = conv > 0 ? costPerContact / conv : Infinity;
+        const totalCost = contacts * costPerContact;
+        const profit = dealValue > 0 ? (conversions * dealValue - totalCost) : null;
+        return { conv, conversions, costPerContact, cpa, totalCost, profit };
+      }
+
+      const cc = mkChannel(v.ccConvPct, v.hhPerVacancy);
+      const bot = mkChannel(v.botConvPct, v.botCostPerMin);
+      const ai = mkChannel(v.aiConvPct, v.aiCostPerMin);
+
+      const channels = { cc, bot, ai };
+      const bestKey = ['cc', 'bot', 'ai'].reduce((best, key) => {
+        const cur = channels[key];
+        if (!isFinite(cur.cpa)) return best;
+        if (!best) return key;
+        return cur.cpa < channels[best].cpa ? key : best;
+      }, null);
+
+      const aiDeltaCpaVsCc = isFinite(ai.cpa) && isFinite(cc.cpa) ? (ai.cpa - cc.cpa) : NaN;
+      const aiDeltaCpaVsBot = isFinite(ai.cpa) && isFinite(bot.cpa) ? (ai.cpa - bot.cpa) : NaN;
+
+      return { cc, bot, ai, bestKey, aiDeltaCpaVsCc, aiDeltaCpaVsBot };
+    }
+
+    function renderMarketCompare(m) {
+      const names = { cc: 'КЦ', bot: 'Сценарный бот', ai: 'ИИ рекрутер' };
+      const bestName = m.bestKey ? names[m.bestKey] : '—';
+
+      function clsFor(key) {
+        return 'market-card' + (m.bestKey === key ? ' best' : '');
+      }
+
+      function metricRow(lbl, val, suffix = '') {
+        return `
+          <div class="market-metric">
+            <span>${lbl}</span>
+            <span class="val">${val}${suffix}</span>
+          </div>
+        `;
+      }
+
+      function signMoney(delta) {
+        if (!isFinite(delta)) return '—';
+        const s = delta > 0 ? '+' : '';
+        return s + fmtMoney(delta);
+      }
+
+      const cc = m.cc, bot = m.bot, ai = m.ai;
+
+      const profitLine = (ai.profit !== null)
+        ? `Прибыль на объёме: <strong>${fmtMoney(ai.profit)}</strong>`
+        : `Профит не посчитан (поставь “Ценность конверсии” > 0)`;
+
+      document.getElementById('marketCompare').innerHTML = `
+        <div class="block-title">Конкуренты по CPA</div>
+        <div class="market-summary">
+          Лучший по CPA: <strong>${bestName}</strong>.
+          AI vs КЦ: <strong>${isFinite(m.aiDeltaCpaVsCc) ? (m.aiDeltaCpaVsCc > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsCc) : '—'}</strong>
+          за конверсию (AI дороже/дешевле).
+          AI vs бот: <strong>${isFinite(m.aiDeltaCpaVsBot) ? (m.aiDeltaCpaVsBot > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsBot) : '—'}</strong>
+          за конверсию.
+          <div style="margin-top:6px;">${profitLine}</div>
+        </div>
+
+        <div class="market-rows">
+          <div class="${clsFor('cc')}">
+            <div class="market-title">
+              <div class="name">${names.cc}</div>
+              <div class="badge">лучший</div>
+            </div>
+            ${metricRow('Стоимость контакта', fmtMoney(cc.costPerContact))}
+            ${metricRow('CPA (руб/конверсия)', fmtMoney(cc.cpa))}
+            ${metricRow('Конверсии на объём', fmt(cc.conversions, 0))}
+            ${metricRow('Затраты на объём', fmtMoney(cc.totalCost))}
+          </div>
+
+          <div class="${clsFor('bot')}">
+            <div class="market-title">
+              <div class="name">${names.bot}</div>
+              <div class="badge">лучший</div>
+            </div>
+            ${metricRow('Стоимость контакта', fmtMoney(bot.costPerContact))}
+            ${metricRow('CPA (руб/конверсия)', fmtMoney(bot.cpa))}
+            ${metricRow('Конверсии на объём', fmt(bot.conversions, 0))}
+            ${metricRow('Затраты на объём', fmtMoney(bot.totalCost))}
+          </div>
+
+          <div class="${clsFor('ai')}">
+            <div class="market-title">
+              <div class="name">${names.ai}</div>
+              <div class="badge">лучший</div>
+            </div>
+            ${metricRow('Стоимость контакта', fmtMoney(ai.costPerContact))}
+            ${metricRow('CPA (руб/конверсия)', fmtMoney(ai.cpa))}
+            ${metricRow('Конверсии на объём', fmt(ai.conversions, 0))}
+            ${metricRow('Затраты на объём', fmtMoney(ai.totalCost))}
+            ${ai.profit !== null ? metricRow('Прибыль на объём', fmtMoney(ai.profit)) : ''}
+          </div>
+        </div>
+      `;
+    }
+
     function renderScenarios(r, v) {
       const scenarios = [
         { name: 'Штатный HR', current: r.savedCost, ai: v.aiPrice },
@@ -780,6 +1026,9 @@
       renderFunnel(r);
       renderUnitCosts(r);
       renderScenarios(r, v);
+
+      const m = calculateMarket(v);
+      renderMarketCompare(m);
     }
 
     Object.values(fieldIds).forEach(id => {
