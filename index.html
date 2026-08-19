@@ -17,114 +17,156 @@
       --success: #34d399;
       --warning: #fbbf24;
       --danger: #f87171;
-      --radius: 12px;
-      --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+      --radius: 10px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.5;
-      min-height: 100vh;
+      line-height: 1.35;
+      font-size: 13px;
     }
 
     .page {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 32px 20px 64px;
+      height: 100dvh;
+      max-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 14px 12px;
+      gap: 8px;
+      overflow: hidden;
     }
 
     header {
-      text-align: center;
-      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .header-main {
+      min-width: 0;
     }
 
     header h1 {
-      font-size: clamp(1.5rem, 4vw, 2.25rem);
+      font-size: 1.15rem;
       font-weight: 700;
       background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 12px;
-    }
-
-    header p {
-      color: var(--muted);
-      max-width: 640px;
-      margin: 0 auto;
-      font-size: 0.95rem;
+      white-space: nowrap;
     }
 
     .disclaimer {
-      margin-top: 16px;
-      padding: 10px 16px;
-      background: rgba(251, 191, 36, 0.1);
-      border: 1px solid rgba(251, 191, 36, 0.25);
-      border-radius: 8px;
       color: var(--warning);
-      font-size: 0.85rem;
-      display: inline-block;
+      font-size: 0.68rem;
+      margin-top: 2px;
+      opacity: 0.9;
     }
 
-    .grid {
+    .reset-btn {
+      flex-shrink: 0;
+      padding: 5px 10px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.72rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .dashboard {
+      flex: 1;
+      min-height: 0;
       display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 24px;
-      align-items: start;
-    }
-
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: 1fr; }
+      grid-template-columns: minmax(280px, 34%) 1fr 1fr;
+      gap: 8px;
+      overflow: hidden;
     }
 
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow);
+      padding: 10px 12px;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .card h2 {
-      font-size: 1.1rem;
+      font-size: 0.82rem;
       font-weight: 600;
-      margin-bottom: 20px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
     .card h2::before {
       content: "";
-      width: 4px;
-      height: 18px;
+      width: 3px;
+      height: 14px;
       background: var(--accent);
       border-radius: 2px;
     }
 
-    .field {
-      margin-bottom: 16px;
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 8px;
+      flex: 1;
+      align-content: start;
+      overflow: hidden;
     }
+
+    .section-label {
+      grid-column: 1 / -1;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-light);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .section-label:first-child { margin-top: 0; }
 
     .field label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.68rem;
       color: var(--muted);
-      margin-bottom: 6px;
+      margin-bottom: 2px;
+      line-height: 1.2;
     }
 
     .field input {
       width: 100%;
-      padding: 10px 14px;
+      padding: 5px 8px;
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       color: var(--text);
-      font-size: 1rem;
+      font-size: 0.82rem;
       transition: border-color 0.2s;
     }
 
@@ -133,100 +175,98 @@
       border-color: var(--accent);
     }
 
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    .field.span2 { grid-column: 1 / -1; }
 
-    .section-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--accent-light);
-      margin: 24px 0 12px;
-      font-weight: 600;
+    .results-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+      overflow: hidden;
     }
-
-    .section-label:first-of-type { margin-top: 0; }
 
     .funnel {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-bottom: 24px;
+      gap: 4px;
+      flex-shrink: 0;
     }
 
     .funnel-step {
       display: grid;
-      grid-template-columns: 140px 1fr auto;
+      grid-template-columns: minmax(90px, 38%) 1fr auto;
       align-items: center;
-      gap: 12px;
+      gap: 6px;
     }
 
     .funnel-step .label {
-      font-size: 0.85rem;
+      font-size: 0.68rem;
       color: var(--muted);
+      line-height: 1.2;
     }
 
     .funnel-bar-wrap {
       background: var(--surface-2);
-      border-radius: 6px;
-      height: 28px;
+      border-radius: 4px;
+      height: 16px;
       overflow: hidden;
     }
 
     .funnel-bar {
       height: 100%;
       background: linear-gradient(90deg, var(--accent), var(--accent-light));
-      border-radius: 6px;
-      transition: width 0.4s ease;
+      border-radius: 4px;
+      transition: width 0.3s ease;
       min-width: 2px;
     }
 
     .funnel-step .value {
       font-weight: 600;
-      font-size: 0.95rem;
-      min-width: 90px;
+      font-size: 0.78rem;
+      min-width: 64px;
       text-align: right;
+      font-variant-numeric: tabular-nums;
     }
 
     .metrics {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      flex-shrink: 0;
     }
 
     .metric {
       background: var(--surface-2);
-      border-radius: 8px;
-      padding: 14px;
+      border-radius: 6px;
+      padding: 6px 4px;
       text-align: center;
     }
 
     .metric .num {
-      font-size: 1.25rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: var(--success);
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
     }
 
     .metric .num.negative { color: var(--danger); }
 
     .metric .lbl {
-      font-size: 0.75rem;
+      font-size: 0.58rem;
       color: var(--muted);
-      margin-top: 4px;
+      margin-top: 2px;
+      line-height: 1.15;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.9rem;
+      font-size: 0.72rem;
     }
 
     th, td {
-      padding: 12px 10px;
+      padding: 4px 6px;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
@@ -234,150 +274,134 @@
     th {
       color: var(--muted);
       font-weight: 500;
-      font-size: 0.8rem;
+      font-size: 0.66rem;
     }
 
     td.num { text-align: right; font-variant-numeric: tabular-nums; }
 
-    tr.highlight td {
-      background: rgba(99, 102, 241, 0.08);
-      font-weight: 600;
-    }
-
-    .savings-positive { color: var(--success); }
-    .savings-negative { color: var(--danger); }
+    .savings-positive { color: var(--success); font-weight: 600; }
+    .savings-negative { color: var(--danger); font-weight: 600; }
 
     .price-row td:first-child { color: var(--muted); }
 
-    footer {
-      margin-top: 40px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.8rem;
+    .card-grow {
+      flex: 1;
+      min-height: 0;
     }
 
-    .reset-btn {
-      margin-top: 8px;
-      padding: 8px 16px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.2s;
+    .table-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
     }
 
-    .reset-btn:hover {
-      border-color: var(--accent);
-      color: var(--text);
+    @media (max-width: 1100px) {
+      html, body { overflow: auto; height: auto; }
+      .page { height: auto; max-height: none; overflow: visible; }
+      .dashboard { grid-template-columns: 1fr 1fr; overflow: visible; }
+      .inputs-card { grid-column: 1 / -1; }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <header>
-      <h1>Калькулятор эффекта ИИ Рекрутер</h1>
-      <p>Модель для оценки масштаба пилота и разговора об экономике. Подставьте параметры клиента — результат обновится автоматически.</p>
-      <div class="disclaimer">Внутренняя модель, не гарантия клиенту. Телефония, маркировка, интеграция и НДС не включены.</div>
+      <div class="header-main">
+        <h1>Калькулятор эффекта ИИ Рекрутер</h1>
+        <div class="disclaimer">Внутренняя модель · не гарантия клиенту · телефония, маркировка, интеграция и НДС не включены</div>
+      </div>
+      <button class="reset-btn" type="button" id="resetBtn">Сбросить</button>
     </header>
 
-    <div class="grid">
-      <div class="card">
+    <div class="dashboard">
+      <div class="card inputs-card">
         <h2>Входные параметры</h2>
+        <div class="inputs-grid">
+          <div class="section-label">Пакет AI</div>
+          <div class="field">
+            <label for="aiMinutes">Пакет минут AI</label>
+            <input type="number" id="aiMinutes" value="200000" min="0" step="1000">
+          </div>
+          <div class="field">
+            <label for="aiPrice">Цена AI, ₽</label>
+            <input type="number" id="aiPrice" value="3600000" min="0" step="1000">
+          </div>
+          <div class="field span2">
+            <label for="packagePer10k">Звонков на 10 000 минут</label>
+            <input type="number" id="packagePer10k" value="21260" min="0" step="1">
+          </div>
 
-        <div class="section-label">Пакет AI</div>
-        <div class="field">
-          <label for="aiMinutes">Пакет минут AI</label>
-          <input type="number" id="aiMinutes" value="200000" min="0" step="1000">
-        </div>
-        <div class="field">
-          <label for="aiPrice">Цена AI, ₽</label>
-          <input type="number" id="aiPrice" value="3600000" min="0" step="1000">
-        </div>
-        <div class="field">
-          <label for="packagePer10k">Звонков на 10 000 минут (коэффициент)</label>
-          <input type="number" id="packagePer10k" value="21260" min="0" step="1">
-        </div>
-
-        <div class="section-label">Воронка</div>
-        <div class="field-row">
+          <div class="section-label">Воронка</div>
           <div class="field">
             <label for="contactRate">Контакт, %</label>
             <input type="number" id="contactRate" value="26.3" min="0" max="100" step="0.1">
           </div>
           <div class="field">
-            <label for="meaningfulRate">Содержательное интервью, %</label>
+            <label for="meaningfulRate">Содерж. интервью, %</label>
             <input type="number" id="meaningfulRate" value="50.1" min="0" max="100" step="0.1">
           </div>
-        </div>
-        <div class="field">
-          <label for="relevanceRate">Подходящий кандидат, %</label>
-          <input type="number" id="relevanceRate" value="27.1" min="0" max="100" step="0.1">
-        </div>
+          <div class="field span2">
+            <label for="relevanceRate">Подходящий кандидат, %</label>
+            <input type="number" id="relevanceRate" value="27.1" min="0" max="100" step="0.1">
+          </div>
 
-        <div class="section-label">Ручной труд</div>
-        <div class="field-row">
+          <div class="section-label">Ручной труд</div>
           <div class="field">
-            <label for="manualAttemptMin">Минут на попытку</label>
+            <label for="manualAttemptMin">Мин. на попытку</label>
             <input type="number" id="manualAttemptMin" value="1" min="0" step="0.1">
           </div>
           <div class="field">
-            <label for="manualInterviewMin">Минут на интервью</label>
+            <label for="manualInterviewMin">Мин. на интервью</label>
             <input type="number" id="manualInterviewMin" value="15" min="0" step="0.1">
           </div>
-        </div>
-        <div class="field-row">
           <div class="field">
-            <label for="recruiterCost">Зарплата рекрутера, ₽/мес</label>
+            <label for="recruiterCost">Зарплата рекрутера, ₽</label>
             <input type="number" id="recruiterCost" value="80000" min="0" step="1000">
           </div>
           <div class="field">
-            <label for="workingHours">Рабочих часов в месяц</label>
+            <label for="workingHours">Раб. часов / мес</label>
             <input type="number" id="workingHours" value="160" min="1" step="1">
           </div>
-        </div>
-        <div class="field">
-          <label for="aiControlMin">Контроль AI, мин/интервью</label>
-          <input type="number" id="aiControlMin" value="3" min="0" step="0.1">
-        </div>
+          <div class="field span2">
+            <label for="aiControlMin">Контроль AI, мин/интервью</label>
+            <input type="number" id="aiControlMin" value="3" min="0" step="0.1">
+          </div>
 
-        <div class="section-label">Сравнение с альтернативами</div>
-        <div class="field-row">
+          <div class="section-label">Альтернативы</div>
           <div class="field">
-            <label for="hhPerVacancy">hh.ru, ₽/минута ручного труда</label>
+            <label for="hhPerVacancy">hh.ru, ₽/мин</label>
             <input type="number" id="hhPerVacancy" value="17" min="0" step="1">
           </div>
           <div class="field">
-            <label for="saasPerEmployee">AI-рекрутмент SaaS, ₽/интервью</label>
+            <label for="saasPerEmployee">SaaS, ₽/интервью</label>
             <input type="number" id="saasPerEmployee" value="149" min="0" step="1">
           </div>
         </div>
-
-        <button class="reset-btn" type="button" id="resetBtn">Сбросить к значениям по умолчанию</button>
       </div>
 
-      <div>
-        <div class="card" style="margin-bottom: 24px;">
+      <div class="results-col">
+        <div class="card card-grow">
           <h2>Результат по воронке</h2>
           <div class="funnel" id="funnel"></div>
-
-          <div class="metrics" id="keyMetrics"></div>
-
-          <table>
-            <tbody id="priceTable"></tbody>
-          </table>
+          <div class="metrics" id="keyMetrics" style="margin-top: 8px;"></div>
+          <div class="table-wrap" style="margin-top: 8px;">
+            <table>
+              <tbody id="priceTable"></tbody>
+            </table>
+          </div>
         </div>
+      </div>
 
-        <div class="card">
-          <h2>Сравнение сценариев</h2>
+      <div class="card">
+        <h2>Сравнение сценариев</h2>
+        <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>Сценарий</th>
-                <th style="text-align:right">Текущие затраты</th>
-                <th style="text-align:right">Стоимость AI</th>
-                <th style="text-align:right">Экономия, ₽</th>
+                <th style="text-align:right">Текущие</th>
+                <th style="text-align:right">AI</th>
+                <th style="text-align:right">Экономия</th>
               </tr>
             </thead>
             <tbody id="scenarioTable"></tbody>
@@ -385,10 +409,6 @@
         </div>
       </div>
     </div>
-
-    <footer>
-      ИИ Рекрутер · Sales-калькулятор · Модель для внутреннего использования
-    </footer>
   </div>
 
   <script>
@@ -444,10 +464,6 @@
       return fmt(Math.round(n)) + ' ₽';
     }
 
-    function fmtPct(n) {
-      return fmt(n, 1) + '%';
-    }
-
     function calculate(v) {
       const packageCapacity = Math.round(v.packagePer10k * v.aiMinutes / 10000);
       const actualAttempts = packageCapacity;
@@ -472,24 +488,10 @@
       const saasCost = meaningfulInterviews * v.saasPerEmployee;
 
       return {
-        packageCapacity,
-        actualAttempts,
-        contacts,
-        meaningfulInterviews,
-        relevantCandidates,
-        manualMinutes,
-        manualHours,
-        aiControlHours,
-        netSavedHours,
-        savedCost,
-        netEffect,
-        fte,
-        pricePerAttempt,
-        pricePerContact,
-        pricePerInterview,
-        pricePerCandidate,
-        hhCost,
-        saasCost
+        actualAttempts, contacts, meaningfulInterviews, relevantCandidates,
+        manualHours, netSavedHours, savedCost, netEffect, fte,
+        pricePerAttempt, pricePerContact, pricePerInterview, pricePerCandidate,
+        hhCost, saasCost
       };
     }
 
@@ -497,17 +499,14 @@
       const steps = [
         { label: 'Тарифицируемые звонки', value: r.actualAttempts },
         { label: 'Контакты', value: r.contacts },
-        { label: 'Содержательные интервью', value: r.meaningfulInterviews },
+        { label: 'Содерж. интервью', value: r.meaningfulInterviews },
         { label: 'Подходящие кандидаты', value: r.relevantCandidates }
       ];
       const max = r.actualAttempts || 1;
-
       document.getElementById('funnel').innerHTML = steps.map(s => `
         <div class="funnel-step">
           <span class="label">${s.label}</span>
-          <div class="funnel-bar-wrap">
-            <div class="funnel-bar" style="width: ${Math.max(2, (s.value / max) * 100)}%"></div>
-          </div>
+          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${Math.max(2, (s.value / max) * 100)}%"></div></div>
           <span class="value">${fmt(s.value)}</span>
         </div>
       `).join('');
@@ -516,60 +515,39 @@
     function renderMetrics(r, v) {
       const netClass = r.netEffect >= 0 ? '' : 'negative';
       document.getElementById('keyMetrics').innerHTML = `
-        <div class="metric">
-          <div class="num">${fmt(r.manualHours, 1)}</div>
-          <div class="lbl">Ручных HR-часов</div>
-        </div>
-        <div class="metric">
-          <div class="num">${fmt(r.netSavedHours, 1)}</div>
-          <div class="lbl">Снятые HR-часы</div>
-        </div>
-        <div class="metric">
-          <div class="num">${fmt(r.fte, 1)}</div>
-          <div class="lbl">FTE (экв. рекрутеров)</div>
-        </div>
-        <div class="metric">
-          <div class="num">${fmtMoney(r.savedCost)}</div>
-          <div class="lbl">Стоимость снятых часов</div>
-        </div>
-        <div class="metric">
-          <div class="num ${netClass}">${fmtMoney(r.netEffect)}</div>
-          <div class="lbl">Чистый эффект</div>
-        </div>
-        <div class="metric">
-          <div class="num">${fmt(v.aiPrice / v.aiMinutes, 1)} ₽</div>
-          <div class="lbl">Цена минуты AI</div>
-        </div>
+        <div class="metric"><div class="num">${fmt(r.manualHours, 1)}</div><div class="lbl">Ручных HR-часов</div></div>
+        <div class="metric"><div class="num">${fmt(r.netSavedHours, 1)}</div><div class="lbl">Снятые HR-часы</div></div>
+        <div class="metric"><div class="num">${fmt(r.fte, 1)}</div><div class="lbl">FTE рекрутеров</div></div>
+        <div class="metric"><div class="num">${fmtMoney(r.savedCost)}</div><div class="lbl">Стоимость снятых часов</div></div>
+        <div class="metric"><div class="num ${netClass}">${fmtMoney(r.netEffect)}</div><div class="lbl">Чистый эффект</div></div>
+        <div class="metric"><div class="num">${fmt(v.aiPrice / v.aiMinutes, 1)} ₽</div><div class="lbl">Цена минуты AI</div></div>
       `;
     }
 
     function renderPriceTable(r) {
       document.getElementById('priceTable').innerHTML = `
-        <tr class="price-row"><td>Цена AI за 1000 звонков</td><td class="num">${fmt(r.pricePerAttempt, 0)} ₽</td></tr>
-        <tr class="price-row"><td>Цена AI за контакт</td><td class="num">${fmt(r.pricePerContact, 0)} ₽</td></tr>
-        <tr class="price-row"><td>Цена AI за содержательное интервью</td><td class="num">${fmt(r.pricePerInterview, 0)} ₽</td></tr>
-        <tr class="price-row"><td>Цена AI за подходящего кандидата</td><td class="num">${fmt(r.pricePerCandidate, 0)} ₽</td></tr>
+        <tr class="price-row"><td>Цена AI / 1000 звонков</td><td class="num">${fmt(r.pricePerAttempt, 0)} ₽</td></tr>
+        <tr class="price-row"><td>Цена AI / контакт</td><td class="num">${fmt(r.pricePerContact, 0)} ₽</td></tr>
+        <tr class="price-row"><td>Цена AI / интервью</td><td class="num">${fmt(r.pricePerInterview, 0)} ₽</td></tr>
+        <tr class="price-row"><td>Цена AI / кандидат</td><td class="num">${fmt(r.pricePerCandidate, 0)} ₽</td></tr>
       `;
     }
 
     function renderScenarios(r, v) {
       const scenarios = [
         { name: 'Один рекрутер', current: r.savedCost, ai: v.aiPrice },
-        { name: 'hh.ru (по минутам ручного труда)', current: r.hhCost, ai: v.aiPrice },
+        { name: 'hh.ru', current: r.hhCost, ai: v.aiPrice },
         { name: 'AI-рекрутмент SaaS', current: r.saasCost, ai: v.aiPrice }
       ];
-
       document.getElementById('scenarioTable').innerHTML = scenarios.map(s => {
         const savings = s.current - s.ai;
         const cls = savings >= 0 ? 'savings-positive' : 'savings-negative';
-        return `
-          <tr>
-            <td>${s.name}</td>
-            <td class="num">${fmtMoney(s.current)}</td>
-            <td class="num">${fmtMoney(s.ai)}</td>
-            <td class="num ${cls}">${fmtMoney(savings)}</td>
-          </tr>
-        `;
+        return `<tr>
+          <td>${s.name}</td>
+          <td class="num">${fmtMoney(s.current)}</td>
+          <td class="num">${fmtMoney(s.ai)}</td>
+          <td class="num ${cls}">${fmtMoney(savings)}</td>
+        </tr>`;
       }).join('');
     }
 
