@@ -99,7 +99,7 @@
       flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: minmax(300px, 34%) 1fr 1fr;
+      grid-template-columns: minmax(320px, 1.2fr) minmax(250px, 0.78fr) minmax(230px, 0.72fr);
       gap: 12px;
       overflow: hidden;
     }
@@ -193,8 +193,18 @@
       min-height: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 14px;
+      justify-content: flex-start;
+      gap: 12px;
+    }
+
+    .card-results,
+    .card-scenarios {
+      padding: 14px 12px;
+    }
+
+    .card-results h2,
+    .card-scenarios h2 {
+      margin-bottom: 10px;
     }
 
     .funnel {
@@ -206,15 +216,15 @@
 
     .funnel-step {
       display: grid;
-      grid-template-columns: minmax(110px, 38%) 1fr auto;
+      grid-template-columns: minmax(88px, 36%) 1fr auto;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
     }
 
     .funnel-step .label {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: var(--muted);
-      line-height: 1.25;
+      line-height: 1.2;
     }
 
     .funnel-bar-wrap {
@@ -234,31 +244,31 @@
 
     .funnel-step .value {
       font-weight: 600;
-      font-size: 0.92rem;
-      min-width: 72px;
+      font-size: 0.88rem;
+      min-width: 62px;
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
 
     .metrics {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
       flex-shrink: 0;
     }
 
     .metric {
       background: var(--surface-2);
       border-radius: 8px;
-      padding: 10px 8px;
+      padding: 8px 6px;
       text-align: center;
     }
 
     .metric .num {
-      font-size: 1.05rem;
+      font-size: 0.98rem;
       font-weight: 700;
       color: var(--success);
-      line-height: 1.25;
+      line-height: 1.2;
       font-variant-numeric: tabular-nums;
     }
 
@@ -305,19 +315,28 @@
       flex-shrink: 0;
     }
 
-    .card-body-center {
-      justify-content: center;
+    .card-results table,
+    .card-scenarios table {
+      font-size: 0.8rem;
     }
 
+    .card-results th,
+    .card-results td,
     .card-scenarios th,
     .card-scenarios td {
-      padding: 10px 8px;
+      padding: 6px 4px;
     }
-      font-size: 0.88rem;
+
+    .card-scenarios th {
+      font-size: 0.72rem;
+    }
+
+    #scenarioTable td:first-child {
+      font-size: 0.82rem;
     }
 
     #scenarioTable td.num {
-      font-size: 0.92rem;
+      font-size: 0.84rem;
     }
 
     @media (max-width: 1100px) {
@@ -405,7 +424,7 @@
       </div>
 
       <div class="results-col">
-        <div class="card card-grow">
+        <div class="card card-grow card-results">
           <h2>Результат по воронке</h2>
           <div class="card-body">
             <div class="funnel" id="funnel"></div>
@@ -421,7 +440,7 @@
 
       <div class="card card-scenarios">
         <h2>Сравнение сценариев</h2>
-        <div class="card-body card-body-center">
+        <div class="card-body">
           <div class="table-wrap">
             <table>
               <thead>
