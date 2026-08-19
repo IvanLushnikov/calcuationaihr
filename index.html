@@ -9,12 +9,14 @@
       --bg: #0f1419;
       --surface: #1a2332;
       --surface-2: #243044;
+      --surface-3: #2d3a50;
       --border: #334155;
       --text: #f1f5f9;
       --muted: #94a3b8;
       --accent: #6366f1;
       --accent-light: #818cf8;
       --success: #34d399;
+      --success-dim: rgba(52, 211, 153, 0.12);
       --warning: #fbbf24;
       --danger: #f87171;
       --radius: 12px;
@@ -22,10 +24,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html, body {
-      height: 100%;
-      overflow: hidden;
-    }
+    html, body { height: 100%; overflow: hidden; }
 
     html {
       font-size: clamp(15px, 0.55vw + 0.9vh, 17px);
@@ -56,10 +55,6 @@
       flex-shrink: 0;
     }
 
-    .header-main {
-      min-width: 0;
-    }
-
     header h1 {
       font-size: 1.45rem;
       font-weight: 700;
@@ -67,14 +62,13 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      white-space: nowrap;
     }
 
     .disclaimer {
       color: var(--warning);
-      font-size: 0.78rem;
-      margin-top: 4px;
-      opacity: 0.95;
+      font-size: 0.76rem;
+      margin-top: 3px;
+      opacity: 0.9;
     }
 
     .reset-btn {
@@ -87,7 +81,6 @@
       cursor: pointer;
       font-size: 0.85rem;
       transition: all 0.2s;
-      white-space: nowrap;
     }
 
     .reset-btn:hover {
@@ -95,11 +88,12 @@
       color: var(--text);
     }
 
+    /* col1 уже, col2 и col3 шире */
     .dashboard {
       flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: minmax(320px, 1.2fr) minmax(250px, 0.78fr) minmax(230px, 0.72fr);
+      grid-template-columns: minmax(220px, 0.68fr) minmax(320px, 1.15fr) minmax(300px, 1.05fr);
       gap: 12px;
       overflow: hidden;
     }
@@ -133,10 +127,28 @@
       border-radius: 2px;
     }
 
+    /* --- Входные: приглушённые --- */
+    .inputs-card {
+      background: rgba(26, 35, 50, 0.65);
+      border-color: rgba(51, 65, 85, 0.6);
+      padding: 12px 14px;
+    }
+
+    .inputs-card h2 {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .inputs-card h2::before {
+      background: var(--muted);
+      height: 14px;
+    }
+
     .inputs-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px 12px;
+      gap: 8px 10px;
       flex: 1;
       align-content: space-between;
       overflow: hidden;
@@ -144,48 +156,52 @@
 
     .section-label {
       grid-column: 1 / -1;
-      font-size: 0.72rem;
+      font-size: 0.65rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--accent-light);
-      margin-top: 4px;
+      color: var(--muted);
+      margin-top: 2px;
       font-weight: 600;
+      opacity: 0.8;
     }
 
     .section-label:first-child { margin-top: 0; }
 
     .field label {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       color: var(--muted);
-      margin-bottom: 4px;
-      line-height: 1.25;
+      margin-bottom: 3px;
+      line-height: 1.2;
     }
 
     .field input {
       width: 100%;
-      padding: 8px 10px;
+      padding: 6px 8px;
       background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      border-radius: 6px;
       color: var(--text);
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       transition: border-color 0.2s;
     }
 
     .field input:focus {
       outline: none;
       border-color: var(--accent);
+      background: var(--surface-3);
     }
 
     .field.span2 { grid-column: 1 / -1; }
 
-    .results-col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-height: 0;
-      overflow: hidden;
+    /* --- Результаты: акцент --- */
+    .card-output {
+      border-color: rgba(99, 102, 241, 0.35);
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.06) 0%, var(--surface) 40%);
+    }
+
+    .card-output h2::before {
+      background: var(--success);
     }
 
     .card-body {
@@ -193,44 +209,111 @@
       min-height: 0;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      gap: 12px;
+      gap: 14px;
+      overflow: hidden;
     }
 
-    .card-results,
-    .card-scenarios {
-      padding: 14px 12px;
+    /* Hero KPI */
+    .hero-kpi {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 10px;
+      flex-shrink: 0;
     }
 
-    .card-results h2,
-    .card-scenarios h2 {
-      margin-bottom: 10px;
+    .hero-kpi-main {
+      background: var(--success-dim);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-kpi-main .kpi-label {
+      font-size: 0.78rem;
+      color: var(--success);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .hero-kpi-main .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--success);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hero-kpi-main .kpi-value.negative {
+      color: var(--danger);
+    }
+
+    .hero-kpi-main .kpi-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .hero-kpi-item {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-kpi-item .kpi-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.15;
+    }
+
+    .hero-kpi-item .kpi-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.2;
+    }
+
+    .block-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-light);
+      font-weight: 600;
+      margin-bottom: 8px;
     }
 
     .funnel {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 7px;
       flex-shrink: 0;
     }
 
     .funnel-step {
       display: grid;
-      grid-template-columns: minmax(88px, 36%) 1fr auto;
+      grid-template-columns: minmax(120px, 34%) 1fr auto;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
     }
 
     .funnel-step .label {
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       color: var(--muted);
-      line-height: 1.2;
     }
 
     .funnel-bar-wrap {
       background: var(--surface-2);
       border-radius: 6px;
-      height: 22px;
+      height: 24px;
       overflow: hidden;
     }
 
@@ -243,127 +326,131 @@
     }
 
     .funnel-step .value {
-      font-weight: 600;
-      font-size: 0.88rem;
-      min-width: 62px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      min-width: 72px;
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
 
-    .metrics {
+    .unit-costs {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 16px;
       flex-shrink: 0;
     }
 
-    .metric {
-      background: var(--surface-2);
-      border-radius: 8px;
-      padding: 8px 6px;
-      text-align: center;
-    }
-
-    .metric .num {
-      font-size: 0.98rem;
-      font-weight: 700;
-      color: var(--success);
-      line-height: 1.2;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .metric .num.negative { color: var(--danger); }
-
-    .metric .lbl {
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-top: 4px;
-      line-height: 1.2;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-
-    th, td {
-      padding: 8px 8px;
-      text-align: left;
+    .unit-cost {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      padding: 6px 0;
       border-bottom: 1px solid var(--border);
-    }
-
-    th {
-      color: var(--muted);
-      font-weight: 500;
-      font-size: 0.78rem;
-    }
-
-    td.num { text-align: right; font-variant-numeric: tabular-nums; }
-
-    .savings-positive { color: var(--success); font-weight: 700; }
-    .savings-negative { color: var(--danger); font-weight: 700; }
-
-    .price-row td:first-child { color: var(--muted); }
-
-    .card-grow {
-      flex: 1;
-      min-height: 0;
-    }
-
-    .table-wrap {
-      flex-shrink: 0;
-    }
-
-    .card-results table,
-    .card-scenarios table {
-      font-size: 0.8rem;
-    }
-
-    .card-results th,
-    .card-results td,
-    .card-scenarios th,
-    .card-scenarios td {
-      padding: 6px 4px;
-    }
-
-    .card-scenarios th {
-      font-size: 0.72rem;
-    }
-
-    #scenarioTable td:first-child {
       font-size: 0.82rem;
     }
 
-    #scenarioTable td.num {
-      font-size: 0.84rem;
+    .unit-cost .lbl { color: var(--muted); }
+    .unit-cost .val { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    /* --- Сценарии --- */
+    .card-scenarios {
+      border-color: rgba(52, 211, 153, 0.2);
     }
+
+    .card-scenarios h2::before {
+      background: var(--success);
+    }
+
+    .scenario-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .scenario-card {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+    }
+
+    .scenario-card.best {
+      border-color: rgba(52, 211, 153, 0.4);
+      background: rgba(52, 211, 153, 0.06);
+    }
+
+    .scenario-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .scenario-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .scenario-row .val {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .scenario-savings {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .scenario-savings .lbl {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .scenario-savings .val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .scenario-savings .val.positive { color: var(--success); }
+    .scenario-savings .val.negative { color: var(--danger); }
 
     @media (max-width: 1100px) {
       html, body { overflow: auto; height: auto; }
-      .page { height: auto; max-height: none; overflow: visible; }
-      .dashboard { grid-template-columns: 1fr 1fr; overflow: visible; }
-      .inputs-card { grid-column: 1 / -1; }
+      .page { height: auto; max-height: none; }
+      .dashboard { grid-template-columns: 1fr; overflow: visible; }
+      .hero-kpi { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <header>
-      <div class="header-main">
+      <div>
         <h1>Калькулятор эффекта ИИ Рекрутер</h1>
-        <div class="disclaimer">Внутренняя модель · не гарантия клиенту · телефония, маркировка, интеграция и НДС не включены</div>
+        <div class="disclaimer">Модель для оценки масштаба · не гарантия · телефония и интеграция не включены</div>
       </div>
       <button class="reset-btn" type="button" id="resetBtn">Сбросить</button>
     </header>
 
     <div class="dashboard">
+      <!-- 1: параметры — уже, второстепенно -->
       <div class="card inputs-card">
-        <h2>Входные параметры</h2>
+        <h2>Параметры расчёта</h2>
         <div class="inputs-grid">
           <div class="section-label">Пакет AI</div>
           <div class="field">
-            <label for="aiMinutes">Пакет минут AI</label>
+            <label for="aiMinutes">Минут AI</label>
             <input type="number" id="aiMinutes" value="200000" min="0" step="1000">
           </div>
           <div class="field">
@@ -371,7 +458,7 @@
             <input type="number" id="aiPrice" value="3600000" min="0" step="1000">
           </div>
           <div class="field span2">
-            <label for="packagePer10k">Звонков на 10 000 минут</label>
+            <label for="packagePer10k">Звонков / 10 000 мин</label>
             <input type="number" id="packagePer10k" value="21260" min="0" step="1">
           </div>
 
@@ -381,115 +468,88 @@
             <input type="number" id="contactRate" value="26.3" min="0" max="100" step="0.1">
           </div>
           <div class="field">
-            <label for="meaningfulRate">Содерж. интервью, %</label>
+            <label for="meaningfulRate">Интервью, %</label>
             <input type="number" id="meaningfulRate" value="50.1" min="0" max="100" step="0.1">
           </div>
           <div class="field span2">
-            <label for="relevanceRate">Подходящий кандидат, %</label>
+            <label for="relevanceRate">Подходящий, %</label>
             <input type="number" id="relevanceRate" value="27.1" min="0" max="100" step="0.1">
           </div>
 
           <div class="section-label">Ручной труд</div>
           <div class="field">
-            <label for="manualAttemptMin">Мин. на попытку</label>
+            <label for="manualAttemptMin">Мин / попытка</label>
             <input type="number" id="manualAttemptMin" value="1" min="0" step="0.1">
           </div>
           <div class="field">
-            <label for="manualInterviewMin">Мин. на интервью</label>
+            <label for="manualInterviewMin">Мин / интервью</label>
             <input type="number" id="manualInterviewMin" value="15" min="0" step="0.1">
           </div>
           <div class="field">
-            <label for="recruiterCost">Зарплата рекрутера, ₽</label>
+            <label for="recruiterCost">Зарплата, ₽</label>
             <input type="number" id="recruiterCost" value="80000" min="0" step="1000">
           </div>
           <div class="field">
-            <label for="workingHours">Раб. часов / мес</label>
+            <label for="workingHours">Часов / мес</label>
             <input type="number" id="workingHours" value="160" min="1" step="1">
           </div>
           <div class="field span2">
-            <label for="aiControlMin">Контроль AI, мин/интервью</label>
+            <label for="aiControlMin">Контроль AI, мин</label>
             <input type="number" id="aiControlMin" value="3" min="0" step="0.1">
           </div>
 
           <div class="section-label">Альтернативы</div>
           <div class="field">
-            <label for="hhPerVacancy">hh.ru, ₽/мин</label>
+            <label for="hhPerVacancy">hh.ru ₽/мин</label>
             <input type="number" id="hhPerVacancy" value="17" min="0" step="1">
           </div>
           <div class="field">
-            <label for="saasPerEmployee">SaaS, ₽/интервью</label>
+            <label for="saasPerEmployee">SaaS ₽/инт.</label>
             <input type="number" id="saasPerEmployee" value="149" min="0" step="1">
           </div>
         </div>
       </div>
 
-      <div class="results-col">
-        <div class="card card-grow card-results">
-          <h2>Результат по воронке</h2>
-          <div class="card-body">
+      <!-- 2: выхлоп и метрики — главный акцент -->
+      <div class="card card-output">
+        <h2>Ваш результат</h2>
+        <div class="card-body">
+          <div class="hero-kpi" id="heroKpi"></div>
+
+          <div>
+            <div class="block-title">Воронка</div>
             <div class="funnel" id="funnel"></div>
-            <div class="metrics" id="keyMetrics"></div>
-            <div class="table-wrap">
-              <table>
-                <tbody id="priceTable"></tbody>
-              </table>
-            </div>
+          </div>
+
+          <div>
+            <div class="block-title">Стоимость единицы</div>
+            <div class="unit-costs" id="unitCosts"></div>
           </div>
         </div>
       </div>
 
+      <!-- 3: сравнение — акцент на экономии -->
       <div class="card card-scenarios">
-        <h2>Сравнение сценариев</h2>
-        <div class="card-body">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Сценарий</th>
-                  <th style="text-align:right">Текущие</th>
-                  <th style="text-align:right">AI</th>
-                  <th style="text-align:right">Экономия</th>
-                </tr>
-              </thead>
-              <tbody id="scenarioTable"></tbody>
-            </table>
-          </div>
-        </div>
+        <h2>Экономия vs альтернативы</h2>
+        <div class="scenario-list" id="scenarioList"></div>
       </div>
     </div>
   </div>
 
   <script>
     const DEFAULTS = {
-      aiMinutes: 200000,
-      aiPrice: 3600000,
-      packagePer10k: 21260,
-      contactRate: 26.3,
-      meaningfulRate: 50.1,
-      relevanceRate: 27.1,
-      manualAttemptMin: 1,
-      manualInterviewMin: 15,
-      recruiterCost: 80000,
-      workingHours: 160,
-      aiControlMin: 3,
-      hhPerVacancy: 17,
-      saasPerEmployee: 149
+      aiMinutes: 200000, aiPrice: 3600000, packagePer10k: 21260,
+      contactRate: 26.3, meaningfulRate: 50.1, relevanceRate: 27.1,
+      manualAttemptMin: 1, manualInterviewMin: 15, recruiterCost: 80000,
+      workingHours: 160, aiControlMin: 3, hhPerVacancy: 17, saasPerEmployee: 149
     };
 
     const fieldIds = {
-      aiMinutes: 'aiMinutes',
-      aiPrice: 'aiPrice',
-      packagePer10k: 'packagePer10k',
-      contactRate: 'contactRate',
-      meaningfulRate: 'meaningfulRate',
-      relevanceRate: 'relevanceRate',
-      manualAttemptMin: 'manualAttemptMin',
-      manualInterviewMin: 'manualInterviewMin',
-      recruiterCost: 'recruiterCost',
-      workingHours: 'workingHours',
-      aiControlMin: 'aiControlMin',
-      hhPerVacancy: 'hhPerVacancy',
-      saasPerEmployee: 'saasPerEmployee'
+      aiMinutes: 'aiMinutes', aiPrice: 'aiPrice', packagePer10k: 'packagePer10k',
+      contactRate: 'contactRate', meaningfulRate: 'meaningfulRate', relevanceRate: 'relevanceRate',
+      manualAttemptMin: 'manualAttemptMin', manualInterviewMin: 'manualInterviewMin',
+      recruiterCost: 'recruiterCost', workingHours: 'workingHours', aiControlMin: 'aiControlMin',
+      hhPerVacancy: 'hhPerVacancy', saasPerEmployee: 'saasPerEmployee'
     };
 
     function getValues() {
@@ -500,25 +560,18 @@
       return v;
     }
 
-    function fmt(n, decimals = 0) {
+    function fmt(n, d = 0) {
       if (!isFinite(n)) return '—';
-      return n.toLocaleString('ru-RU', {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals
-      });
+      return n.toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d });
     }
 
-    function fmtMoney(n) {
-      return fmt(Math.round(n)) + ' ₽';
-    }
+    function fmtMoney(n) { return fmt(Math.round(n)) + ' ₽'; }
 
     function calculate(v) {
-      const packageCapacity = Math.round(v.packagePer10k * v.aiMinutes / 10000);
-      const actualAttempts = packageCapacity;
+      const actualAttempts = Math.round(v.packagePer10k * v.aiMinutes / 10000);
       const contacts = actualAttempts * (v.contactRate / 100);
       const meaningfulInterviews = contacts * (v.meaningfulRate / 100);
       const relevantCandidates = meaningfulInterviews * (v.relevanceRate / 100);
-
       const manualMinutes = actualAttempts * v.manualAttemptMin + meaningfulInterviews * v.manualInterviewMin;
       const manualHours = manualMinutes / 60;
       const aiControlHours = meaningfulInterviews * v.aiControlMin / 60;
@@ -526,28 +579,46 @@
       const savedCost = netSavedHours * v.recruiterCost / v.workingHours;
       const netEffect = savedCost - v.aiPrice;
       const fte = netSavedHours / v.workingHours;
-
-      const pricePerAttempt = v.aiPrice / actualAttempts * 1000;
-      const pricePerContact = contacts > 0 ? v.aiPrice / contacts : 0;
-      const pricePerInterview = meaningfulInterviews > 0 ? v.aiPrice / meaningfulInterviews : 0;
-      const pricePerCandidate = relevantCandidates > 0 ? v.aiPrice / relevantCandidates : 0;
-
-      const hhCost = manualMinutes * v.hhPerVacancy;
-      const saasCost = meaningfulInterviews * v.saasPerEmployee;
-
       return {
         actualAttempts, contacts, meaningfulInterviews, relevantCandidates,
         manualHours, netSavedHours, savedCost, netEffect, fte,
-        pricePerAttempt, pricePerContact, pricePerInterview, pricePerCandidate,
-        hhCost, saasCost
+        pricePerAttempt: v.aiPrice / actualAttempts * 1000,
+        pricePerContact: contacts > 0 ? v.aiPrice / contacts : 0,
+        pricePerInterview: meaningfulInterviews > 0 ? v.aiPrice / meaningfulInterviews : 0,
+        pricePerCandidate: relevantCandidates > 0 ? v.aiPrice / relevantCandidates : 0,
+        hhCost: manualMinutes * v.hhPerVacancy,
+        saasCost: meaningfulInterviews * v.saasPerEmployee
       };
+    }
+
+    function renderHero(r) {
+      const neg = r.netEffect < 0 ? ' negative' : '';
+      document.getElementById('heroKpi').innerHTML = `
+        <div class="hero-kpi-main">
+          <div class="kpi-label">Чистый эффект</div>
+          <div class="kpi-value${neg}">${fmtMoney(r.netEffect)}</div>
+          <div class="kpi-sub">экономия минус стоимость AI</div>
+        </div>
+        <div class="hero-kpi-item">
+          <div class="kpi-value">${fmt(r.netSavedHours, 0)}</div>
+          <div class="kpi-label">снятых HR-часов</div>
+        </div>
+        <div class="hero-kpi-item">
+          <div class="kpi-value">${fmt(r.relevantCandidates)}</div>
+          <div class="kpi-label">подходящих кандидатов</div>
+        </div>
+        <div class="hero-kpi-item">
+          <div class="kpi-value">${fmt(r.fte, 1)}</div>
+          <div class="kpi-label">экв. рекрутеров (FTE)</div>
+        </div>
+      `;
     }
 
     function renderFunnel(r) {
       const steps = [
         { label: 'Тарифицируемые звонки', value: r.actualAttempts },
         { label: 'Контакты', value: r.contacts },
-        { label: 'Содерж. интервью', value: r.meaningfulInterviews },
+        { label: 'Содержательные интервью', value: r.meaningfulInterviews },
         { label: 'Подходящие кандидаты', value: r.relevantCandidates }
       ];
       const max = r.actualAttempts || 1;
@@ -560,24 +631,12 @@
       `).join('');
     }
 
-    function renderMetrics(r, v) {
-      const netClass = r.netEffect >= 0 ? '' : 'negative';
-      document.getElementById('keyMetrics').innerHTML = `
-        <div class="metric"><div class="num">${fmt(r.manualHours, 1)}</div><div class="lbl">Ручных HR-часов</div></div>
-        <div class="metric"><div class="num">${fmt(r.netSavedHours, 1)}</div><div class="lbl">Снятые HR-часы</div></div>
-        <div class="metric"><div class="num">${fmt(r.fte, 1)}</div><div class="lbl">FTE рекрутеров</div></div>
-        <div class="metric"><div class="num">${fmtMoney(r.savedCost)}</div><div class="lbl">Стоимость снятых часов</div></div>
-        <div class="metric"><div class="num ${netClass}">${fmtMoney(r.netEffect)}</div><div class="lbl">Чистый эффект</div></div>
-        <div class="metric"><div class="num">${fmt(v.aiPrice / v.aiMinutes, 1)} ₽</div><div class="lbl">Цена минуты AI</div></div>
-      `;
-    }
-
-    function renderPriceTable(r) {
-      document.getElementById('priceTable').innerHTML = `
-        <tr class="price-row"><td>Цена AI / 1000 звонков</td><td class="num">${fmt(r.pricePerAttempt, 0)} ₽</td></tr>
-        <tr class="price-row"><td>Цена AI / контакт</td><td class="num">${fmt(r.pricePerContact, 0)} ₽</td></tr>
-        <tr class="price-row"><td>Цена AI / интервью</td><td class="num">${fmt(r.pricePerInterview, 0)} ₽</td></tr>
-        <tr class="price-row"><td>Цена AI / кандидат</td><td class="num">${fmt(r.pricePerCandidate, 0)} ₽</td></tr>
+    function renderUnitCosts(r) {
+      document.getElementById('unitCosts').innerHTML = `
+        <div class="unit-cost"><span class="lbl">За 1000 звонков</span><span class="val">${fmt(r.pricePerAttempt, 0)} ₽</span></div>
+        <div class="unit-cost"><span class="lbl">За контакт</span><span class="val">${fmt(r.pricePerContact, 0)} ₽</span></div>
+        <div class="unit-cost"><span class="lbl">За интервью</span><span class="val">${fmt(r.pricePerInterview, 0)} ₽</span></div>
+        <div class="unit-cost"><span class="lbl">За кандидата</span><span class="val">${fmt(r.pricePerCandidate, 0)} ₽</span></div>
       `;
     }
 
@@ -587,24 +646,30 @@
         { name: 'hh.ru', current: r.hhCost, ai: v.aiPrice },
         { name: 'AI-рекрутмент SaaS', current: r.saasCost, ai: v.aiPrice }
       ];
-      document.getElementById('scenarioTable').innerHTML = scenarios.map(s => {
+      const maxSaving = Math.max(...scenarios.map(s => s.current - s.ai));
+      document.getElementById('scenarioList').innerHTML = scenarios.map(s => {
         const savings = s.current - s.ai;
-        const cls = savings >= 0 ? 'savings-positive' : 'savings-negative';
-        return `<tr>
-          <td>${s.name}</td>
-          <td class="num">${fmtMoney(s.current)}</td>
-          <td class="num">${fmtMoney(s.ai)}</td>
-          <td class="num ${cls}">${fmtMoney(savings)}</td>
-        </tr>`;
+        const cls = savings >= 0 ? 'positive' : 'negative';
+        const best = savings === maxSaving && savings > 0 ? ' best' : '';
+        return `
+          <div class="scenario-card${best}">
+            <div class="scenario-name">${s.name}</div>
+            <div class="scenario-row"><span>Сейчас</span><span class="val">${fmtMoney(s.current)}</span></div>
+            <div class="scenario-row"><span>С AI Recruiter</span><span class="val">${fmtMoney(s.ai)}</span></div>
+            <div class="scenario-savings">
+              <span class="lbl">Экономия</span>
+              <span class="val ${cls}">${fmtMoney(savings)}</span>
+            </div>
+          </div>`;
       }).join('');
     }
 
     function recalculate() {
       const v = getValues();
       const r = calculate(v);
+      renderHero(r);
       renderFunnel(r);
-      renderMetrics(r, v);
-      renderPriceTable(r);
+      renderUnitCosts(r);
       renderScenarios(r, v);
     }
 
