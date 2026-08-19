@@ -192,6 +192,31 @@
       background: var(--surface-3);
     }
 
+    .field select {
+      width: 100%;
+      padding: 6px 8px;
+      background: var(--surface-2);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .field select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .field-output {
+      padding: 6px 8px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
     .field.span2 { grid-column: 1 / -1; }
 
     /* --- Результаты: акцент --- */
@@ -449,31 +474,49 @@
         <h2>Параметры расчёта</h2>
         <div class="inputs-grid">
           <div class="section-label">Пакет AI</div>
+          <div class="field span2">
+            <label for="region">Регион тарифа</label>
+            <select id="region">
+              <option value="intl_ru">Ин.яз + РУ</option>
+              <option value="sng">СНГ</option>
+            </select>
+          </div>
           <div class="field">
-            <label for="aiMinutes">Минут AI</label>
+            <label for="aiMinutes">Тарифицируемые минуты</label>
             <input type="number" id="aiMinutes" value="200000" min="0" step="1000">
           </div>
           <div class="field">
-            <label for="aiPrice">Цена AI, ₽</label>
-            <input type="number" id="aiPrice" value="3600000" min="0" step="1000">
+            <label>Цена AI, ₽</label>
+            <div class="field-output" id="aiPriceOut">—</div>
           </div>
-          <div class="field span2">
-            <label for="packagePer10k">Звонков / 10 000 мин</label>
+          <div class="field">
+            <label>Цена минуты AI, ₽</label>
+            <div class="field-output" id="aiMinutePriceOut">—</div>
+          </div>
+          <div class="field">
+            <label for="packagePer10k">Попыток / 10 000 мин</label>
             <input type="number" id="packagePer10k" value="21260" min="0" step="1">
           </div>
 
           <div class="section-label">Воронка</div>
-          <div class="field">
-            <label for="contactRate">Контакт, %</label>
-            <input type="number" id="contactRate" value="26.3" min="0" max="100" step="0.1">
+          <div class="field span2">
+            <label for="conversionScenario">Сценарий конверсий</label>
+            <select id="conversionScenario">
+              <option value="standard">Стандартный</option>
+              <option value="pessimistic">Пессимистичный</option>
+            </select>
           </div>
           <div class="field">
-            <label for="meaningfulRate">Интервью, %</label>
-            <input type="number" id="meaningfulRate" value="50.1" min="0" max="100" step="0.1">
+            <label>Контакт</label>
+            <div class="field-output" id="contactRateOut">—</div>
+          </div>
+          <div class="field">
+            <label>Интервью</label>
+            <div class="field-output" id="meaningfulRateOut">—</div>
           </div>
           <div class="field span2">
-            <label for="relevanceRate">Подходящий, %</label>
-            <input type="number" id="relevanceRate" value="27.1" min="0" max="100" step="0.1">
+            <label>Релевантный</label>
+            <div class="field-output" id="relevanceRateOut">—</div>
           </div>
 
           <div class="section-label">Ручной труд</div>
@@ -500,7 +543,7 @@
 
           <div class="section-label">Альтернативы</div>
           <div class="field">
-            <label for="hhPerVacancy">hh.ru ₽/мин</label>
+            <label for="hhPerVacancy">КЦ, ₽/мин</label>
             <input type="number" id="hhPerVacancy" value="17" min="0" step="1">
           </div>
           <div class="field">
@@ -537,26 +580,79 @@
   </div>
 
   <script>
+    // --- Данные из Excel: листы «Пакеты» и «Конверсии» ---
+    const TARIFF_FIXED = { intl_ru: 300000, sng: 320000 };
+    const TARIFF_TIERS = [
+      { threshold: 10001, intl_ru: 29, sng: 31 },
+      { threshold: 30001, intl_ru: 26, sng: 28 },
+      { threshold: 50001, intl_ru: 23, sng: 25 },
+      { threshold: 100001, intl_ru: 21, sng: 23 },
+      { threshold: 150001, intl_ru: 18, sng: 20 },
+      { threshold: 200001, intl_ru: 15, sng: 15 }
+    ];
+
+    const CONVERSIONS = {
+      standard: { contact: 0.263, interview: 0.501, relevant: 0.271 },
+      pessimistic: { contact: 0.18, interview: 0.372, relevant: 0.25 }
+    };
+
     const DEFAULTS = {
-      aiMinutes: 200000, aiPrice: 3600000, packagePer10k: 21260,
-      contactRate: 26.3, meaningfulRate: 50.1, relevanceRate: 27.1,
-      manualAttemptMin: 1, manualInterviewMin: 15, recruiterCost: 80000,
-      workingHours: 160, aiControlMin: 3, hhPerVacancy: 17, saasPerEmployee: 149
+      region: 'intl_ru',
+      aiMinutes: 200000,
+      packagePer10k: 21260,
+      conversionScenario: 'standard',
+      manualAttemptMin: 1,
+      manualInterviewMin: 15,
+      recruiterCost: 80000,
+      workingHours: 160,
+      aiControlMin: 3,
+      hhPerVacancy: 17,
+      saasPerEmployee: 149
     };
 
     const fieldIds = {
-      aiMinutes: 'aiMinutes', aiPrice: 'aiPrice', packagePer10k: 'packagePer10k',
-      contactRate: 'contactRate', meaningfulRate: 'meaningfulRate', relevanceRate: 'relevanceRate',
-      manualAttemptMin: 'manualAttemptMin', manualInterviewMin: 'manualInterviewMin',
-      recruiterCost: 'recruiterCost', workingHours: 'workingHours', aiControlMin: 'aiControlMin',
-      hhPerVacancy: 'hhPerVacancy', saasPerEmployee: 'saasPerEmployee'
+      aiMinutes: 'aiMinutes',
+      packagePer10k: 'packagePer10k',
+      manualAttemptMin: 'manualAttemptMin',
+      manualInterviewMin: 'manualInterviewMin',
+      recruiterCost: 'recruiterCost',
+      workingHours: 'workingHours',
+      aiControlMin: 'aiControlMin',
+      hhPerVacancy: 'hhPerVacancy',
+      saasPerEmployee: 'saasPerEmployee'
     };
 
+    // Excel: MATCH(minutes, thresholds, 1) — наибольший порог <= minutes
+    function lookupTariffPerMinute(minutes, region) {
+      let tier = TARIFF_TIERS[0];
+      for (const t of TARIFF_TIERS) {
+        if (minutes >= t.threshold) tier = t;
+        else break;
+      }
+      return tier[region];
+    }
+
+    // Excel B8: IF(minutes<=10000, fixed, minutes * tier_price)
+    function calcAiPrice(minutes, region) {
+      if (minutes <= 0) return 0;
+      if (minutes <= 10000) return TARIFF_FIXED[region];
+      return minutes * lookupTariffPerMinute(minutes, region);
+    }
+
     function getValues() {
-      const v = {};
+      const v = {
+        region: document.getElementById('region').value,
+        conversionScenario: document.getElementById('conversionScenario').value
+      };
       for (const [key, id] of Object.entries(fieldIds)) {
         v[key] = parseFloat(document.getElementById(id).value) || 0;
       }
+      const conv = CONVERSIONS[v.conversionScenario] || CONVERSIONS.standard;
+      v.contactRate = conv.contact;
+      v.meaningfulRate = conv.interview;
+      v.relevanceRate = conv.relevant;
+      v.aiPrice = calcAiPrice(v.aiMinutes, v.region);
+      v.aiPricePerMinute = v.aiMinutes > 0 ? v.aiPrice / v.aiMinutes : 0;
       return v;
     }
 
@@ -566,29 +662,41 @@
     }
 
     function fmtMoney(n) { return fmt(Math.round(n)) + ' ₽'; }
+    function fmtPct(rate) { return fmt(rate * 100, 1) + '%'; }
 
     function calculate(v) {
+      // B24/B25 = ROUND(B14 * B7 / 10000, 0)
       const actualAttempts = Math.round(v.packagePer10k * v.aiMinutes / 10000);
-      const contacts = actualAttempts * (v.contactRate / 100);
-      const meaningfulInterviews = contacts * (v.meaningfulRate / 100);
-      const relevantCandidates = meaningfulInterviews * (v.relevanceRate / 100);
+      const contacts = actualAttempts * v.contactRate;
+      const meaningfulInterviews = contacts * v.meaningfulRate;
+      const relevantCandidates = meaningfulInterviews * v.relevanceRate;
+
       const manualMinutes = actualAttempts * v.manualAttemptMin + meaningfulInterviews * v.manualInterviewMin;
       const manualHours = manualMinutes / 60;
       const aiControlHours = meaningfulInterviews * v.aiControlMin / 60;
-      const netSavedHours = manualHours - aiControlHours;
+      const netSavedHours = Math.max(0, manualHours - aiControlHours);
       const savedCost = netSavedHours * v.recruiterCost / v.workingHours;
       const netEffect = savedCost - v.aiPrice;
       const fte = netSavedHours / v.workingHours;
+
       return {
         actualAttempts, contacts, meaningfulInterviews, relevantCandidates,
         manualHours, netSavedHours, savedCost, netEffect, fte,
-        pricePerAttempt: v.aiPrice / actualAttempts * 1000,
+        pricePerAttempt: actualAttempts > 0 ? v.aiPrice / actualAttempts * 1000 : 0,
         pricePerContact: contacts > 0 ? v.aiPrice / contacts : 0,
         pricePerInterview: meaningfulInterviews > 0 ? v.aiPrice / meaningfulInterviews : 0,
         pricePerCandidate: relevantCandidates > 0 ? v.aiPrice / relevantCandidates : 0,
         hhCost: manualMinutes * v.hhPerVacancy,
         saasCost: meaningfulInterviews * v.saasPerEmployee
       };
+    }
+
+    function renderCalculatedFields(v) {
+      document.getElementById('aiPriceOut').textContent = fmtMoney(v.aiPrice);
+      document.getElementById('aiMinutePriceOut').textContent = fmt(v.aiPricePerMinute, 1) + ' ₽';
+      document.getElementById('contactRateOut').textContent = fmtPct(v.contactRate);
+      document.getElementById('meaningfulRateOut').textContent = fmtPct(v.meaningfulRate);
+      document.getElementById('relevanceRateOut').textContent = fmtPct(v.relevanceRate);
     }
 
     function renderHero(r) {
@@ -642,9 +750,9 @@
 
     function renderScenarios(r, v) {
       const scenarios = [
-        { name: 'Один рекрутер', current: r.savedCost, ai: v.aiPrice },
-        { name: 'hh.ru', current: r.hhCost, ai: v.aiPrice },
-        { name: 'AI-рекрутмент SaaS', current: r.saasCost, ai: v.aiPrice }
+        { name: 'Штатный HR', current: r.savedCost, ai: v.aiPrice },
+        { name: 'КЦ по минутам', current: r.hhCost, ai: v.aiPrice },
+        { name: 'AI-интервьюер SaaS', current: r.saasCost, ai: v.aiPrice }
       ];
       const maxSaving = Math.max(...scenarios.map(s => s.current - s.ai));
       document.getElementById('scenarioList').innerHTML = scenarios.map(s => {
@@ -667,6 +775,7 @@
     function recalculate() {
       const v = getValues();
       const r = calculate(v);
+      renderCalculatedFields(v);
       renderHero(r);
       renderFunnel(r);
       renderUnitCosts(r);
@@ -676,8 +785,13 @@
     Object.values(fieldIds).forEach(id => {
       document.getElementById(id).addEventListener('input', recalculate);
     });
+    ['region', 'conversionScenario'].forEach(id => {
+      document.getElementById(id).addEventListener('change', recalculate);
+    });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('region').value = DEFAULTS.region;
+      document.getElementById('conversionScenario').value = DEFAULTS.conversionScenario;
       for (const [key, id] of Object.entries(fieldIds)) {
         document.getElementById(id).value = DEFAULTS[key];
       }
