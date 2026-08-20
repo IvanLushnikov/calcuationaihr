@@ -629,13 +629,20 @@
           </div>
 
           <div class="section-label">Сравнение конкурентов (CPA)</div>
+          <div class="field span2">
+            <label for="cpaCompareScenario">Сценарий сравнения</label>
+            <select id="cpaCompareScenario">
+              <option value="market">Рынок (КЦ 8% / бот 2% / ИИ 5%)</option>
+              <option value="our_base">Наша база (Excel, холодная)</option>
+            </select>
+          </div>
           <div class="field">
-            <label for="marketContactDurationMin">Длительность контакта, мин</label>
+            <label for="marketContactDurationMin">Средний разговор, мин</label>
             <input type="number" id="marketContactDurationMin" value="10" min="0" step="0.1">
           </div>
           <div class="field">
-            <label for="marketContactsVolume">Объём контактов</label>
-            <input type="number" id="marketContactsVolume" value="10000" min="0" step="1">
+            <label for="marketShortCallPct">Короткие &lt;10 сек, % контактов</label>
+            <input type="number" id="marketShortCallPct" value="15" min="0" max="100" step="1">
           </div>
 
           <div class="field">
@@ -648,17 +655,18 @@
           </div>
 
           <div class="field">
-            <label for="aiConvPct">ИИ рекрутер: конверсия, %</label>
+            <label for="aiConvPct" id="aiConvPctLabel">ИИ рекрутер: конверсия, %</label>
             <input type="number" id="aiConvPct" value="5" min="0" step="0.1">
+            <div class="field-output" id="aiConvPctOut" hidden>—</div>
           </div>
           <div class="field">
             <label for="botCostPerMin">Сценарный бот: ₽/мин</label>
             <input type="number" id="botCostPerMin" value="3" min="0" step="0.1">
           </div>
 
-          <div class="field">
-            <label for="aiCostPerMin">ИИ рекрутер: ₽/мин</label>
-            <input type="number" id="aiCostPerMin" value="8" min="0" step="0.1">
+          <div class="field span2">
+            <label>ИИ: ₽/мин по тарифу</label>
+            <div class="field-output" id="aiTariffPerMinOut">—</div>
           </div>
 
           <div class="field span2">
@@ -726,15 +734,17 @@
       hhPerVacancy: 17,
       saasPerEmployee: 149,
 
+      cpaCompareScenario: 'market',
       marketContactDurationMin: 10,
-      marketContactsVolume: 10000,
+      marketShortCallPct: 15,
       ccConvPct: 8,
       botConvPct: 2,
       aiConvPct: 5,
       botCostPerMin: 3,
-      aiCostPerMin: 8,
       dealValuePerConv: 0
     };
+
+    const MARKET_CONV = { cc: 8, bot: 2, ai: 5 };
 
     const fieldIds = {
       aiMinutes: 'aiMinutes',
@@ -748,12 +758,11 @@
       saasPerEmployee: 'saasPerEmployee',
 
       marketContactDurationMin: 'marketContactDurationMin',
-      marketContactsVolume: 'marketContactsVolume',
+      marketShortCallPct: 'marketShortCallPct',
       ccConvPct: 'ccConvPct',
       botConvPct: 'botConvPct',
       aiConvPct: 'aiConvPct',
       botCostPerMin: 'botCostPerMin',
-      aiCostPerMin: 'aiCostPerMin',
       dealValuePerConv: 'dealValuePerConv'
     };
 
@@ -777,7 +786,8 @@
     function getValues() {
       const v = {
         region: document.getElementById('region').value,
-        conversionScenario: document.getElementById('conversionScenario').value
+        conversionScenario: document.getElementById('conversionScenario').value,
+        cpaCompareScenario: document.getElementById('cpaCompareScenario').value
       };
       for (const [key, id] of Object.entries(fieldIds)) {
         v[key] = parseFloat(document.getElementById(id).value) || 0;
@@ -786,9 +796,37 @@
       v.contactRate = conv.contact;
       v.meaningfulRate = conv.interview;
       v.relevanceRate = conv.relevant;
+      // Контакт → релевантный (холодная база Excel)
+      v.aiConvOurBasePct = v.meaningfulRate * v.relevanceRate * 100;
+      if (v.cpaCompareScenario === 'our_base') {
+        v.aiConvPct = v.aiConvOurBasePct;
+      }
       v.aiPrice = calcAiPrice(v.aiMinutes, v.region);
       v.aiPricePerMinute = v.aiMinutes > 0 ? v.aiPrice / v.aiMinutes : 0;
       return v;
+    }
+
+    function syncCpaScenarioUi(v) {
+      const isOurBase = v.cpaCompareScenario === 'our_base';
+      const input = document.getElementById('aiConvPct');
+      const out = document.getElementById('aiConvPctOut');
+      const label = document.getElementById('aiConvPctLabel');
+      input.hidden = isOurBase;
+      out.hidden = !isOurBase;
+      if (isOurBase) {
+        label.textContent = 'ИИ: контакт → релевантный (Excel), %';
+        out.textContent = fmt(v.aiConvOurBasePct, 1) + '%';
+      } else {
+        label.textContent = 'ИИ рекрутер: конверсия, %';
+      }
+    }
+
+    function applyCpaScenarioDefaults(scenario) {
+      if (scenario === 'market') {
+        document.getElementById('ccConvPct').value = MARKET_CONV.cc;
+        document.getElementById('botConvPct').value = MARKET_CONV.bot;
+        document.getElementById('aiConvPct').value = MARKET_CONV.ai;
+      }
     }
 
     function fmt(n, d = 0) {
@@ -829,6 +867,8 @@
     function renderCalculatedFields(v) {
       document.getElementById('aiPriceOut').textContent = fmtMoney(v.aiPrice);
       document.getElementById('aiMinutePriceOut').textContent = fmt(v.aiPricePerMinute, 1) + ' ₽';
+      const aiTariffOut = document.getElementById('aiTariffPerMinOut');
+      if (aiTariffOut) aiTariffOut.textContent = fmt(v.aiPricePerMinute, 1) + ' ₽';
       document.getElementById('contactRateOut').textContent = fmtPct(v.contactRate);
       document.getElementById('meaningfulRateOut').textContent = fmtPct(v.meaningfulRate);
       document.getElementById('relevanceRateOut').textContent = fmtPct(v.relevanceRate);
@@ -883,24 +923,67 @@
       `;
     }
 
-    function calculateMarket(v) {
+    function calculateMarket(v, r) {
       const duration = Math.max(0, v.marketContactDurationMin);
-      const contacts = Math.max(0, v.marketContactsVolume);
+      const shortShare = Math.min(1, Math.max(0, v.marketShortCallPct / 100));
       const dealValue = Math.max(0, v.dealValuePerConv);
+      const isOurBase = v.cpaCompareScenario === 'our_base';
 
-      function mkChannel(convPct, costPerMin) {
+      const attempts = r.actualAttempts;
+      const contacts = r.contacts;
+      const noAnswers = Math.max(0, attempts - contacts);
+
+      function mkPaidChannel(convPct, costPerMin, billingNote) {
         const conv = convPct / 100;
-        const costPerContact = costPerMin * duration;
+        const billableMinutes = contacts * duration;
+        const totalCost = billableMinutes * costPerMin;
         const conversions = contacts * conv;
-        const cpa = conv > 0 ? costPerContact / conv : Infinity;
-        const totalCost = contacts * costPerContact;
+        const cpa = conversions > 0 ? totalCost / conversions : Infinity;
+        const costPerContact = contacts > 0 ? totalCost / contacts : 0;
         const profit = dealValue > 0 ? (conversions * dealValue - totalCost) : null;
-        return { conv, conversions, costPerContact, cpa, totalCost, profit };
+        return {
+          conv, conversions, billableMinutes, costPerMin, costPerContact, cpa, totalCost, profit, billingNote
+        };
       }
 
-      const cc = mkChannel(v.ccConvPct, v.hhPerVacancy);
-      const bot = mkChannel(v.botConvPct, v.botCostPerMin);
-      const ai = mkChannel(v.aiConvPct, v.aiCostPerMin);
+      const aiBillableContacts = contacts * (1 - shortShare);
+      const aiBillableMinutes = aiBillableContacts * duration;
+      // Наша база: берём релевантных из Excel-воронки; рынок: % от контактов
+      const aiConversions = isOurBase
+        ? r.relevantCandidates
+        : contacts * (v.aiConvPct / 100);
+      const aiConv = contacts > 0 ? aiConversions / contacts : 0;
+      const aiTotalCost = v.aiPrice;
+      const aiCpa = aiConversions > 0 ? aiTotalCost / aiConversions : Infinity;
+      const aiCostPerContact = contacts > 0 ? aiTotalCost / contacts : 0;
+      const aiProfit = dealValue > 0 ? (aiConversions * dealValue - aiTotalCost) : null;
+
+      const ai = {
+        conv: aiConv,
+        conversions: aiConversions,
+        billableMinutes: aiBillableMinutes,
+        costPerMin: v.aiPricePerMinute,
+        costPerContact: aiCostPerContact,
+        cpa: aiCpa,
+        totalCost: aiTotalCost,
+        profit: aiProfit,
+        billingNote: 'Недозвоны и разговоры &lt;10 сек не тарифицируются',
+        noAnswers,
+        shortShare,
+        shortContacts: contacts * shortShare,
+        convLabel: isOurBase ? 'контакт → релевантный (Excel)' : 'гипотеза рынка'
+      };
+
+      const cc = mkPaidChannel(
+        v.ccConvPct,
+        v.hhPerVacancy,
+        '₽/мин за каждый состоявшийся разговор'
+      );
+      const bot = mkPaidChannel(
+        v.botConvPct,
+        v.botCostPerMin,
+        '₽/мин за каждый состоявшийся разговор'
+      );
 
       const channels = { cc, bot, ai };
       const bestKey = ['cc', 'bot', 'ai'].reduce((best, key) => {
@@ -913,10 +996,10 @@
       const aiDeltaCpaVsCc = isFinite(ai.cpa) && isFinite(cc.cpa) ? (ai.cpa - cc.cpa) : NaN;
       const aiDeltaCpaVsBot = isFinite(ai.cpa) && isFinite(bot.cpa) ? (ai.cpa - bot.cpa) : NaN;
 
-      return { cc, bot, ai, bestKey, aiDeltaCpaVsCc, aiDeltaCpaVsBot };
+      return { attempts, contacts, noAnswers, cc, bot, ai, bestKey, aiDeltaCpaVsCc, aiDeltaCpaVsBot };
     }
 
-    function renderMarketCompare(m) {
+    function renderMarketCompare(m, v) {
       const names = { cc: 'КЦ', bot: 'Сценарный бот', ai: 'ИИ рекрутер' };
       const bestName = m.bestKey ? names[m.bestKey] : '—';
 
@@ -924,36 +1007,39 @@
         return 'market-card' + (m.bestKey === key ? ' best' : '');
       }
 
-      function metricRow(lbl, val, suffix = '') {
+      function metricRow(lbl, val) {
         return `
           <div class="market-metric">
             <span>${lbl}</span>
-            <span class="val">${val}${suffix}</span>
+            <span class="val">${val}</span>
           </div>
         `;
-      }
-
-      function signMoney(delta) {
-        if (!isFinite(delta)) return '—';
-        const s = delta > 0 ? '+' : '';
-        return s + fmtMoney(delta);
       }
 
       const cc = m.cc, bot = m.bot, ai = m.ai;
 
       const profitLine = (ai.profit !== null)
-        ? `Прибыль на объёме: <strong>${fmtMoney(ai.profit)}</strong>`
-        : `Профит не посчитан (поставь “Ценность конверсии” > 0)`;
+        ? `Прибыль ИИ на объёме: <strong>${fmtMoney(ai.profit)}</strong>`
+        : '';
+
+      const scenarioTitle = v.cpaCompareScenario === 'our_base'
+        ? 'Наша база (Excel, холодная)'
+        : 'Рынок (КЦ 8% / бот 2% / ИИ 5%)';
+      const scenarioNote = v.cpaCompareScenario === 'our_base'
+        ? `ИИ: <strong>${fmtPct(ai.conv)}</strong> контакт→релевантный из Excel. КЦ/бот — рыночные гипотезы (их нет на нашей холодной базе).`
+        : 'Все три конверсии — рыночные гипотезы для сравнения каналов.';
 
       document.getElementById('marketCompare').innerHTML = `
-        <div class="block-title">Конкуренты по CPA</div>
+        <div class="block-title">Конкуренты по CPA · ${scenarioTitle}</div>
         <div class="market-summary">
+          ${scenarioNote}
+          Один и тот же объём: <strong>${fmt(m.attempts)}</strong> попыток → <strong>${fmt(m.contacts, 0)}</strong> контактов
+          (<strong>${fmt(m.noAnswers, 0)}</strong> недозвонов бесплатно для ИИ).
           Лучший по CPA: <strong>${bestName}</strong>.
-          AI vs КЦ: <strong>${isFinite(m.aiDeltaCpaVsCc) ? (m.aiDeltaCpaVsCc > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsCc) : '—'}</strong>
-          за конверсию (AI дороже/дешевле).
-          AI vs бот: <strong>${isFinite(m.aiDeltaCpaVsBot) ? (m.aiDeltaCpaVsBot > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsBot) : '—'}</strong>
-          за конверсию.
-          <div style="margin-top:6px;">${profitLine}</div>
+          ИИ vs КЦ: <strong>${isFinite(m.aiDeltaCpaVsCc) ? (m.aiDeltaCpaVsCc > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsCc) : '—'}</strong>
+          за конверсию · ИИ vs бот:
+          <strong>${isFinite(m.aiDeltaCpaVsBot) ? (m.aiDeltaCpaVsBot > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsBot) : '—'}</strong>.
+          ${profitLine ? `<div style="margin-top:6px;">${profitLine}</div>` : ''}
         </div>
 
         <div class="market-rows">
@@ -962,10 +1048,12 @@
               <div class="name">${names.cc}</div>
               <div class="badge">лучший</div>
             </div>
+            <div class="market-metric"><span>${cc.billingNote}</span></div>
+            ${metricRow('Тарифицируемые минуты', fmt(cc.billableMinutes, 0))}
             ${metricRow('Стоимость контакта', fmtMoney(cc.costPerContact))}
-            ${metricRow('CPA (руб/конверсия)', fmtMoney(cc.cpa))}
-            ${metricRow('Конверсии на объём', fmt(cc.conversions, 0))}
-            ${metricRow('Затраты на объём', fmtMoney(cc.totalCost))}
+            ${metricRow('CPA', fmtMoney(cc.cpa))}
+            ${metricRow('Конверсии', fmt(cc.conversions, 0))}
+            ${metricRow('Затраты', fmtMoney(cc.totalCost))}
           </div>
 
           <div class="${clsFor('bot')}">
@@ -973,10 +1061,12 @@
               <div class="name">${names.bot}</div>
               <div class="badge">лучший</div>
             </div>
+            <div class="market-metric"><span>${bot.billingNote}</span></div>
+            ${metricRow('Тарифицируемые минуты', fmt(bot.billableMinutes, 0))}
             ${metricRow('Стоимость контакта', fmtMoney(bot.costPerContact))}
-            ${metricRow('CPA (руб/конверсия)', fmtMoney(bot.cpa))}
-            ${metricRow('Конверсии на объём', fmt(bot.conversions, 0))}
-            ${metricRow('Затраты на объём', fmtMoney(bot.totalCost))}
+            ${metricRow('CPA', fmtMoney(bot.cpa))}
+            ${metricRow('Конверсии', fmt(bot.conversions, 0))}
+            ${metricRow('Затраты', fmtMoney(bot.totalCost))}
           </div>
 
           <div class="${clsFor('ai')}">
@@ -984,11 +1074,14 @@
               <div class="name">${names.ai}</div>
               <div class="badge">лучший</div>
             </div>
-            ${metricRow('Стоимость контакта', fmtMoney(ai.costPerContact))}
-            ${metricRow('CPA (руб/конверсия)', fmtMoney(ai.cpa))}
-            ${metricRow('Конверсии на объём', fmt(ai.conversions, 0))}
-            ${metricRow('Затраты на объём', fmtMoney(ai.totalCost))}
-            ${ai.profit !== null ? metricRow('Прибыль на объём', fmtMoney(ai.profit)) : ''}
+            <div class="market-metric"><span>${ai.billingNote}</span></div>
+            ${metricRow('Короткие &lt;10 сек', fmt(ai.shortContacts, 0) + ' (' + fmt(v.marketShortCallPct, 0) + '%)')}
+            ${metricRow('Тарифицируемые минуты', fmt(ai.billableMinutes, 0))}
+            ${metricRow('Цена пакета', fmtMoney(ai.totalCost))}
+            ${metricRow('₽/мин по тарифу', fmt(v.aiPricePerMinute, 1) + ' ₽')}
+            ${metricRow('Конверсия', fmtPct(ai.conv) + (ai.convLabel ? ' · ' + ai.convLabel : ''))}
+            ${metricRow('CPA', fmtMoney(ai.cpa))}
+            ${metricRow(v.cpaCompareScenario === 'our_base' ? 'Релевантные' : 'Конверсии', fmt(ai.conversions, 0))}
           </div>
         </div>
       `;
@@ -1022,13 +1115,14 @@
       const v = getValues();
       const r = calculate(v);
       renderCalculatedFields(v);
+      syncCpaScenarioUi(v);
       renderHero(r);
       renderFunnel(r);
       renderUnitCosts(r);
       renderScenarios(r, v);
 
-      const m = calculateMarket(v);
-      renderMarketCompare(m);
+      const m = calculateMarket(v, r);
+      renderMarketCompare(m, v);
     }
 
     Object.values(fieldIds).forEach(id => {
@@ -1038,9 +1132,15 @@
       document.getElementById(id).addEventListener('change', recalculate);
     });
 
+    document.getElementById('cpaCompareScenario').addEventListener('change', () => {
+      applyCpaScenarioDefaults(document.getElementById('cpaCompareScenario').value);
+      recalculate();
+    });
+
     document.getElementById('resetBtn').addEventListener('click', () => {
       document.getElementById('region').value = DEFAULTS.region;
       document.getElementById('conversionScenario').value = DEFAULTS.conversionScenario;
+      document.getElementById('cpaCompareScenario').value = DEFAULTS.cpaCompareScenario;
       for (const [key, id] of Object.entries(fieldIds)) {
         document.getElementById(id).value = DEFAULTS[key];
       }
