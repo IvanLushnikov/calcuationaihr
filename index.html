@@ -585,6 +585,13 @@
     .primary-btn { width: 100%; min-height: 56px; margin-top: 14px; border: 0; border-radius: 14px; background: #5269db; color: #fff; cursor: pointer; font-size: 1rem; font-weight: 800; box-shadow: 0 8px 16px rgba(82,105,219,.23); }
     .primary-btn:hover, .primary-btn:focus-visible { background: #4055c2; outline: 3px solid rgba(82,105,219,.2); outline-offset: 2px; }
     .quiet-note { margin-top: 14px; color: #667085; font-size: .78rem; line-height: 1.45; }
+    .start-card .start-label { display: block; margin-top: 14px; margin-bottom: 6px; color: #344054; font-size: .92rem; font-weight: 700; }
+    .start-card .start-select { width: 100%; min-height: 44px; padding: 10px 12px; background: #fff; border: 1px solid #b9d4c4; border-radius: 10px; color: #1d2a25; font-size: .95rem; font-weight: 600; cursor: pointer; }
+    .start-card .start-select:focus { outline: 3px solid rgba(46, 116, 88, .2); border-color: #2e7459; }
+    .source-note { margin-top: 6px; margin-bottom: 0; color: #62716a; font-size: .78rem; line-height: 1.4; }
+    .result-subtitle { margin: 4px 0 0; color: #3b795f; font-size: .88rem; font-weight: 600; }
+    .result-subtitle.warn { color: #b44d45; }
+    .result-subtitle.estimate { color: #b07a2c; }
 
     .results-section { scroll-margin-top: 18px; }
     .results-section:focus { outline: none; }
@@ -739,22 +746,52 @@
       <section class="welcome" aria-labelledby="welcomeTitle">
         <div class="welcome-copy">
           <div class="eyebrow">Калькулятор эффекта</div>
-          <h2 id="welcomeTitle">Посмотрите, сколько работы возьмёт на себя ИИ</h2>
-          <p>Введите объём разговоров. Калькулятор покажет ожидаемый результат и время, которое команда сможет потратить на более важные задачи.</p>
+          <h2 id="welcomeTitle">Сколько будет стоить обработать ваши отклики</h2>
+          <p>Введите вакансии и отрасль. Калькулятор покажет нужные минуты ИИ, стоимость пакета и сравнение с колл-центром и штатным HR.</p>
           <div class="three-steps" aria-label="Как это работает">
-            <span>① Введите минуты</span>
-            <span>② Посмотрите результат</span>
-            <span>③ Настройте детали — если нужно</span>
+            <span>① Введите вакансии</span>
+            <span>② Выберите отрасль</span>
+            <span>③ Сравните стоимость</span>
           </div>
         </div>
         <div class="start-card">
           <h2>Начните здесь</h2>
-          <p>Сколько минут разговоров вы планируете?</p>
-          <label for="aiMinutes">Минуты разговоров</label>
+          <p>Сколько у вас вакансий в месяц и в какой отрасли?</p>
+
+          <label for="vacanciesPerMonth">Вакансий в месяц</label>
           <div class="minute-input">
-            <input type="number" id="aiMinutes" value="200000" min="0" step="1000" inputmode="numeric">
-            <span>минут</span>
+            <input type="number" id="vacanciesPerMonth" value="20" min="1" step="1" inputmode="numeric">
+            <span>шт.</span>
           </div>
+
+          <label for="industry" class="start-label">Отрасль</label>
+          <select id="industry" class="start-select">
+            <option value="industrial">Промышленность</option>
+            <option value="logistics">Логистика</option>
+            <option value="horeca">Хорека / Ритейл</option>
+            <option value="it">IT / Digital</option>
+            <option value="medicine">Медицина / Фарма</option>
+            <option value="sales">Продажи / B2B</option>
+            <option value="construction">Строительство</option>
+            <option value="finance">Финансы / Банки</option>
+          </select>
+
+          <label for="responsesPerVacancy" class="start-label">Откликов на вакансию</label>
+          <div class="minute-input">
+            <input type="number" id="responsesPerVacancy" placeholder="45" min="1" step="0.5" inputmode="decimal">
+            <span>среднее</span>
+          </div>
+
+          <label for="segment" class="start-label">Сегмент компании</label>
+          <select id="segment" class="start-select">
+            <option value="micro">Микро (1-15 чел.)</option>
+            <option value="small">Малая (16-100)</option>
+            <option value="medium" selected>Средняя (101-500)</option>
+            <option value="large">Крупная (501-3000)</option>
+            <option value="enterprise">Энтерпрайз (3000+)</option>
+          </select>
+          <p class="source-note" id="segmentContext">Средняя: ~112 вакансий/год для производства</p>
+
           <button class="primary-btn" type="button" id="showResultsBtn">Посмотреть мой расчёт ↓</button>
           <p class="quiet-note">Это предварительная модель, а не обещание результата. Телефония и интеграция в сумму не входят.</p>
         </div>
@@ -764,9 +801,10 @@
         <div class="section-heading">
           <div>
             <div class="eyebrow">Ваш расчёт</div>
-            <h2 id="resultsTitle">Что получится при таком объёме</h2>
+            <h2 id="resultsTitle">Расчёт для отрасли</h2>
+            <p id="resultIndustry" class="result-subtitle">Промышленность</p>
           </div>
-          <p>Цифры обновляются, когда вы меняете минуты.</p>
+          <p>Цифры обновляются при смене найма или отрасли.</p>
         </div>
         <div class="dashboard">
           <div class="card card-output">
@@ -860,6 +898,10 @@
             <label for="workingHours">Рабочих часов в месяц</label>
             <input type="number" id="workingHours" value="160" min="1" step="1">
           </div>
+          <div class="field">
+            <label for="hrOverhead">Наценка на HR (налоги, офис, менеджмент), ×</label>
+            <input type="number" id="hrOverhead" value="1.5" min="1" step="0.1">
+          </div>
           <div class="field span2">
             <label for="aiControlMin">Минут на проверку одного разговора ИИ</label>
             <input type="number" id="aiControlMin" value="3" min="0" step="0.1">
@@ -868,7 +910,7 @@
           <div class="section-label">С чем сравниваем</div>
           <div class="field">
             <label for="hhPerVacancy">Колл-центр, ₽ за минуту</label>
-            <input type="number" id="hhPerVacancy" value="17" min="0" step="1">
+            <input type="number" id="hhPerVacancy" value="35" min="0" step="1">
           </div>
           <div class="field">
             <label for="saasPerEmployee">Другой сервис, ₽ за интервью</label>
@@ -949,14 +991,37 @@
       { threshold: 200001, intl_ru: 15, sng: 15 }
     ];
 
+    // --- Отрасли: метки + откликов на вакансию ---
+    const INDUSTRIES = {
+      industrial:   { name: 'Промышленность',        sourceTag: 'прокси', sourceKind: 'proxy',   responsesPerVacancy: 45 },
+      logistics:    { name: 'Логистика / Транспорт', sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 55 },
+      horeca:       { name: 'Хорека / Ритейл',       sourceTag: 'прокси', sourceKind: 'proxy',   responsesPerVacancy: 120 },
+      it:           { name: 'IT / Digital',           sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 60 },
+      medicine:     { name: 'Медицина / Фарма',      sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 35 },
+      sales:        { name: 'Продажи / B2B',         sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 80 },
+      construction: { name: 'Строительство',         sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 40 },
+      finance:      { name: 'Финансы / Банки',       sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 100 }
+    };
+
+    // --- Сегменты: вакансий в год (раздел 1 файла-воронки, контекст) ---
+    const SEGMENTS = {
+      micro:     { name: 'Микро (1-15)',     vakYear: { industrial: 4,  logistics: 4,  horeca: 5 } },
+      small:     { name: 'Малая (16-100)',   vakYear: { industrial: 22, logistics: 28, horeca: 30 } },
+      medium:    { name: 'Средняя (101-500)',vakYear: { industrial: 112,logistics: 138,horeca: 150 } },
+      large:     { name: 'Крупная (501-3000)', vakYear: { industrial: 540,logistics: 660, horeca: 720 } },
+      enterprise:{ name: 'Энтерпрайз (3000+)',vakYear: { industrial: 2700,logistics: 3300, horeca: 3600 } }
+    };
+
     const CONVERSIONS = {
       standard: { contact: 0.263, interview: 0.501, relevant: 0.271 },
       pessimistic: { contact: 0.18, interview: 0.372, relevant: 0.25 }
     };
 
     const DEFAULTS = {
+      industry: 'industrial',
+      vacanciesPerMonth: 20,
+      segment: 'medium',
       region: 'intl_ru',
-      aiMinutes: 200000,
       packagePer10k: 21260,
       conversionScenario: 'standard',
       manualAttemptMin: 1,
@@ -964,7 +1029,8 @@
       recruiterCost: 80000,
       workingHours: 160,
       aiControlMin: 3,
-      hhPerVacancy: 17,
+      hrOverhead: 1.5,
+      hhPerVacancy: 35,
       saasPerEmployee: 149,
 
       cpaCompareScenario: 'market',
@@ -980,13 +1046,13 @@
     const MARKET_CONV = { cc: 8, bot: 2, ai: 5 };
 
     const fieldIds = {
-      aiMinutes: 'aiMinutes',
       packagePer10k: 'packagePer10k',
       manualAttemptMin: 'manualAttemptMin',
       manualInterviewMin: 'manualInterviewMin',
       recruiterCost: 'recruiterCost',
       workingHours: 'workingHours',
       aiControlMin: 'aiControlMin',
+      hrOverhead: 'hrOverhead',
       hhPerVacancy: 'hhPerVacancy',
       saasPerEmployee: 'saasPerEmployee',
 
@@ -1018,6 +1084,10 @@
 
     function getValues() {
       const v = {
+        industry: document.getElementById('industry').value,
+        vacanciesPerMonth: parseFloat(document.getElementById('vacanciesPerMonth').value) || 0,
+        responsesPerVacancy: parseFloat(document.getElementById('responsesPerVacancy').value) || 0,
+        segment: document.getElementById('segment').value,
         region: document.getElementById('region').value,
         conversionScenario: document.getElementById('conversionScenario').value,
         cpaCompareScenario: document.getElementById('cpaCompareScenario').value
@@ -1034,8 +1104,6 @@
       if (v.cpaCompareScenario === 'our_base') {
         v.aiConvPct = v.aiConvOurBasePct;
       }
-      v.aiPrice = calcAiPrice(v.aiMinutes, v.region);
-      v.aiPricePerMinute = v.aiMinutes > 0 ? v.aiPrice / v.aiMinutes : 0;
       return v;
     }
 
@@ -1077,73 +1145,100 @@
     function fmtPct(rate) { return fmt(rate * 100, 1) + '%'; }
 
     function calculate(v) {
-      // B24/B25 = ROUND(B14 * B7 / 10000, 0)
-      const actualAttempts = Math.round(v.packagePer10k * v.aiMinutes / 10000);
-      const contacts = actualAttempts * v.contactRate;
-      const meaningfulInterviews = contacts * v.meaningfulRate;
-      const relevantCandidates = meaningfulInterviews * v.relevanceRate;
+      // Вход — вакансии × откликов на вакансию (отрасль).
+      // Дальше считаем объём работы и стоимость по трём каналам.
+      const industry = INDUSTRIES[v.industry] || INDUSTRIES.industrial;
+      const vacancies = Math.max(0, v.vacanciesPerMonth);
+      const responsesPerVac = v.responsesPerVacancy > 0
+        ? v.responsesPerVacancy
+        : industry.responsesPerVacancy;
+      const totalResponses = vacancies * responsesPerVac;
 
-      const manualMinutes = actualAttempts * v.manualAttemptMin + meaningfulInterviews * v.manualInterviewMin;
+      // Воронка: отклики → контакты → разговоры → подходящие.
+      const contacts = totalResponses * v.contactRate;
+      const conversations = contacts * v.meaningfulRate;
+      const qualified = conversations * v.relevanceRate;
+
+      // --- ИИ ---
+      const aiMinutes = totalResponses * 10000 / Math.max(1, v.packagePer10k);
+      const aiPrice = calcAiPrice(aiMinutes, v.region);
+      const aiPricePerMinute = aiMinutes > 0 ? aiPrice / aiMinutes : 0;
+
+      // --- КЦ (колл-центр): берём только реальные разговоры ---
+      const kcBillableMinutes = contacts * v.marketContactDurationMin;
+      const kcCost = kcBillableMinutes * v.hhPerVacancy;
+      const kcQualified = contacts * (v.ccConvPct / 100);
+
+      // --- Штатный HR: часы × ставка × наценка (налоги, офис, менеджмент) ---
+      const manualMinutes = totalResponses * v.manualAttemptMin + conversations * v.manualInterviewMin;
       const manualHours = manualMinutes / 60;
-      const aiControlHours = meaningfulInterviews * v.aiControlMin / 60;
+      const aiControlHours = conversations * v.aiControlMin / 60;
       const netSavedHours = Math.max(0, manualHours - aiControlHours);
-      const savedCost = netSavedHours * v.recruiterCost / v.workingHours;
-      const netEffect = savedCost - v.aiPrice;
+      const hrCost = netSavedHours * v.recruiterCost / v.workingHours * (v.hrOverhead || 1);
       const fte = netSavedHours / v.workingHours;
 
+      // Экономия ИИ vs каждого канала.
+      const savingsVsKc = kcCost - aiPrice;
+      const savingsVsHr = hrCost - aiPrice;
+
       return {
-        actualAttempts, contacts, meaningfulInterviews, relevantCandidates,
-        manualHours, netSavedHours, savedCost, netEffect, fte,
-        pricePerAttempt: actualAttempts > 0 ? v.aiPrice / actualAttempts * 1000 : 0,
-        pricePerContact: contacts > 0 ? v.aiPrice / contacts : 0,
-        pricePerInterview: meaningfulInterviews > 0 ? v.aiPrice / meaningfulInterviews : 0,
-        pricePerCandidate: relevantCandidates > 0 ? v.aiPrice / relevantCandidates : 0,
-        hhCost: manualMinutes * v.hhPerVacancy,
-        saasCost: meaningfulInterviews * v.saasPerEmployee
+        industry, vacancies, responsesPerVac, totalResponses,
+        contacts, conversations, qualified,
+        aiMinutes, aiPrice, aiPricePerMinute,
+        kcBillableMinutes, kcCost, kcQualified,
+        manualHours, netSavedHours, hrCost, savingsVsKc, savingsVsHr, fte,
+        pricePerQualified: qualified > 0 ? aiPrice / qualified : 0,
+        pricePerConversation: conversations > 0 ? aiPrice / conversations : 0,
+        pricePerContact: contacts > 0 ? aiPrice / contacts : 0,
+        pricePerResponse: totalResponses > 0 ? aiPrice / totalResponses : 0,
+        hhCost: contacts * v.hhPerVacancy,
+        saasCost: conversations * v.saasPerEmployee
       };
     }
 
-    function renderCalculatedFields(v) {
-      document.getElementById('aiPriceOut').textContent = fmtMoney(v.aiPrice);
-      document.getElementById('aiMinutePriceOut').textContent = fmt(v.aiPricePerMinute, 1) + ' ₽';
+    function renderCalculatedFields(v, r) {
+      document.getElementById('aiPriceOut').textContent = fmtMoney(r.aiPrice);
+      document.getElementById('aiMinutePriceOut').textContent = fmt(r.aiPricePerMinute, 1) + ' ₽';
       const aiTariffOut = document.getElementById('aiTariffPerMinOut');
-      if (aiTariffOut) aiTariffOut.textContent = fmt(v.aiPricePerMinute, 1) + ' ₽';
+      if (aiTariffOut) aiTariffOut.textContent = fmt(r.aiPricePerMinute, 1) + ' ₽';
       document.getElementById('contactRateOut').textContent = fmtPct(v.contactRate);
       document.getElementById('meaningfulRateOut').textContent = fmtPct(v.meaningfulRate);
       document.getElementById('relevanceRateOut').textContent = fmtPct(v.relevanceRate);
     }
 
     function renderHero(r) {
-      const neg = r.netEffect < 0 ? ' negative' : '';
+      const negKc = r.savingsVsKc < 0 ? ' negative' : '';
+      const negHr = r.savingsVsHr < 0 ? ' negative' : '';
       document.getElementById('heroKpi').innerHTML = `
         <div class="hero-kpi-main">
-          <div class="kpi-label">Ожидаемый эффект</div>
-          <div class="kpi-value${neg}" title="Точная сумма: ${fmtMoney(r.netEffect)}">${fmtMoneyCompact(r.netEffect)}</div>
-          <div class="kpi-sub">экономия за вычетом стоимости ИИ</div>
+          <div class="kpi-label">Экономия vs колл-центр</div>
+          <div class="kpi-value${negKc}" title="Точная сумма: ${fmtMoney(r.savingsVsKc)}">${fmtMoneyCompact(r.savingsVsKc)}</div>
+          <div class="kpi-sub">${fmt(r.kcCost)} ₽ колл-центр − ${fmt(r.aiPrice)} ₽ ИИ</div>
         </div>
         <div class="hero-kpi-item">
-          <div class="kpi-value">${fmt(r.netSavedHours, 0)}</div>
-          <div class="kpi-label">снятых HR-часов</div>
+          <div class="kpi-value">${fmt(r.totalResponses)}</div>
+          <div class="kpi-label">откликов всего</div>
         </div>
         <div class="hero-kpi-item">
-          <div class="kpi-value">${fmt(r.relevantCandidates)}</div>
-          <div class="kpi-label">подходящих кандидатов</div>
+          <div class="kpi-value">${fmt(r.aiPrice)}</div>
+          <div class="kpi-label">пакет ИИ, ₽</div>
         </div>
         <div class="hero-kpi-item">
-          <div class="kpi-value">${fmt(r.fte, 1)}</div>
-          <div class="kpi-label">нагрузки одного рекрутера</div>
+          <div class="kpi-value${negHr}" title="Точная сумма: ${fmtMoney(r.savingsVsHr)}">${fmtMoneyCompact(r.savingsVsHr)}</div>
+          <div class="kpi-label">экономия vs штатный HR</div>
         </div>
       `;
     }
 
     function renderFunnel(r) {
+      // Воронка считается от totalResponses (отклики) к подходящим.
       const steps = [
-        { label: 'Звонки от ИИ', value: r.actualAttempts },
+        { label: 'Откликов', value: r.totalResponses },
         { label: 'Дошли до человека', value: r.contacts },
-        { label: 'Провели разговор', value: r.meaningfulInterviews },
-        { label: 'Подошли под вакансию', value: r.relevantCandidates }
+        { label: 'Провели разговор', value: r.conversations },
+        { label: 'Подошли под вакансию', value: r.qualified }
       ];
-      const max = r.actualAttempts || 1;
+      const max = r.totalResponses || 1;
       document.getElementById('funnel').innerHTML = steps.map(s => `
         <div class="funnel-step">
           <span class="label">${s.label}</span>
@@ -1155,10 +1250,10 @@
 
     function renderUnitCosts(r) {
       document.getElementById('unitCosts').innerHTML = `
-        <div class="unit-cost"><span class="lbl">За 1000 звонков</span><span class="val">${fmt(r.pricePerAttempt, 0)} ₽</span></div>
-        <div class="unit-cost"><span class="lbl">За контакт</span><span class="val">${fmt(r.pricePerContact, 0)} ₽</span></div>
-        <div class="unit-cost"><span class="lbl">За интервью</span><span class="val">${fmt(r.pricePerInterview, 0)} ₽</span></div>
-        <div class="unit-cost"><span class="lbl">За кандидата</span><span class="val">${fmt(r.pricePerCandidate, 0)} ₽</span></div>
+        <div class="unit-cost"><span class="lbl">Минут ИИ</span><span class="val">${fmt(r.aiMinutes, 0)}</span></div>
+        <div class="unit-cost"><span class="lbl">Стоимость пакета</span><span class="val">${fmtMoney(r.aiPrice)}</span></div>
+        <div class="unit-cost"><span class="lbl">₽/мин по тарифу</span><span class="val">${fmt(r.aiPricePerMinute, 1)} ₽</span></div>
+        <div class="unit-cost"><span class="lbl">₽ за 1 подходящего</span><span class="val">${fmtMoney(r.pricePerQualified)}</span></div>
       `;
     }
 
@@ -1168,7 +1263,7 @@
       const dealValue = Math.max(0, v.dealValuePerConv);
       const isOurBase = v.cpaCompareScenario === 'our_base';
 
-      const attempts = r.actualAttempts;
+      const attempts = r.totalResponses;
       const contacts = r.contacts;
       const noAnswers = Math.max(0, attempts - contacts);
 
@@ -1187,12 +1282,12 @@
 
       const aiBillableContacts = contacts * (1 - shortShare);
       const aiBillableMinutes = aiBillableContacts * duration;
-      // Наша база: берём релевантных из Excel-воронки; рынок: % от контактов
+      // Наша база: берём релевантных из отраслевой воронки (= наймы); рынок: % от контактов
       const aiConversions = isOurBase
-        ? r.relevantCandidates
+        ? r.Q
         : contacts * (v.aiConvPct / 100);
       const aiConv = contacts > 0 ? aiConversions / contacts : 0;
-      const aiTotalCost = v.aiPrice;
+      const aiTotalCost = r.aiPrice;
       const aiCpa = aiConversions > 0 ? aiTotalCost / aiConversions : Infinity;
       const aiCostPerContact = contacts > 0 ? aiTotalCost / contacts : 0;
       const aiProfit = dealValue > 0 ? (aiConversions * dealValue - aiTotalCost) : null;
@@ -1201,7 +1296,7 @@
         conv: aiConv,
         conversions: aiConversions,
         billableMinutes: aiBillableMinutes,
-        costPerMin: v.aiPricePerMinute,
+        costPerMin: r.aiPricePerMinute,
         costPerContact: aiCostPerContact,
         cpa: aiCpa,
         totalCost: aiTotalCost,
@@ -1210,7 +1305,7 @@
         noAnswers,
         shortShare,
         shortContacts: contacts * shortShare,
-        convLabel: isOurBase ? 'контакт → релевантный (Excel)' : 'гипотеза рынка'
+        convLabel: isOurBase ? 'квалифицированных из воронки' : 'гипотеза рынка'
       };
 
       const cc = mkPaidChannel(
@@ -1238,7 +1333,7 @@
       return { attempts, contacts, noAnswers, cc, bot, ai, bestKey, aiDeltaCpaVsCc, aiDeltaCpaVsBot };
     }
 
-    function renderMarketCompare(m, v) {
+    function renderMarketCompare(m, v, r) {
       const names = { cc: 'КЦ', bot: 'Сценарный бот', ai: 'ИИ рекрутер' };
       const bestName = m.bestKey ? names[m.bestKey] : '—';
 
@@ -1317,10 +1412,10 @@
             ${metricRow('Короткие &lt;10 сек', fmt(ai.shortContacts, 0) + ' (' + fmt(v.marketShortCallPct, 0) + '%)')}
             ${metricRow('Тарифицируемые минуты', fmt(ai.billableMinutes, 0))}
             ${metricRow('Цена пакета', fmtMoney(ai.totalCost))}
-            ${metricRow('₽/мин по тарифу', fmt(v.aiPricePerMinute, 1) + ' ₽')}
+            ${metricRow('₽/мин по тарифу', fmt(r.aiPricePerMinute, 1) + ' ₽')}
             ${metricRow('Конверсия', fmtPct(ai.conv) + (ai.convLabel ? ' · ' + ai.convLabel : ''))}
             ${metricRow('CPA', fmtMoney(ai.cpa))}
-            ${metricRow(v.cpaCompareScenario === 'our_base' ? 'Релевантные' : 'Конверсии', fmt(ai.conversions, 0))}
+            ${metricRow(v.cpaCompareScenario === 'our_base' ? 'Наймы' : 'Конверсии', fmt(ai.conversions, 0))}
           </div>
         </div>
       `;
@@ -1328,9 +1423,9 @@
 
     function renderScenarios(r, v) {
       const scenarios = [
-        { name: 'Штатный HR', current: r.savedCost, ai: v.aiPrice },
-        { name: 'КЦ по минутам', current: r.hhCost, ai: v.aiPrice },
-        { name: 'Другой сервис для интервью', current: r.saasCost, ai: v.aiPrice }
+        { name: 'Штатный HR', current: r.hrCost, ai: r.aiPrice },
+        { name: 'Колл-центр', current: r.kcCost, ai: r.aiPrice },
+        { name: 'SaaS для интервью', current: r.saasCost, ai: r.aiPrice }
       ];
       const maxSaving = Math.max(...scenarios.map(s => s.current - s.ai));
       document.getElementById('scenarioList').innerHTML = scenarios.map(s => {
@@ -1350,10 +1445,38 @@
       }).join('');
     }
 
+    function renderIndustryMeta(v) {
+      const industry = INDUSTRIES[v.industry] || INDUSTRIES.industrial;
+
+      // Подсказка-плейсхолдер показывает отраслевой default.
+      const respEl = document.getElementById('responsesPerVacancy');
+      if (respEl && !respEl.value) {
+        respEl.placeholder = String(industry.responsesPerVacancy);
+      }
+
+      const seg = SEGMENTS[v.segment] || SEGMENTS.medium;
+      const ctxEl = document.getElementById('segmentContext');
+      if (ctxEl) {
+        const vak = seg.vakYear[v.industry] != null ? seg.vakYear[v.industry] : '—';
+        const vacancies = v.vacanciesPerMonth || 0;
+        const months = vak > 0 ? fmt((vacancies / vak * 12), 1) : '—';
+        ctxEl.textContent = `${seg.name}: ~${vak} вакансий/год · ${vacancies} в мес. ≈ ${months} мес.`;
+      }
+
+      const resEl = document.getElementById('resultIndustry');
+      if (resEl) {
+        resEl.textContent = industry.name;
+        resEl.classList.remove('warn', 'estimate');
+        if (industry.sourceKind === 'proxy') resEl.classList.add('warn');
+        if (industry.sourceKind === 'estimate') resEl.classList.add('estimate');
+      }
+    }
+
     function recalculate() {
       const v = getValues();
       const r = calculate(v);
-      renderCalculatedFields(v);
+      renderIndustryMeta(v);
+      renderCalculatedFields(v, r);
       syncCpaScenarioUi(v);
       renderHero(r);
       renderFunnel(r);
@@ -1361,13 +1484,16 @@
       renderScenarios(r, v);
 
       const m = calculateMarket(v, r);
-      renderMarketCompare(m, v);
+      renderMarketCompare(m, v, r);
     }
 
     Object.values(fieldIds).forEach(id => {
       document.getElementById(id).addEventListener('input', recalculate);
     });
-    ['region', 'conversionScenario'].forEach(id => {
+    ['vacanciesPerMonth', 'responsesPerVacancy'].forEach(id => {
+      document.getElementById(id).addEventListener('input', recalculate);
+    });
+    ['region', 'conversionScenario', 'industry', 'segment'].forEach(id => {
       document.getElementById(id).addEventListener('change', recalculate);
     });
 
@@ -1377,6 +1503,10 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('industry').value = DEFAULTS.industry;
+      document.getElementById('vacanciesPerMonth').value = DEFAULTS.vacanciesPerMonth;
+      document.getElementById('responsesPerVacancy').value = '';
+      document.getElementById('segment').value = DEFAULTS.segment;
       document.getElementById('region').value = DEFAULTS.region;
       document.getElementById('conversionScenario').value = DEFAULTS.conversionScenario;
       document.getElementById('cpaCompareScenario').value = DEFAULTS.cpaCompareScenario;
