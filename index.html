@@ -295,6 +295,50 @@
       font-size: 0.92rem;
     }
 
+    /* ===== Dashboard-head: тонкий заголовок с live-pill для дашбордов ===== */
+    .dashboard-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .dashboard-head h2 {
+      font-size: clamp(1.15rem, 2vw, 1.45rem);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.2;
+      margin: 0;
+    }
+    .dashboard-note {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+      margin: 0 0 14px;
+    }
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px 4px 8px;
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 100px;
+      color: var(--success);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      text-transform: lowercase;
+    }
+    .live-pill .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25);
+      animation: pulse 2s infinite;
+    }
+
     /* ===== Inputs / выбор отрасли и размера ===== */
     .input-card {
       background: var(--surface);
@@ -375,6 +419,7 @@
       text-align: center;
       transition: all 0.2s;
       user-select: none;
+      position: relative;
     }
     .industry-card:hover {
       border-color: var(--accent);
@@ -386,6 +431,22 @@
       background: var(--accent-dim);
       box-shadow: 0 0 0 1px var(--accent), 0 8px 20px rgba(99, 102, 241, 0.2);
     }
+    /* чек-маркер в активной карточке отрасли */
+    .industry-card .check {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: none;
+      place-items: center;
+      font-size: 0;
+    }
+    .industry-card .check svg { width: 10px; height: 10px; stroke: #fff; stroke-width: 3; fill: none; }
+    .industry-card[aria-checked="true"] .check { display: grid; }
     .industry-card .ico {
       font-size: 1.6rem;
       line-height: 1;
@@ -402,7 +463,7 @@
     .industry-card .ico svg { width: 100%; height: 100%; }
     .industry-card .name { font-size: 0.78rem; }
     .industry-card .name {
-      font-size: 0.84rem;
+      font-size: 0.78rem;
       font-weight: 600;
       line-height: 1.25;
     }
@@ -895,6 +956,11 @@
   <!-- ========= СЕЙЧАС / AI ========= -->
   <section>
     <div class="container">
+      <div class="dashboard-head reveal">
+        <h2>Сейчас vs с&nbsp;ИИ&nbsp;Рекрутером</h2>
+        <span class="live-pill"><span class="live-dot"></span>обновляется при выборе</span>
+      </div>
+
       <div class="grid-2">
         <div class="panel reveal">
           <div class="panel-title"><span class="badge"></span>Что происходит сейчас</div>
@@ -921,40 +987,39 @@
     </div>
   </section>
 
-  <!-- ========= CHANNELS ========= -->
+  <!-- ========= CHANNELS (дашборд, обновляется при выборе) ========= -->
   <section id="channels">
     <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Сравнение каналов</span>
+      <div class="dashboard-head reveal">
         <h2>CPA: сколько стоит один&nbsp;подходящий кандидат</h2>
-        <p>Считаем на&nbsp;одном и&nbsp;том&nbsp;же объёме контактов. ИИ&nbsp;Рекрутер не&nbsp;тарифицирует недозвоны и&nbsp;разговоры короче&nbsp;10&nbsp;секунд.</p>
+        <span class="live-pill"><span class="live-dot"></span>обновляется при выборе</span>
       </div>
+      <p class="dashboard-note">Считаем на&nbsp;одном и&nbsp;том&nbsp;же объёме контактов. ИИ&nbsp;Рекрутер не&nbsp;тарифицирует недозвоны и&nbsp;разговоры короче&nbsp;10&nbsp;секунд.</p>
 
       <div class="channels-grid reveal" id="channelsGrid"></div>
     </div>
   </section>
 
-  <!-- ========= SCENARIOS ========= -->
+  <!-- ========= SCENARIOS (дашборд, обновляется при выборе) ========= -->
   <section>
     <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Сценарии экономии</span>
+      <div class="dashboard-head reveal">
         <h2>ИИ&nbsp;Рекрутер vs&nbsp;три альтернативы</h2>
-        <p>Показываем, во&nbsp;что обойдётся закрыть ваш годовой объём каждым каналом.</p>
+        <span class="live-pill"><span class="live-dot"></span>обновляется при выборе</span>
       </div>
+      <p class="dashboard-note">Показываем, во&nbsp;что обойдётся закрыть ваш годовой объём каждым каналом.</p>
 
       <div class="scenarios-grid reveal" id="scenariosGrid"></div>
     </div>
   </section>
 
-  <!-- ========= КОНВЕРСИИ ПО ЗАМЕРАМ ========= -->
+  <!-- ========= КОНВЕРСИИ ПО ЗАМЕРАМ (статика, не дашборд) ========= -->
   <section>
     <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Конверсии по&nbsp;замерам</span>
+      <div class="dashboard-head reveal">
         <h2>Текущие метрики ИИ&nbsp;Рекрутера</h2>
-        <p>Данные с&nbsp;холодной базы, N&gt;1000&nbsp;контактов. Рынок КЦ на&nbsp;этих&nbsp;же этапах&nbsp;— 8–12%.</p>
       </div>
+      <p class="dashboard-note">Данные с&nbsp;холодной базы, N&gt;1000&nbsp;контактов. Рынок КЦ на&nbsp;этих&nbsp;же этапах&nbsp;— 8–12%.</p>
       <div class="pilot-stats reveal">
         <div class="pilot-stat">
           <div class="v">26,3%</div>
@@ -1368,6 +1433,7 @@
              tabindex="0"
              aria-checked="${i.id === state.industryId}"
              data-id="${i.id}">
+          <span class="check" aria-hidden="true"><svg viewBox="0 0 16 16"><polyline points="3,8 7,12 13,4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           <span class="ico">${i.icon}</span>
           <span class="name">${i.name}</span>
         </div>
