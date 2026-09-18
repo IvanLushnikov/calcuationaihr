@@ -207,8 +207,8 @@
 
     /* ===== Hero ===== */
     .hero {
-      padding-top: 96px;
-      padding-bottom: 56px;
+      padding-top: 48px;
+      padding-bottom: 32px;
       text-align: center;
     }
     .hero-tag {
@@ -300,18 +300,52 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px;
+      padding: 24px;
       box-shadow: var(--shadow-1);
     }
-    .input-group + .input-group { margin-top: 28px; }
+    .input-group + .input-group { margin-top: 20px; }
     .input-label {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    /* ===== Calculator-row: выбор слева + эффект справа, на одном экране ===== */
+    .calculator-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+    @media (max-width: 960px) {
+      .calculator-row { grid-template-columns: 1fr; }
+    }
+    .calculator-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .calculator-eyebrow .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.9); }
     }
     .input-label .step {
       display: inline-grid;
@@ -329,14 +363,14 @@
     .industry-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 8px;
     }
     @media (max-width: 900px) { .industry-grid { grid-template-columns: repeat(2, 1fr); } }
     .industry-card {
       background: var(--surface-2);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 14px 12px;
+      padding: 11px 10px;
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
@@ -353,19 +387,20 @@
       box-shadow: 0 0 0 1px var(--accent), 0 8px 20px rgba(99, 102, 241, 0.2);
     }
     .industry-card .ico {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       line-height: 1;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
+      width: 26px;
+      height: 26px;
       margin-left: auto;
       margin-right: auto;
       color: var(--accent-light);
     }
     .industry-card .ico svg { width: 100%; height: 100%; }
+    .industry-card .name { font-size: 0.78rem; }
     .industry-card .name {
       font-size: 0.84rem;
       font-weight: 600;
@@ -416,35 +451,38 @@
       background: linear-gradient(180deg, rgba(52, 211, 153, 0.07) 0%, var(--surface) 60%);
       border: 1px solid rgba(52, 211, 153, 0.3);
       border-radius: var(--radius);
-      padding: 36px;
+      padding: 24px 24px 20px;
       text-align: center;
       box-shadow: var(--shadow-2);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     .hero-result .label {
       display: inline-block;
-      padding: 5px 12px;
+      padding: 4px 11px;
       background: var(--success-dim);
       color: var(--success);
       border-radius: 100px;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 700;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
     .hero-result .big {
-      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-size: clamp(1.9rem, 4.4vw, 2.9rem);
       font-weight: 800;
       color: var(--success);
       line-height: 1.05;
       letter-spacing: -0.03em;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       font-variant-numeric: tabular-nums;
     }
     .hero-result .big-sub {
       color: var(--muted);
-      font-size: 1rem;
-      margin-bottom: 28px;
+      font-size: 0.88rem;
+      margin-bottom: 16px;
     }
     .hero-result .big-sub strong { color: var(--text); }
     .hero-result.neg .big { color: var(--warning); }
@@ -468,19 +506,19 @@
     .sub-metrics {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-top: 8px;
+      gap: 10px;
+      margin-top: 4px;
     }
     @media (max-width: 720px) { .sub-metrics { grid-template-columns: repeat(2, 1fr); } }
     .sub-metric {
       background: rgba(15, 20, 25, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: var(--radius-sm);
-      padding: 16px 14px;
+      padding: 12px 10px;
       text-align: center;
     }
     .sub-metric .v {
-      font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+      font-size: clamp(1rem, 2vw, 1.3rem);
       font-weight: 800;
       color: var(--text);
       letter-spacing: -0.01em;
@@ -488,10 +526,10 @@
       line-height: 1.1;
     }
     .sub-metric .l {
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       color: var(--muted);
-      margin-top: 6px;
-      line-height: 1.25;
+      margin-top: 4px;
+      line-height: 1.2;
     }
 
     /* ===== Two-col grid blocks ===== */
@@ -799,67 +837,55 @@
     </div>
   </section>
 
-  <!-- ========= INPUT ========= -->
-  <section id="calc">
+  <!-- ========= INPUT + HERO RESULT (один экран) ========= -->
+  <section id="calc" style="padding-top: 24px;">
     <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Шаг 1</span>
-        <h2>Ваша ситуация</h2>
-        <p>Два клика — и&nbsp;калькулятор подставит средние по&nbsp;вашей отрасли: сколько в&nbsp;год вакансий, откликов и&nbsp;интервью.</p>
-      </div>
-
-      <div class="input-card reveal">
-        <div class="input-group">
-          <div class="input-label">
-            <span class="step">1</span>
-            Отрасль
+      <div class="calculator-eyebrow"><span class="live-dot"></span>Калькулятор экономии</div>
+      <div class="calculator-row">
+        <!-- Левая колонка: выбор -->
+        <div class="input-card reveal">
+          <div class="input-group">
+            <div class="input-label">
+              <span class="step">1</span>
+              Отрасль
+            </div>
+            <div class="industry-grid" id="industryGrid" role="radiogroup" aria-label="Выбор отрасли"></div>
           </div>
-          <div class="industry-grid" id="industryGrid" role="radiogroup" aria-label="Выбор отрасли"></div>
-        </div>
-        <div class="input-group">
-          <div class="input-label">
-            <span class="step">2</span>
-            Размер компании
+          <div class="input-group">
+            <div class="input-label">
+              <span class="step">2</span>
+              Размер компании
+            </div>
+            <div class="size-group" id="sizeGroup" role="radiogroup" aria-label="Размер компании"></div>
           </div>
-          <div class="size-group" id="sizeGroup" role="radiogroup" aria-label="Размер компании"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========= HERO RESULT ========= -->
-  <section id="result" style="padding-top: 32px;">
-    <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">Ваша экономия</span>
-        <h2>Что вы получите за&nbsp;год</h2>
-        <p>Сравниваем стоимость найма в&nbsp;вашей отрасли со&nbsp;стоимостью пакета ИИ&nbsp;Рекрутера на&nbsp;нужный объём.</p>
-      </div>
-
-      <div class="hero-result reveal" id="heroResult">
-        <div class="label" id="savingLabel">Экономия в год</div>
-        <div class="big" id="savingBig">— ₽</div>
-        <div class="big-sub">при <strong id="savingVac">—</strong> вакансиях в&nbsp;год · окупаемость <strong id="savingRoi">—</strong></div>
-        <div class="hero-result-note" id="savingNote">
-          При малом пакете фиксированная часть 10&nbsp;000&nbsp;мин даёт слабый эффект — <strong>выраженная экономия появляется от&nbsp;~30&nbsp;вакансий в&nbsp;год</strong> или если считать вместе с&nbsp;расходами на&nbsp;размещение и&nbsp;агентства.
         </div>
 
-        <div class="sub-metrics">
-          <div class="sub-metric">
-            <div class="v" id="mHours">—</div>
-            <div class="l">часов рекрутера освобождается</div>
+        <!-- Правая колонка: эффект -->
+        <div class="hero-result reveal" id="heroResult">
+          <div class="label" id="savingLabel">Экономия в год</div>
+          <div class="big" id="savingBig">— ₽</div>
+          <div class="big-sub">при <strong id="savingVac">—</strong> вакансиях в&nbsp;год · окупаемость <strong id="savingRoi">—</strong></div>
+          <div class="hero-result-note" id="savingNote">
+            При малом пакете фиксированная часть 10&nbsp;000&nbsp;мин даёт слабый эффект — <strong>выраженная экономия появляется от&nbsp;~30&nbsp;вакансий в&nbsp;год</strong> или если считать вместе с&nbsp;расходами на&nbsp;размещение и&nbsp;агентства.
           </div>
-          <div class="sub-metric">
-            <div class="v" id="mCandidates">—</div>
-            <div class="l">релевантных кандидатов</div>
-          </div>
-          <div class="sub-metric">
-            <div class="v" id="mFte">—</div>
-            <div class="l">эквивалент месяцев работы HR</div>
-          </div>
-          <div class="sub-metric">
-            <div class="v" id="mCostPerHire">—</div>
-            <div class="l">стоимость закрытия вакансии</div>
+
+          <div class="sub-metrics">
+            <div class="sub-metric">
+              <div class="v" id="mHours">—</div>
+              <div class="l">часов рекрутера освобождается</div>
+            </div>
+            <div class="sub-metric">
+              <div class="v" id="mCandidates">—</div>
+              <div class="l">релевантных кандидатов</div>
+            </div>
+            <div class="sub-metric">
+              <div class="v" id="mFte">—</div>
+              <div class="l">эквивалент месяцев работы HR</div>
+            </div>
+            <div class="sub-metric">
+              <div class="v" id="mCostPerHire">—</div>
+              <div class="l">стоимость закрытия вакансии</div>
+            </div>
           </div>
         </div>
       </div>
