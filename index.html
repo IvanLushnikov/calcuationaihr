@@ -592,6 +592,10 @@
       margin-top: 4px;
       line-height: 1.2;
     }
+    .sub-metric.compare .v { display: flex; align-items: baseline; justify-content: center; gap: 6px; }
+    .sub-metric.compare #mAiConv { color: var(--success); font-size: clamp(0.95rem, 1.9vw, 1.2rem); }
+    .sub-metric.compare #mHrConv { color: var(--muted); font-size: clamp(0.85rem, 1.7vw, 1.05rem); }
+    .sub-metric.compare .vs { color: var(--muted-2); font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
 
     /* ===== Two-col grid blocks ===== */
     .grid-2 {
@@ -931,21 +935,21 @@
           </div>
 
           <div class="sub-metrics">
-            <div class="sub-metric">
-              <div class="v" id="mHours">—</div>
-              <div class="l">часов рекрутера освобождается</div>
-            </div>
-            <div class="sub-metric">
+            <div class="sub-metric" title="Контактов в год × интервью-конверсия × скрининг-конверсия. AI Рекрутер сам доводит до релевантных кандидатов, без участия HR.">
               <div class="v" id="mCandidates">—</div>
               <div class="l">релевантных кандидатов</div>
             </div>
-            <div class="sub-metric">
-              <div class="v" id="mFte">—</div>
-              <div class="l">эквивалент месяцев работы HR</div>
+            <div class="sub-metric compare" title="ИИ Рекрутер: контакт → релевантный (наша воронка пилот). HR: отклик → HR-интервью прошёл (DOCX рынка найма РФ).">
+              <div class="v"><span id="mAiConv">—</span><span class="vs">vs</span><span id="mHrConv">—</span></div>
+              <div class="l">конверсия: ИИ&nbsp;vs&nbsp;HR</div>
             </div>
-            <div class="sub-metric">
+            <div class="sub-metric" title="Цена пакета ИИ Рекрутера, делённая на число закрытых вакансий в год.">
               <div class="v" id="mCostPerHire">—</div>
               <div class="l">стоимость закрытия вакансии</div>
+            </div>
+            <div class="sub-metric" title="Ручной труд: отклики × 1 мин + интервью × 15 мин. Минус AI-контроль × 3 мин. Итого сколько часов HR освобождает.">
+              <div class="v" id="mHours">—</div>
+              <div class="l">часов рекрутера освобождается</div>
             </div>
           </div>
         </div>
@@ -1352,8 +1356,10 @@
 
       animateNumber(document.getElementById('mHours'), prev.hours, r.netSavedHours, 700, v => fmt(v, 0));
       animateNumber(document.getElementById('mCandidates'), prev.candidates, r.funnel.relevant, 700, v => fmt(v, 0));
-      animateNumber(document.getElementById('mFte'), prev.fte, r.fte, 700, v => fmt(v, 1));
       document.getElementById('mCostPerHire').textContent = fmtMoney(r.costPerHireAi);
+      const aiConv = D.ourConversion.contact * D.ourConversion.interview * D.ourConversion.relevant;
+      document.getElementById('mAiConv').textContent = fmtPct(aiConv);
+      document.getElementById('mHrConv').textContent = fmtPct(r.industry.hrScreeningRate || 0);
 
       // Сейчас
       document.getElementById('nowVac').textContent = fmt(r.vacAvg, 1);
@@ -1395,15 +1401,14 @@
           </div>`;
       }).join('');
 
-      // Сценарии
+      // Сценарии — без подсветки «ЛУЧШИЙ» (контринтуитивно: max savings обычно у штатного HR)
       document.getElementById('scenariosGrid').innerHTML = r.scenarios.map(s => {
         const saving = s.now - s.ai;
         const cls = saving >= 0 ? '' : 'neg';
         const sign = saving >= 0 ? '' : '−';
         const abs = Math.abs(saving);
-        const best = saving === Math.max(...r.scenarios.map(x => x.now - x.ai)) ? ' best' : '';
         return `
-          <div class="scenario-card${best}">
+          <div class="scenario-card">
             <div class="name">${s.name}</div>
             <div class="desc">${s.desc}</div>
             <div class="scenario-compare">
@@ -1432,7 +1437,8 @@
              role="radio"
              tabindex="0"
              aria-checked="${i.id === state.industryId}"
-             data-id="${i.id}">
+             data-id="${i.id}"
+             title="Откликов на вакансию: ${i.responses.avg} · стоимость закрытия: ${fmtMoney(i.avgHireCost)} · HR-скрининг: ${fmtPct(i.hrScreeningRate || 0)}">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 16 16"><polyline points="3,8 7,12 13,4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           <span class="ico">${i.icon}</span>
           <span class="name">${i.name}</span>
@@ -1440,14 +1446,18 @@
       `).join('');
 
       const sg = document.getElementById('sizeGroup');
-      sg.innerHTML = D.companySizes.map(s => `
+      sg.innerHTML = D.companySizes.map(s => {
+        const m = D.matrix[`${state.industryId}|${s.id}`];
+        const vac = m?.vacAvg ?? 0;
+        return `
         <button type="button" class="size-btn"
                 role="radio"
                 aria-checked="${s.id === state.sizeId}"
-                data-id="${s.id}">
+                data-id="${s.id}"
+                title="${s.range} · ${fmt(vac, 1)} вакансий/год">
           ${s.name}<small>${s.range}</small>
         </button>
-      `).join('');
+      `}).join('');
 
       // listeners
       ig.querySelectorAll('.industry-card').forEach(el => {

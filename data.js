@@ -7,8 +7,21 @@ window.AI_RECRUITER_DATA = {
   industries: [
     {
       id: 'it',
-      name: 'IT / Digital',
+      name: 'IT / Телеком / Digital',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3M6 8l3 3-3 3M10 14h4"/></svg>',
+      responses: { min: 15, avg: 60, max: 250 },
+      interviews: { min: 2, avg: 4, max: 8 },
+      funnel: { responses: 60, screening: 18, hrInterview: 8, final: 3, offer: 1.8, hire: 1.4 },
+      convResponseToOffer: 3.0,
+      convResponseToHire: 2.38,
+      hrScreeningRate: 0.133, // 8/60 — отклик → HR-интервью прошёл
+      avgHireCost: 180000,
+      hrScreeningRate: 0.133,
+      avgSalary: 250000,
+    },
+    {
+      id: 'retail',
+      name: 'Ритейл / Массовый найм',
       // Средние отклики и интервью на 1 вакансию
       responses: { min: 15, avg: 60, max: 250 },
       interviews: { min: 2, avg: 4, max: 8 },
@@ -32,6 +45,7 @@ window.AI_RECRUITER_DATA = {
       convResponseToOffer: 7.1,
       convResponseToHire: 4.25,
       avgHireCost: 95000,
+      hrScreeningRate: 0.225, // 27/120
       avgSalary: 80000,
     },
     {
@@ -44,11 +58,12 @@ window.AI_RECRUITER_DATA = {
       convResponseToOffer: 7.9,
       convResponseToHire: 5.51,
       avgHireCost: 65000,
+      hrScreeningRate: 0.222, // 10/45
       avgSalary: 70000,
     },
     {
       id: 'sales',
-      name: 'Продажи / B2B',
+      name: 'Продажи / B2B / Консалтинг',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-9"/><path d="M14 6h7v7"/></svg>',
       responses: { min: 20, avg: 80, max: 300 },
       interviews: { min: 2, avg: 4, max: 9 },
@@ -56,6 +71,7 @@ window.AI_RECRUITER_DATA = {
       convResponseToOffer: 4.8,
       convResponseToHire: 3.37,
       avgHireCost: 130000,
+      hrScreeningRate: 0.175, // 14/80
       avgSalary: 120000,
     },
     {
@@ -68,6 +84,7 @@ window.AI_RECRUITER_DATA = {
       convResponseToOffer: 3.7,
       convResponseToHire: 2.9,
       avgHireCost: 210000,
+      hrScreeningRate: 0.140, // 14/100
       avgSalary: 180000,
     },
     {
@@ -80,6 +97,7 @@ window.AI_RECRUITER_DATA = {
       convResponseToOffer: 8.9,
       convResponseToHire: 7.13,
       avgHireCost: 145000,
+      hrScreeningRate: 0.257, // 9/35
       avgSalary: 110000,
     },
     {
@@ -92,6 +110,7 @@ window.AI_RECRUITER_DATA = {
       convResponseToOffer: 7.3,
       convResponseToHire: 4.94,
       avgHireCost: 85000,
+      hrScreeningRate: 0.225, // 9/40
       avgSalary: 95000,
     },
     {
@@ -104,6 +123,7 @@ window.AI_RECRUITER_DATA = {
       convResponseToOffer: 7.4,
       convResponseToHire: 4.83,
       avgHireCost: 90000,
+      hrScreeningRate: 0.218, // 12/55
       avgSalary: 85000,
     },
   ],
