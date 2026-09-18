@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Recruiter — сколько вы переплачиваете за найм</title>
-  <meta name="description" content="Калькулятор экономии найма: узнайте за 30 секунд, сколько часов и рублей уходит на ручной рекрутинг и что даст AI Recruiter в вашей отрасли.">
+  <title>ИИ Рекрутер — сколько вы переплачиваете за найм</title>
+  <meta name="description" content="Калькулятор экономии найма: узнайте за 30 секунд, сколько часов и рублей уходит на ручной рекрутинг и что даст ИИ Рекрутер в вашей отрасли.">
   <style>
     /* ===== Design tokens ===== */
     :root {
@@ -773,7 +773,7 @@
         <span class="logo-mark">J</span>
         <span class="logo-text">
           <strong>Just AI</strong>
-          <span>· AI Recruiter</span>
+          <span>· ИИ&nbsp;Рекрутер</span>
         </span>
       </a>
       <nav class="nav" aria-label="Главная навигация">
@@ -787,7 +787,7 @@
   <!-- ========= HERO ========= -->
   <section class="hero">
     <div class="container">
-      <span class="hero-tag">AI Recruiter · расчёт экономии за&nbsp;30&nbsp;секунд</span>
+      <span class="hero-tag">ИИ&nbsp;Рекрутер · расчёт экономии за&nbsp;30&nbsp;секунд</span>
       <h1>Закрывайте вакансии втрое быстрее</h1>
       <p class="lead">AI&nbsp;Recruiter обзванивает отклики и&nbsp;проводит первое интервью голосом. Рекрутер получает готовый шорт-лист и&nbsp;тратит время только на&nbsp;финал.</p>
       <a href="#calc" class="hero-cta">
@@ -841,7 +841,7 @@
         <div class="big" id="savingBig">— ₽</div>
         <div class="big-sub">при <strong id="savingVac">—</strong> вакансиях в&nbsp;год · окупаемость <strong id="savingRoi">—</strong></div>
         <div class="hero-result-note" id="savingNote">
-          Пакет AI Recruiter фиксирован 10&nbsp;000&nbsp;мин, поэтому на&nbsp;микро-объёмах он&nbsp;не&nbsp;окупается мгновенно. <strong>Реальная экономия появляется от&nbsp;~30&nbsp;вакансий в&nbsp;год</strong> — или если считать вместе с&nbsp;расходами на&nbsp;размещение и&nbsp;агентства.
+          Пакет ИИ&nbsp;Рекрутера фиксирован 10&nbsp;000&nbsp;мин, поэтому на&nbsp;микро-объёмах он&nbsp;не&nbsp;окупается мгновенно. <strong>Реальная экономия появляется от&nbsp;~30&nbsp;вакансий в&nbsp;год</strong> — или если считать вместе с&nbsp;расходами на&nbsp;размещение и&nbsp;агентства.
         </div>
 
         <div class="sub-metrics">
@@ -882,7 +882,7 @@
         </div>
 
         <div class="panel green reveal">
-          <div class="panel-title"><span class="badge"></span>Что даёт AI Recruiter</div>
+          <div class="panel-title"><span class="badge"></span>Что даёт ИИ&nbsp;Рекрутер</div>
           <div class="panel-sub">Пакет минут под ваш объём и&nbsp;результат, который вы получите.</div>
           <div class="stat-list">
             <div class="stat-row"><span class="l">Пакет минут</span><span class="v" id="aiMins">—</span></div>
@@ -913,7 +913,7 @@
     <div class="container">
       <div class="section-head reveal">
         <span class="eyebrow">Сценарии экономии</span>
-        <h2>AI Recruiter vs&nbsp;три альтернативы</h2>
+        <h2>ИИ&nbsp;Рекрутер vs&nbsp;три альтернативы</h2>
         <p>Сравниваем не&nbsp;абстрактные тарифы, а&nbsp;то, во&nbsp;что обойдётся закрыть ваш годовой объём вакансий каждым каналом.</p>
       </div>
 
@@ -1101,7 +1101,7 @@
       const roi = aiPrice > 0 ? annualHireCost / aiPrice : 0;
       const paybackMonths = saving > 0 ? (aiPrice / (saving / 12)) : 0;
 
-      // Стоимость закрытия с AI Recruiter (если считать пакет на вакансии)
+      // Стоимость закрытия с ИИ&nbsp;Рекрутером (если считать пакет на вакансии)
       const costPerHireAi = vacAvg > 0 ? aiPrice / vacAvg : 0;
 
       // ===== Сценарии экономии =====
@@ -1168,7 +1168,7 @@
         compCost.bot,
         'Сценарный бот без адаптации. Оплата по&nbsp;минутам разговора, 3&nbsp;₽/мин.'
       );
-      // AI Recruiter: используем РЕАЛЬНУЮ воронку из data.js (контакт → релевантный = 0.501 × 0.271 ≈ 13.6%)
+      // ИИ&nbsp;Рекрутер: используем РЕАЛЬНУЮ воронку из data.js (контакт → релевантный = 0.501 × 0.271 ≈ 13.6%)
       const aiRelevantConv = conv.interview * conv.relevant; // ≈ 0.1357 (контакт → релевантный)
       const aiConversions = contacts * aiRelevantConv;
       const aiShortContacts = contacts * (market.shortCallPct / 100);
@@ -1189,7 +1189,7 @@
       // Ручной канал: считаем по полной рыночной стоимости найма (avgHireCost × vacAvg),
       // а «релевантных» = число интервью (vacAvg × industry.interviews.avg).
       // Так CPA ручного канала = avgHireCost / interviews.avg — большое число,
-      // и AI Recruiter естественно побеждает по «стоимости за результат».
+      // и ИИ&nbsp;Рекрутер естественно побеждает по «стоимости за результат».
       const manualInterviews = interviewsYear;
       const manualChannel = {
         name: '', icon: '', desc: 'Полная рыночная стоимость найма в&nbsp;отрасли: зарплата рекрутера, размещение, агентства.',
@@ -1284,7 +1284,7 @@
         { name: 'Ручной рекрутер', icon: '👤', key: 0 },
         { name: 'Колл-центр', icon: '📞', key: 1 },
         { name: 'Сценарный бот', icon: '🤖', key: 2 },
-        { name: 'AI Recruiter', icon: '✨', key: 3 },
+        { name: 'ИИ Рекрутер', icon: '✨', key: 3 },
       ];
       document.getElementById('channelsGrid').innerHTML = channelMeta.map((m, i) => {
         const ch = r.channels[i];
@@ -1320,7 +1320,7 @@
             <div class="desc">${s.desc}</div>
             <div class="scenario-compare">
               <div class="row now"><span>Сейчас</span><span class="v">${fmtMoney(s.now)}</span></div>
-              <div class="row ai"><span>С AI Recruiter</span><span class="v">${fmtMoney(s.ai)}</span></div>
+              <div class="row ai"><span>С ИИ&nbsp;Рекрутером</span><span class="v">${fmtMoney(s.ai)}</span></div>
             </div>
             <div class="scenario-savings">
               <span class="l">Экономия в год</span>
