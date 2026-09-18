@@ -8,7 +8,7 @@ window.AI_RECRUITER_DATA = {
     {
       id: 'it',
       name: 'IT / Digital',
-      icon: '💻',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3M6 8l3 3-3 3M10 14h4"/></svg>',
       // Средние отклики и интервью на 1 вакансию
       responses: { min: 15, avg: 60, max: 250 },
       interviews: { min: 2, avg: 4, max: 8 },
@@ -25,7 +25,7 @@ window.AI_RECRUITER_DATA = {
     {
       id: 'retail',
       name: 'Ритейл / Массовый найм',
-      icon: '🛒',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11.5a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L21 8H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>',
       responses: { min: 30, avg: 120, max: 500 },
       interviews: { min: 3, avg: 6, max: 15 },
       funnel: { responses: 120, screening: 54, hrInterview: 27, final: 19, offer: 8.5, hire: 5.1 },
@@ -37,7 +37,7 @@ window.AI_RECRUITER_DATA = {
     {
       id: 'production',
       name: 'Производство / Рабочие',
-      icon: '🏭',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V11l5 3V11l5 3V8l8 4v9H3z"/><path d="M7 17h2M11 17h2M15 17h2"/></svg>',
       responses: { min: 8, avg: 45, max: 200 },
       interviews: { min: 1, avg: 3, max: 6 },
       funnel: { responses: 45, screening: 18, hrInterview: 10, final: 6, offer: 3.5, hire: 2.5 },
@@ -49,7 +49,7 @@ window.AI_RECRUITER_DATA = {
     {
       id: 'sales',
       name: 'Продажи / B2B',
-      icon: '📈',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-9"/><path d="M14 6h7v7"/></svg>',
       responses: { min: 20, avg: 80, max: 300 },
       interviews: { min: 2, avg: 4, max: 9 },
       funnel: { responses: 80, screening: 28, hrInterview: 14, final: 8, offer: 3.9, hire: 2.7 },
@@ -61,7 +61,7 @@ window.AI_RECRUITER_DATA = {
     {
       id: 'finance',
       name: 'Финансы / Банки',
-      icon: '🏦',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18M5 10v9h14v-9M3 10l9-6 9 6"/><path d="M7 14h2M11 14h2M15 14h2"/></svg>',
       responses: { min: 25, avg: 100, max: 400 },
       interviews: { min: 2, avg: 4, max: 7 },
       funnel: { responses: 100, screening: 30, hrInterview: 14, final: 7, offer: 3.7, hire: 2.9 },
@@ -73,7 +73,7 @@ window.AI_RECRUITER_DATA = {
     {
       id: 'medicine',
       name: 'Медицина / Фарма',
-      icon: '⚕️',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3v6H3v6h6v6h6v-6h6V9h-6V3z"/></svg>',
       responses: { min: 5, avg: 35, max: 150 },
       interviews: { min: 1, avg: 3, max: 5 },
       funnel: { responses: 35, screening: 16, hrInterview: 9, final: 5, offer: 3.1, hire: 2.5 },
@@ -85,7 +85,7 @@ window.AI_RECRUITER_DATA = {
     {
       id: 'construction',
       name: 'Строительство',
-      icon: '🏗️',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V11l7-5 7 5v10M9 21v-5h6v5"/><path d="M9 11h6M11 11v4M13 11v4"/></svg>',
       responses: { min: 8, avg: 40, max: 180 },
       interviews: { min: 1, avg: 3, max: 6 },
       funnel: { responses: 40, screening: 16, hrInterview: 9, final: 5, offer: 2.9, hire: 2.0 },
@@ -97,7 +97,7 @@ window.AI_RECRUITER_DATA = {
     {
       id: 'logistics',
       name: 'Логистика / Транспорт',
-      icon: '🚚',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>',
       responses: { min: 12, avg: 55, max: 220 },
       interviews: { min: 1, avg: 3, max: 7 },
       funnel: { responses: 55, screening: 23, hrInterview: 12, final: 8, offer: 4.1, hire: 2.7 },
