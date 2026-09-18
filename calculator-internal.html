@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор эффекта ИИ Рекрутер</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface-2: #243044;
+      --surface-3: #2d3a50;
+      --border: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --success: #34d399;
+      --success-dim: rgba(52, 211, 153, 0.12);
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    html {
+      font-size: clamp(15px, 0.55vw + 0.9vh, 17px);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .page {
+      height: 100dvh;
+      max-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 18px 16px;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .disclaimer {
+      color: var(--warning);
+      font-size: 0.76rem;
+      margin-top: 3px;
+      opacity: 0.9;
+    }
+
+    .reset-btn {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    /* col1 уже, col2 и col3 шире */
+    .dashboard {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(220px, 0.68fr) minmax(320px, 1.15fr) minmax(300px, 1.05fr);
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .card h2::before {
+      content: "";
+      width: 4px;
+      height: 18px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    /* --- Входные: приглушённые --- */
+    .inputs-card {
+      background: rgba(26, 35, 50, 0.65);
+      border-color: rgba(51, 65, 85, 0.6);
+      padding: 12px 14px;
+    }
+
+    .inputs-card h2 {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .inputs-card h2::before {
+      background: var(--muted);
+      height: 14px;
+    }
+
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 10px;
+      flex: 1;
+      align-content: space-between;
+      overflow: hidden;
+    }
+
+    .section-label {
+      grid-column: 1 / -1;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-top: 2px;
+      font-weight: 600;
+      opacity: 0.8;
+    }
+
+    .section-label:first-child { margin-top: 0; }
+
+    .field label {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+      line-height: 1.2;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 6px 8px;
+      background: var(--surface-2);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.88rem;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--surface-3);
+    }
+
+    .field select {
+      width: 100%;
+      padding: 6px 8px;
+      background: var(--surface-2);
+      border: 1px solid rgba(51, 65, 85, 0.7);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .field select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .field-output {
+      padding: 6px 8px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .field.span2 { grid-column: 1 / -1; }
+
+    /* --- Результаты: акцент --- */
+    .card-output {
+      border-color: rgba(99, 102, 241, 0.35);
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.06) 0%, var(--surface) 40%);
+    }
+
+    .card-output h2::before {
+      background: var(--success);
+    }
+
+    .card-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow: hidden;
+    }
+
+    /* Hero KPI */
+    .hero-kpi {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .hero-kpi-main {
+      background: var(--success-dim);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-kpi-main .kpi-label {
+      font-size: 0.78rem;
+      color: var(--success);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+
+    .hero-kpi-main .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--success);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hero-kpi-main .kpi-value.negative {
+      color: var(--danger);
+    }
+
+    .hero-kpi-main .kpi-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .hero-kpi-item {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-kpi-item .kpi-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.15;
+    }
+
+    .hero-kpi-item .kpi-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.2;
+    }
+
+    .block-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-light);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .funnel {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex-shrink: 0;
+    }
+
+    .funnel-step {
+      display: grid;
+      grid-template-columns: minmax(120px, 34%) 1fr auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .funnel-step .label {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .funnel-bar-wrap {
+      background: var(--surface-2);
+      border-radius: 6px;
+      height: 24px;
+      overflow: hidden;
+    }
+
+    .funnel-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      border-radius: 6px;
+      transition: width 0.3s ease;
+      min-width: 2px;
+    }
+
+    .funnel-step .value {
+      font-weight: 700;
+      font-size: 0.95rem;
+      min-width: 72px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .unit-costs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 16px;
+      flex-shrink: 0;
+    }
+
+    .unit-cost {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+
+    .unit-cost .lbl { color: var(--muted); }
+    .unit-cost .val { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    /* --- Конкуренты по CPA --- */
+    .market-compare {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .market-rows {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .market-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .market-card.best {
+      border-color: rgba(52, 211, 153, 0.45);
+      background: rgba(52, 211, 153, 0.06);
+    }
+
+    .market-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .market-title .name {
+      font-weight: 800;
+      font-size: 0.9rem;
+      letter-spacing: 0.01em;
+    }
+
+    .market-title .badge {
+      font-size: 0.72rem;
+      color: var(--success);
+      font-weight: 700;
+      display: none;
+    }
+
+    .market-card.best .market-title .badge { display: inline; }
+
+    .market-metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .market-metric .val {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .market-summary {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .market-summary strong { color: var(--text); }
+
+    /* --- Сценарии --- */
+    .card-scenarios {
+      border-color: rgba(52, 211, 153, 0.2);
+    }
+
+    .card-scenarios h2::before {
+      background: var(--success);
+    }
+
+    .scenario-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .scenario-card {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+    }
+
+    .scenario-card.best {
+      border-color: rgba(52, 211, 153, 0.4);
+      background: rgba(52, 211, 153, 0.06);
+    }
+
+    .scenario-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .scenario-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .scenario-row .val {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .scenario-savings {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .scenario-savings .lbl {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .scenario-savings .val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .scenario-savings .val.positive { color: var(--success); }
+    .scenario-savings .val.negative { color: var(--danger); }
+
+    @media (max-width: 1100px) {
+      html, body { overflow: auto; height: auto; }
+      .page { height: auto; max-height: none; }
+      .dashboard { grid-template-columns: 1fr; overflow: visible; }
+      .hero-kpi { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <h1>Калькулятор эффекта ИИ Рекрутер</h1>
+        <div class="disclaimer">Модель для оценки масштаба · не гарантия · телефония и интеграция не включены</div>
+      </div>
+      <button class="reset-btn" type="button" id="resetBtn">Сбросить</button>
+    </header>
+
+    <div class="dashboard">
+      <!-- 1: параметры — уже, второстепенно -->
+      <div class="card inputs-card">
+        <h2>Параметры расчёта</h2>
+        <div class="inputs-grid">
+          <div class="section-label">Пакет AI</div>
+          <div class="field span2">
+            <label for="region">Регион тарифа</label>
+            <select id="region">
+              <option value="intl_ru">Ин.яз + РУ</option>
+              <option value="sng">СНГ</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="aiMinutes">Тарифицируемые минуты</label>
+            <input type="number" id="aiMinutes" value="200000" min="0" step="1000">
+          </div>
+          <div class="field">
+            <label>Цена AI, ₽</label>
+            <div class="field-output" id="aiPriceOut">—</div>
+          </div>
+          <div class="field">
+            <label>Цена минуты AI, ₽</label>
+            <div class="field-output" id="aiMinutePriceOut">—</div>
+          </div>
+          <div class="field">
+            <label for="packagePer10k">Попыток / 10 000 мин</label>
+            <input type="number" id="packagePer10k" value="21260" min="0" step="1">
+          </div>
+
+          <div class="section-label">Воронка</div>
+          <div class="field span2">
+            <label for="conversionScenario">Сценарий конверсий</label>
+            <select id="conversionScenario">
+              <option value="standard">Стандартный</option>
+              <option value="pessimistic">Пессимистичный</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Контакт</label>
+            <div class="field-output" id="contactRateOut">—</div>
+          </div>
+          <div class="field">
+            <label>Интервью</label>
+            <div class="field-output" id="meaningfulRateOut">—</div>
+          </div>
+          <div class="field span2">
+            <label>Релевантный</label>
+            <div class="field-output" id="relevanceRateOut">—</div>
+          </div>
+
+          <div class="section-label">Ручной труд</div>
+          <div class="field">
+            <label for="manualAttemptMin">Мин / попытка</label>
+            <input type="number" id="manualAttemptMin" value="1" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label for="manualInterviewMin">Мин / интервью</label>
+            <input type="number" id="manualInterviewMin" value="15" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label for="recruiterCost">Зарплата, ₽</label>
+            <input type="number" id="recruiterCost" value="80000" min="0" step="1000">
+          </div>
+          <div class="field">
+            <label for="workingHours">Часов / мес</label>
+            <input type="number" id="workingHours" value="160" min="1" step="1">
+          </div>
+          <div class="field span2">
+            <label for="aiControlMin">Контроль AI, мин</label>
+            <input type="number" id="aiControlMin" value="3" min="0" step="0.1">
+          </div>
+
+          <div class="section-label">Альтернативы</div>
+          <div class="field">
+            <label for="hhPerVacancy">КЦ, ₽/мин</label>
+            <input type="number" id="hhPerVacancy" value="17" min="0" step="1">
+          </div>
+          <div class="field">
+            <label for="saasPerEmployee">SaaS ₽/инт.</label>
+            <input type="number" id="saasPerEmployee" value="149" min="0" step="1">
+          </div>
+
+          <div class="section-label">Сравнение конкурентов (CPA)</div>
+          <div class="field span2">
+            <label for="cpaCompareScenario">Сценарий сравнения</label>
+            <select id="cpaCompareScenario">
+              <option value="market">Рынок (КЦ 8% / бот 2% / ИИ 5%)</option>
+              <option value="our_base">Наша база (Excel, холодная)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="marketContactDurationMin">Средний разговор, мин</label>
+            <input type="number" id="marketContactDurationMin" value="10" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label for="marketShortCallPct">Короткие &lt;10 сек, % контактов</label>
+            <input type="number" id="marketShortCallPct" value="15" min="0" max="100" step="1">
+          </div>
+
+          <div class="field">
+            <label for="ccConvPct">КЦ: конверсия, %</label>
+            <input type="number" id="ccConvPct" value="8" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label for="botConvPct">Сценарный бот: конверсия, %</label>
+            <input type="number" id="botConvPct" value="2" min="0" step="0.1">
+          </div>
+
+          <div class="field">
+            <label for="aiConvPct" id="aiConvPctLabel">ИИ рекрутер: конверсия, %</label>
+            <input type="number" id="aiConvPct" value="5" min="0" step="0.1">
+            <div class="field-output" id="aiConvPctOut" hidden>—</div>
+          </div>
+          <div class="field">
+            <label for="botCostPerMin">Сценарный бот: ₽/мин</label>
+            <input type="number" id="botCostPerMin" value="3" min="0" step="0.1">
+          </div>
+
+          <div class="field span2">
+            <label>ИИ: ₽/мин по тарифу</label>
+            <div class="field-output" id="aiTariffPerMinOut">—</div>
+          </div>
+
+          <div class="field span2">
+            <label for="dealValuePerConv">Ценность конверсии, ₽ (опционально)</label>
+            <input type="number" id="dealValuePerConv" value="0" min="0" step="100">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2: выхлоп и метрики — главный акцент -->
+      <div class="card card-output">
+        <h2>Ваш результат</h2>
+        <div class="card-body">
+          <div class="hero-kpi" id="heroKpi"></div>
+
+          <div>
+            <div class="block-title">Воронка</div>
+            <div class="funnel" id="funnel"></div>
+          </div>
+
+          <div>
+            <div class="block-title">Стоимость единицы</div>
+            <div class="unit-costs" id="unitCosts"></div>
+          </div>
+
+          <div class="market-compare" id="marketCompare"></div>
+        </div>
+      </div>
+
+      <!-- 3: сравнение — акцент на экономии -->
+      <div class="card card-scenarios">
+        <h2>Экономия vs альтернативы</h2>
+        <div class="scenario-list" id="scenarioList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Данные из Excel: листы «Пакеты» и «Конверсии» ---
+    const TARIFF_FIXED = { intl_ru: 300000, sng: 320000 };
+    const TARIFF_TIERS = [
+      { threshold: 10001, intl_ru: 29, sng: 31 },
+      { threshold: 30001, intl_ru: 26, sng: 28 },
+      { threshold: 50001, intl_ru: 23, sng: 25 },
+      { threshold: 100001, intl_ru: 21, sng: 23 },
+      { threshold: 150001, intl_ru: 18, sng: 20 },
+      { threshold: 200001, intl_ru: 15, sng: 15 }
+    ];
+
+    const CONVERSIONS = {
+      standard: { contact: 0.263, interview: 0.501, relevant: 0.271 },
+      pessimistic: { contact: 0.18, interview: 0.372, relevant: 0.25 }
+    };
+
+    const DEFAULTS = {
+      region: 'intl_ru',
+      aiMinutes: 200000,
+      packagePer10k: 21260,
+      conversionScenario: 'standard',
+      manualAttemptMin: 1,
+      manualInterviewMin: 15,
+      recruiterCost: 80000,
+      workingHours: 160,
+      aiControlMin: 3,
+      hhPerVacancy: 17,
+      saasPerEmployee: 149,
+
+      cpaCompareScenario: 'market',
+      marketContactDurationMin: 10,
+      marketShortCallPct: 15,
+      ccConvPct: 8,
+      botConvPct: 2,
+      aiConvPct: 5,
+      botCostPerMin: 3,
+      dealValuePerConv: 0
+    };
+
+    const MARKET_CONV = { cc: 8, bot: 2, ai: 5 };
+
+    const fieldIds = {
+      aiMinutes: 'aiMinutes',
+      packagePer10k: 'packagePer10k',
+      manualAttemptMin: 'manualAttemptMin',
+      manualInterviewMin: 'manualInterviewMin',
+      recruiterCost: 'recruiterCost',
+      workingHours: 'workingHours',
+      aiControlMin: 'aiControlMin',
+      hhPerVacancy: 'hhPerVacancy',
+      saasPerEmployee: 'saasPerEmployee',
+
+      marketContactDurationMin: 'marketContactDurationMin',
+      marketShortCallPct: 'marketShortCallPct',
+      ccConvPct: 'ccConvPct',
+      botConvPct: 'botConvPct',
+      aiConvPct: 'aiConvPct',
+      botCostPerMin: 'botCostPerMin',
+      dealValuePerConv: 'dealValuePerConv'
+    };
+
+    // Excel: MATCH(minutes, thresholds, 1) — наибольший порог <= minutes
+    function lookupTariffPerMinute(minutes, region) {
+      let tier = TARIFF_TIERS[0];
+      for (const t of TARIFF_TIERS) {
+        if (minutes >= t.threshold) tier = t;
+        else break;
+      }
+      return tier[region];
+    }
+
+    // Excel B8: IF(minutes<=10000, fixed, minutes * tier_price)
+    function calcAiPrice(minutes, region) {
+      if (minutes <= 0) return 0;
+      if (minutes <= 10000) return TARIFF_FIXED[region];
+      return minutes * lookupTariffPerMinute(minutes, region);
+    }
+
+    function getValues() {
+      const v = {
+        region: document.getElementById('region').value,
+        conversionScenario: document.getElementById('conversionScenario').value,
+        cpaCompareScenario: document.getElementById('cpaCompareScenario').value
+      };
+      for (const [key, id] of Object.entries(fieldIds)) {
+        v[key] = parseFloat(document.getElementById(id).value) || 0;
+      }
+      const conv = CONVERSIONS[v.conversionScenario] || CONVERSIONS.standard;
+      v.contactRate = conv.contact;
+      v.meaningfulRate = conv.interview;
+      v.relevanceRate = conv.relevant;
+      // Контакт → релевантный (холодная база Excel)
+      v.aiConvOurBasePct = v.meaningfulRate * v.relevanceRate * 100;
+      if (v.cpaCompareScenario === 'our_base') {
+        v.aiConvPct = v.aiConvOurBasePct;
+      }
+      v.aiPrice = calcAiPrice(v.aiMinutes, v.region);
+      v.aiPricePerMinute = v.aiMinutes > 0 ? v.aiPrice / v.aiMinutes : 0;
+      return v;
+    }
+
+    function syncCpaScenarioUi(v) {
+      const isOurBase = v.cpaCompareScenario === 'our_base';
+      const input = document.getElementById('aiConvPct');
+      const out = document.getElementById('aiConvPctOut');
+      const label = document.getElementById('aiConvPctLabel');
+      input.hidden = isOurBase;
+      out.hidden = !isOurBase;
+      if (isOurBase) {
+        label.textContent = 'ИИ: контакт → релевантный (Excel), %';
+        out.textContent = fmt(v.aiConvOurBasePct, 1) + '%';
+      } else {
+        label.textContent = 'ИИ рекрутер: конверсия, %';
+      }
+    }
+
+    function applyCpaScenarioDefaults(scenario) {
+      if (scenario === 'market') {
+        document.getElementById('ccConvPct').value = MARKET_CONV.cc;
+        document.getElementById('botConvPct').value = MARKET_CONV.bot;
+        document.getElementById('aiConvPct').value = MARKET_CONV.ai;
+      }
+    }
+
+    function fmt(n, d = 0) {
+      if (!isFinite(n)) return '—';
+      return n.toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d });
+    }
+
+    function fmtMoney(n) { return fmt(Math.round(n)) + ' ₽'; }
+    function fmtPct(rate) { return fmt(rate * 100, 1) + '%'; }
+
+    function calculate(v) {
+      // B24/B25 = ROUND(B14 * B7 / 10000, 0)
+      const actualAttempts = Math.round(v.packagePer10k * v.aiMinutes / 10000);
+      const contacts = actualAttempts * v.contactRate;
+      const meaningfulInterviews = contacts * v.meaningfulRate;
+      const relevantCandidates = meaningfulInterviews * v.relevanceRate;
+
+      const manualMinutes = actualAttempts * v.manualAttemptMin + meaningfulInterviews * v.manualInterviewMin;
+      const manualHours = manualMinutes / 60;
+      const aiControlHours = meaningfulInterviews * v.aiControlMin / 60;
+      const netSavedHours = Math.max(0, manualHours - aiControlHours);
+      const savedCost = netSavedHours * v.recruiterCost / v.workingHours;
+      const netEffect = savedCost - v.aiPrice;
+      const fte = netSavedHours / v.workingHours;
+
+      return {
+        actualAttempts, contacts, meaningfulInterviews, relevantCandidates,
+        manualHours, netSavedHours, savedCost, netEffect, fte,
+        pricePerAttempt: actualAttempts > 0 ? v.aiPrice / actualAttempts * 1000 : 0,
+        pricePerContact: contacts > 0 ? v.aiPrice / contacts : 0,
+        pricePerInterview: meaningfulInterviews > 0 ? v.aiPrice / meaningfulInterviews : 0,
+        pricePerCandidate: relevantCandidates > 0 ? v.aiPrice / relevantCandidates : 0,
+        hhCost: manualMinutes * v.hhPerVacancy,
+        saasCost: meaningfulInterviews * v.saasPerEmployee
+      };
+    }
+
+    function renderCalculatedFields(v) {
+      document.getElementById('aiPriceOut').textContent = fmtMoney(v.aiPrice);
+      document.getElementById('aiMinutePriceOut').textContent = fmt(v.aiPricePerMinute, 1) + ' ₽';
+      const aiTariffOut = document.getElementById('aiTariffPerMinOut');
+      if (aiTariffOut) aiTariffOut.textContent = fmt(v.aiPricePerMinute, 1) + ' ₽';
+      document.getElementById('contactRateOut').textContent = fmtPct(v.contactRate);
+      document.getElementById('meaningfulRateOut').textContent = fmtPct(v.meaningfulRate);
+      document.getElementById('relevanceRateOut').textContent = fmtPct(v.relevanceRate);
+    }
+
+    function renderHero(r) {
+      const neg = r.netEffect < 0 ? ' negative' : '';
+      document.getElementById('heroKpi').innerHTML = `
+        <div class="hero-kpi-main">
+          <div class="kpi-label">Чистый эффект</div>
+          <div class="kpi-value${neg}">${fmtMoney(r.netEffect)}</div>
+          <div class="kpi-sub">экономия минус стоимость AI</div>
+        </div>
+        <div class="hero-kpi-item">
+          <div class="kpi-value">${fmt(r.netSavedHours, 0)}</div>
+          <div class="kpi-label">снятых HR-часов</div>
+        </div>
+        <div class="hero-kpi-item">
+          <div class="kpi-value">${fmt(r.relevantCandidates)}</div>
+          <div class="kpi-label">подходящих кандидатов</div>
+        </div>
+        <div class="hero-kpi-item">
+          <div class="kpi-value">${fmt(r.fte, 1)}</div>
+          <div class="kpi-label">экв. рекрутеров (FTE)</div>
+        </div>
+      `;
+    }
+
+    function renderFunnel(r) {
+      const steps = [
+        { label: 'Тарифицируемые звонки', value: r.actualAttempts },
+        { label: 'Контакты', value: r.contacts },
+        { label: 'Содержательные интервью', value: r.meaningfulInterviews },
+        { label: 'Подходящие кандидаты', value: r.relevantCandidates }
+      ];
+      const max = r.actualAttempts || 1;
+      document.getElementById('funnel').innerHTML = steps.map(s => `
+        <div class="funnel-step">
+          <span class="label">${s.label}</span>
+          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${Math.max(2, (s.value / max) * 100)}%"></div></div>
+          <span class="value">${fmt(s.value)}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderUnitCosts(r) {
+      document.getElementById('unitCosts').innerHTML = `
+        <div class="unit-cost"><span class="lbl">За 1000 звонков</span><span class="val">${fmt(r.pricePerAttempt, 0)} ₽</span></div>
+        <div class="unit-cost"><span class="lbl">За контакт</span><span class="val">${fmt(r.pricePerContact, 0)} ₽</span></div>
+        <div class="unit-cost"><span class="lbl">За интервью</span><span class="val">${fmt(r.pricePerInterview, 0)} ₽</span></div>
+        <div class="unit-cost"><span class="lbl">За кандидата</span><span class="val">${fmt(r.pricePerCandidate, 0)} ₽</span></div>
+      `;
+    }
+
+    function calculateMarket(v, r) {
+      const duration = Math.max(0, v.marketContactDurationMin);
+      const shortShare = Math.min(1, Math.max(0, v.marketShortCallPct / 100));
+      const dealValue = Math.max(0, v.dealValuePerConv);
+      const isOurBase = v.cpaCompareScenario === 'our_base';
+
+      const attempts = r.actualAttempts;
+      const contacts = r.contacts;
+      const noAnswers = Math.max(0, attempts - contacts);
+
+      function mkPaidChannel(convPct, costPerMin, billingNote) {
+        const conv = convPct / 100;
+        const billableMinutes = contacts * duration;
+        const totalCost = billableMinutes * costPerMin;
+        const conversions = contacts * conv;
+        const cpa = conversions > 0 ? totalCost / conversions : Infinity;
+        const costPerContact = contacts > 0 ? totalCost / contacts : 0;
+        const profit = dealValue > 0 ? (conversions * dealValue - totalCost) : null;
+        return {
+          conv, conversions, billableMinutes, costPerMin, costPerContact, cpa, totalCost, profit, billingNote
+        };
+      }
+
+      const aiBillableContacts = contacts * (1 - shortShare);
+      const aiBillableMinutes = aiBillableContacts * duration;
+      // Наша база: берём релевантных из Excel-воронки; рынок: % от контактов
+      const aiConversions = isOurBase
+        ? r.relevantCandidates
+        : contacts * (v.aiConvPct / 100);
+      const aiConv = contacts > 0 ? aiConversions / contacts : 0;
+      const aiTotalCost = v.aiPrice;
+      const aiCpa = aiConversions > 0 ? aiTotalCost / aiConversions : Infinity;
+      const aiCostPerContact = contacts > 0 ? aiTotalCost / contacts : 0;
+      const aiProfit = dealValue > 0 ? (aiConversions * dealValue - aiTotalCost) : null;
+
+      const ai = {
+        conv: aiConv,
+        conversions: aiConversions,
+        billableMinutes: aiBillableMinutes,
+        costPerMin: v.aiPricePerMinute,
+        costPerContact: aiCostPerContact,
+        cpa: aiCpa,
+        totalCost: aiTotalCost,
+        profit: aiProfit,
+        billingNote: 'Недозвоны и разговоры &lt;10 сек не тарифицируются',
+        noAnswers,
+        shortShare,
+        shortContacts: contacts * shortShare,
+        convLabel: isOurBase ? 'контакт → релевантный (Excel)' : 'гипотеза рынка'
+      };
+
+      const cc = mkPaidChannel(
+        v.ccConvPct,
+        v.hhPerVacancy,
+        '₽/мин за каждый состоявшийся разговор'
+      );
+      const bot = mkPaidChannel(
+        v.botConvPct,
+        v.botCostPerMin,
+        '₽/мин за каждый состоявшийся разговор'
+      );
+
+      const channels = { cc, bot, ai };
+      const bestKey = ['cc', 'bot', 'ai'].reduce((best, key) => {
+        const cur = channels[key];
+        if (!isFinite(cur.cpa)) return best;
+        if (!best) return key;
+        return cur.cpa < channels[best].cpa ? key : best;
+      }, null);
+
+      const aiDeltaCpaVsCc = isFinite(ai.cpa) && isFinite(cc.cpa) ? (ai.cpa - cc.cpa) : NaN;
+      const aiDeltaCpaVsBot = isFinite(ai.cpa) && isFinite(bot.cpa) ? (ai.cpa - bot.cpa) : NaN;
+
+      return { attempts, contacts, noAnswers, cc, bot, ai, bestKey, aiDeltaCpaVsCc, aiDeltaCpaVsBot };
+    }
+
+    function renderMarketCompare(m, v) {
+      const names = { cc: 'КЦ', bot: 'Сценарный бот', ai: 'ИИ рекрутер' };
+      const bestName = m.bestKey ? names[m.bestKey] : '—';
+
+      function clsFor(key) {
+        return 'market-card' + (m.bestKey === key ? ' best' : '');
+      }
+
+      function metricRow(lbl, val) {
+        return `
+          <div class="market-metric">
+            <span>${lbl}</span>
+            <span class="val">${val}</span>
+          </div>
+        `;
+      }
+
+      const cc = m.cc, bot = m.bot, ai = m.ai;
+
+      const profitLine = (ai.profit !== null)
+        ? `Прибыль ИИ на объёме: <strong>${fmtMoney(ai.profit)}</strong>`
+        : '';
+
+      const scenarioTitle = v.cpaCompareScenario === 'our_base'
+        ? 'Наша база (Excel, холодная)'
+        : 'Рынок (КЦ 8% / бот 2% / ИИ 5%)';
+      const scenarioNote = v.cpaCompareScenario === 'our_base'
+        ? `ИИ: <strong>${fmtPct(ai.conv)}</strong> контакт→релевантный из Excel. КЦ/бот — рыночные гипотезы (их нет на нашей холодной базе).`
+        : 'Все три конверсии — рыночные гипотезы для сравнения каналов.';
+
+      document.getElementById('marketCompare').innerHTML = `
+        <div class="block-title">Конкуренты по CPA · ${scenarioTitle}</div>
+        <div class="market-summary">
+          ${scenarioNote}
+          Один и тот же объём: <strong>${fmt(m.attempts)}</strong> попыток → <strong>${fmt(m.contacts, 0)}</strong> контактов
+          (<strong>${fmt(m.noAnswers, 0)}</strong> недозвонов бесплатно для ИИ).
+          Лучший по CPA: <strong>${bestName}</strong>.
+          ИИ vs КЦ: <strong>${isFinite(m.aiDeltaCpaVsCc) ? (m.aiDeltaCpaVsCc > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsCc) : '—'}</strong>
+          за конверсию · ИИ vs бот:
+          <strong>${isFinite(m.aiDeltaCpaVsBot) ? (m.aiDeltaCpaVsBot > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsBot) : '—'}</strong>.
+          ${profitLine ? `<div style="margin-top:6px;">${profitLine}</div>` : ''}
+        </div>
+
+        <div class="market-rows">
+          <div class="${clsFor('cc')}">
+            <div class="market-title">
+              <div class="name">${names.cc}</div>
+              <div class="badge">лучший</div>
+            </div>
+            <div class="market-metric"><span>${cc.billingNote}</span></div>
+            ${metricRow('Тарифицируемые минуты', fmt(cc.billableMinutes, 0))}
+            ${metricRow('Стоимость контакта', fmtMoney(cc.costPerContact))}
+            ${metricRow('CPA', fmtMoney(cc.cpa))}
+            ${metricRow('Конверсии', fmt(cc.conversions, 0))}
+            ${metricRow('Затраты', fmtMoney(cc.totalCost))}
+          </div>
+
+          <div class="${clsFor('bot')}">
+            <div class="market-title">
+              <div class="name">${names.bot}</div>
+              <div class="badge">лучший</div>
+            </div>
+            <div class="market-metric"><span>${bot.billingNote}</span></div>
+            ${metricRow('Тарифицируемые минуты', fmt(bot.billableMinutes, 0))}
+            ${metricRow('Стоимость контакта', fmtMoney(bot.costPerContact))}
+            ${metricRow('CPA', fmtMoney(bot.cpa))}
+            ${metricRow('Конверсии', fmt(bot.conversions, 0))}
+            ${metricRow('Затраты', fmtMoney(bot.totalCost))}
+          </div>
+
+          <div class="${clsFor('ai')}">
+            <div class="market-title">
+              <div class="name">${names.ai}</div>
+              <div class="badge">лучший</div>
+            </div>
+            <div class="market-metric"><span>${ai.billingNote}</span></div>
+            ${metricRow('Короткие &lt;10 сек', fmt(ai.shortContacts, 0) + ' (' + fmt(v.marketShortCallPct, 0) + '%)')}
+            ${metricRow('Тарифицируемые минуты', fmt(ai.billableMinutes, 0))}
+            ${metricRow('Цена пакета', fmtMoney(ai.totalCost))}
+            ${metricRow('₽/мин по тарифу', fmt(v.aiPricePerMinute, 1) + ' ₽')}
+            ${metricRow('Конверсия', fmtPct(ai.conv) + (ai.convLabel ? ' · ' + ai.convLabel : ''))}
+            ${metricRow('CPA', fmtMoney(ai.cpa))}
+            ${metricRow(v.cpaCompareScenario === 'our_base' ? 'Релевантные' : 'Конверсии', fmt(ai.conversions, 0))}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderScenarios(r, v) {
+      const scenarios = [
+        { name: 'Штатный HR', current: r.savedCost, ai: v.aiPrice },
+        { name: 'КЦ по минутам', current: r.hhCost, ai: v.aiPrice },
+        { name: 'AI-интервьюер SaaS', current: r.saasCost, ai: v.aiPrice }
+      ];
+      const maxSaving = Math.max(...scenarios.map(s => s.current - s.ai));
+      document.getElementById('scenarioList').innerHTML = scenarios.map(s => {
+        const savings = s.current - s.ai;
+        const cls = savings >= 0 ? 'positive' : 'negative';
+        const best = savings === maxSaving && savings > 0 ? ' best' : '';
+        return `
+          <div class="scenario-card${best}">
+            <div class="scenario-name">${s.name}</div>
+            <div class="scenario-row"><span>Сейчас</span><span class="val">${fmtMoney(s.current)}</span></div>
+            <div class="scenario-row"><span>С AI Recruiter</span><span class="val">${fmtMoney(s.ai)}</span></div>
+            <div class="scenario-savings">
+              <span class="lbl">Экономия</span>
+              <span class="val ${cls}">${fmtMoney(savings)}</span>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function recalculate() {
+      const v = getValues();
+      const r = calculate(v);
+      renderCalculatedFields(v);
+      syncCpaScenarioUi(v);
+      renderHero(r);
+      renderFunnel(r);
+      renderUnitCosts(r);
+      renderScenarios(r, v);
+
+      const m = calculateMarket(v, r);
+      renderMarketCompare(m, v);
+    }
+
+    Object.values(fieldIds).forEach(id => {
+      document.getElementById(id).addEventListener('input', recalculate);
+    });
+    ['region', 'conversionScenario'].forEach(id => {
+      document.getElementById(id).addEventListener('change', recalculate);
+    });
+
+    document.getElementById('cpaCompareScenario').addEventListener('change', () => {
+      applyCpaScenarioDefaults(document.getElementById('cpaCompareScenario').value);
+      recalculate();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('region').value = DEFAULTS.region;
+      document.getElementById('conversionScenario').value = DEFAULTS.conversionScenario;
+      document.getElementById('cpaCompareScenario').value = DEFAULTS.cpaCompareScenario;
+      for (const [key, id] of Object.entries(fieldIds)) {
+        document.getElementById(id).value = DEFAULTS[key];
+      }
+      recalculate();
+    });
+
+    recalculate();
+  </script>
+</body>
+</html>

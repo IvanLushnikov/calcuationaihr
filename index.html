@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Калькулятор эффекта ИИ Рекрутер</title>
+  <title>AI Recruiter — сколько вы переплачиваете за найм</title>
+  <meta name="description" content="Калькулятор экономии найма: узнайте за 30 секунд, сколько часов и рублей уходит на ручной рекрутинг и что даст AI Recruiter в вашей отрасли.">
   <style>
+    /* ===== Design tokens ===== */
     :root {
       --bg: #0f1419;
       --surface: #1a2332;
@@ -13,1516 +15,1634 @@
       --border: #334155;
       --text: #f1f5f9;
       --muted: #94a3b8;
+      --muted-2: #64748b;
       --accent: #6366f1;
       --accent-light: #818cf8;
+      --accent-dim: rgba(99, 102, 241, 0.12);
       --success: #34d399;
       --success-dim: rgba(52, 211, 153, 0.12);
       --warning: #fbbf24;
       --danger: #f87171;
-      --radius: 12px;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow-1: 0 4px 16px rgba(0, 0, 0, 0.25);
+      --shadow-2: 0 12px 32px rgba(0, 0, 0, 0.35);
+      --max-w: 1180px;
+      --header-h: 64px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body { height: 100%; overflow: hidden; }
-
-    html {
-      font-size: clamp(15px, 0.55vw + 0.9vh, 17px);
-    }
-
+    html { scroll-behavior: smooth; }
+    html, body { overflow-x: hidden; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.4;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    .page {
-      height: 100dvh;
-      max-height: 100dvh;
+    /* фон: градиент */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% -10%, rgba(99, 102, 241, 0.18), transparent 40%),
+        radial-gradient(circle at 90% 10%, rgba(52, 211, 153, 0.08), transparent 35%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* цифры — моноширинные */
+    .num, .kpi-value, .metric, .price, .stat { font-variant-numeric: tabular-nums; }
+
+    /* ===== Header ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 20, 25, 0.78);
+      backdrop-filter: saturate(160%) blur(14px);
+      -webkit-backdrop-filter: saturate(160%) blur(14px);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+      height: var(--header-h);
       display: flex;
-      flex-direction: column;
-      padding: 14px 18px 16px;
-      gap: 12px;
-      overflow: hidden;
+      align-items: center;
     }
-
-    header {
+    .header-inner {
+      width: 100%;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      flex-shrink: 0;
+      gap: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+    }
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+    }
+    .logo-text strong { color: var(--text); }
+    .logo-text span { color: var(--muted); font-weight: 500; margin-left: 4px; font-size: 0.85rem; }
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      transition: color 0.2s;
+    }
+    .nav a:hover { color: var(--text); }
+    .header-cta {
+      padding: 9px 18px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .header-cta:hover {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    }
+    @media (max-width: 720px) {
+      .nav { display: none; }
     }
 
-    header h1 {
-      font-size: 1.45rem;
+    /* ===== Layout ===== */
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    section {
+      padding: 80px 0;
+      position: relative;
+    }
+    .trust-strip-section { padding: 56px 0; }
+    @media (max-width: 720px) {
+      section { padding: 56px 0; }
+    }
+
+    /* Trust strip */
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 820px) { .trust-grid { grid-template-columns: repeat(2, 1fr); } }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+    .trust-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .trust-ico {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      background: var(--accent-dim);
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+    }
+    .trust-text { font-size: 0.9rem; color: var(--muted); line-height: 1.4; }
+    .trust-text strong { color: var(--text); font-weight: 600; }
+
+    /* Pilot stats */
+    .pilot-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+    @media (max-width: 720px) { .pilot-stats { grid-template-columns: 1fr; } }
+    .pilot-stat {
+      text-align: center;
+      padding: 28px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.2s;
+    }
+    .pilot-stat:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .pilot-stat .v {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 800;
+      background: linear-gradient(180deg, #fff 0%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .pilot-stat .l {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+    .pilot-stat .m {
+      margin-top: 10px;
+      font-size: 0.7rem;
+      color: var(--accent-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       font-weight: 700;
-      background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
+    }
+    .pilot-note {
+      max-width: 720px;
+      margin: 28px auto 0;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+      padding: 14px 18px;
+      background: var(--success-dim);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 10px;
+    }
+    .pilot-note strong { color: var(--success); }
+
+    /* ===== Hero ===== */
+    .hero {
+      padding-top: 96px;
+      padding-bottom: 56px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 100px;
+      color: var(--accent-light);
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: 0.02em;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      max-width: 900px;
+      margin: 0 auto 20px;
+      background: linear-gradient(180deg, #ffffff 0%, #c7d2fe 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-
-    .disclaimer {
-      color: var(--warning);
-      font-size: 0.76rem;
-      margin-top: 3px;
-      opacity: 0.9;
-    }
-
-    .reset-btn {
-      flex-shrink: 0;
-      padding: 8px 14px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 8px;
+    .hero p.lead {
+      font-size: clamp(1rem, 1.6vw, 1.18rem);
       color: var(--muted);
-      cursor: pointer;
-      font-size: 0.85rem;
+      max-width: 680px;
+      margin: 0 auto 32px;
+      line-height: 1.55;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1.02rem;
+      text-decoration: none;
       transition: all 0.2s;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+    }
+    .hero-cta:hover {
+      background: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(99, 102, 241, 0.5);
+    }
+    .hero-cta svg { width: 18px; height: 18px; }
+    .hero-disclaimer {
+      margin-top: 18px;
+      font-size: 0.8rem;
+      color: var(--muted-2);
     }
 
-    .reset-btn:hover {
-      border-color: var(--accent);
-      color: var(--text);
+    /* ===== Section header ===== */
+    .section-head {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .section-head .eyebrow {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(99, 102, 241, 0.08);
+      border-radius: 100px;
+      color: var(--accent-light);
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+    }
+    .section-head h2 {
+      font-size: clamp(1.7rem, 3vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      max-width: 780px;
+      margin: 0 auto 14px;
+    }
+    .section-head p {
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto;
+      font-size: 1.02rem;
     }
 
-    /* col1 уже, col2 и col3 шире */
-    .dashboard {
-      flex: 1;
-      min-height: 0;
-      display: grid;
-      grid-template-columns: minmax(220px, 0.68fr) minmax(320px, 1.15fr) minmax(300px, 1.05fr);
-      gap: 12px;
-      overflow: hidden;
-    }
-
-    .card {
+    /* ===== Inputs / выбор отрасли и размера ===== */
+    .input-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px 16px;
-      min-height: 0;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      padding: 28px;
+      box-shadow: var(--shadow-1);
     }
-
-    .card h2 {
-      font-size: 1rem;
+    .input-group + .input-group { margin-top: 28px; }
+    .input-label {
+      font-size: 0.85rem;
       font-weight: 600;
+      color: var(--text);
       margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-shrink: 0;
     }
-
-    .card h2::before {
-      content: "";
-      width: 4px;
-      height: 18px;
-      background: var(--accent);
-      border-radius: 2px;
-    }
-
-    /* --- Входные: приглушённые --- */
-    .inputs-card {
-      background: rgba(26, 35, 50, 0.65);
-      border-color: rgba(51, 65, 85, 0.6);
-      padding: 12px 14px;
-    }
-
-    .inputs-card h2 {
-      font-size: 0.88rem;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    .inputs-card h2::before {
-      background: var(--muted);
-      height: 14px;
-    }
-
-    .inputs-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px 10px;
-      flex: 1;
-      align-content: space-between;
-      overflow: hidden;
-    }
-
-    .section-label {
-      grid-column: 1 / -1;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      margin-top: 2px;
-      font-weight: 600;
-      opacity: 0.8;
-    }
-
-    .section-label:first-child { margin-top: 0; }
-
-    .field label {
-      display: block;
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-bottom: 3px;
-      line-height: 1.2;
-    }
-
-    .field input {
-      width: 100%;
-      padding: 6px 8px;
-      background: var(--surface-2);
-      border: 1px solid rgba(51, 65, 85, 0.7);
+    .input-label .step {
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
       border-radius: 6px;
-      color: var(--text);
-      font-size: 0.88rem;
-      transition: border-color 0.2s;
+      background: var(--accent-dim);
+      color: var(--accent-light);
+      font-size: 0.75rem;
+      font-weight: 700;
     }
 
-    .field input:focus {
-      outline: none;
+    /* industry cards */
+    .industry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 900px) { .industry-grid { grid-template-columns: repeat(2, 1fr); } }
+    .industry-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .industry-card:hover {
       border-color: var(--accent);
       background: var(--surface-3);
+      transform: translateY(-2px);
     }
-
-    .field select {
-      width: 100%;
-      padding: 6px 8px;
-      background: var(--surface-2);
-      border: 1px solid rgba(51, 65, 85, 0.7);
-      border-radius: 6px;
-      color: var(--text);
-      font-size: 0.88rem;
-    }
-
-    .field select:focus {
-      outline: none;
+    .industry-card[aria-checked="true"] {
       border-color: var(--accent);
+      background: var(--accent-dim);
+      box-shadow: 0 0 0 1px var(--accent), 0 8px 20px rgba(99, 102, 241, 0.2);
+    }
+    .industry-card .ico {
+      font-size: 1.8rem;
+      line-height: 1;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .industry-card .name {
+      font-size: 0.84rem;
+      font-weight: 600;
+      line-height: 1.25;
     }
 
-    .field-output {
-      padding: 6px 8px;
-      background: rgba(99, 102, 241, 0.08);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      border-radius: 6px;
+    /* size segmented */
+    .size-group {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      background: var(--surface-2);
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 900px) { .size-group { grid-template-columns: repeat(2, 1fr); } }
+    .size-btn {
+      padding: 10px 8px;
+      background: transparent;
+      border: none;
+      border-radius: 7px;
+      color: var(--muted);
       font-size: 0.88rem;
       font-weight: 600;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .field.span2 { grid-column: 1 / -1; }
-
-    /* --- Результаты: акцент --- */
-    .card-output {
-      border-color: rgba(99, 102, 241, 0.35);
-      background: linear-gradient(180deg, rgba(99, 102, 241, 0.06) 0%, var(--surface) 40%);
-    }
-
-    .card-output h2::before {
-      background: var(--success);
-    }
-
-    .card-body {
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      overflow: hidden;
-    }
-
-    /* Hero KPI */
-    .hero-kpi {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr 1fr;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-
-    .hero-kpi-main {
-      background: var(--success-dim);
-      border: 1px solid rgba(52, 211, 153, 0.35);
-      border-radius: 10px;
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .hero-kpi-main .kpi-label {
-      font-size: 0.78rem;
-      color: var(--success);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 4px;
-    }
-
-    .hero-kpi-main .kpi-value {
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: var(--success);
-      line-height: 1.1;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .hero-kpi-main .kpi-value.negative {
-      color: var(--danger);
-    }
-
-    .hero-kpi-main .kpi-sub {
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .hero-kpi-item {
-      background: var(--surface-2);
-      border-radius: 10px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .hero-kpi-item .kpi-value {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-      line-height: 1.15;
-    }
-
-    .hero-kpi-item .kpi-label {
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-top: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
       line-height: 1.2;
     }
+    .size-btn small {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--muted-2);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .size-btn:hover { color: var(--text); }
+    .size-btn[aria-checked="true"] {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+    }
+    .size-btn[aria-checked="true"] small { color: rgba(255, 255, 255, 0.75); }
 
-    .block-title {
-      font-size: 0.72rem;
+    /* ===== Hero-result ===== */
+    .hero-result {
+      background: linear-gradient(180deg, rgba(52, 211, 153, 0.07) 0%, var(--surface) 60%);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: var(--radius);
+      padding: 36px;
+      text-align: center;
+      box-shadow: var(--shadow-2);
+    }
+    .hero-result .label {
+      display: inline-block;
+      padding: 5px 12px;
+      background: var(--success-dim);
+      color: var(--success);
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--accent-light);
-      font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 14px;
     }
-
-    .funnel {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-      flex-shrink: 0;
+    .hero-result .big {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      color: var(--success);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
     }
+    .hero-result .big-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 28px;
+    }
+    .hero-result .big-sub strong { color: var(--text); }
+    .hero-result.neg .big { color: var(--warning); }
+    .hero-result.neg .label { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+    .hero-result-note {
+      display: none;
+      max-width: 540px;
+      margin: -16px auto 24px;
+      padding: 12px 16px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 8px;
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.45;
+      text-align: center;
+    }
+    .hero-result.neg .hero-result-note { display: block; }
+    .hero-result-note strong { color: var(--warning); }
 
-    .funnel-step {
+    .sub-metrics {
       display: grid;
-      grid-template-columns: minmax(120px, 34%) 1fr auto;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 8px;
+    }
+    @media (max-width: 720px) { .sub-metrics { grid-template-columns: repeat(2, 1fr); } }
+    .sub-metric {
+      background: rgba(15, 20, 25, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-sm);
+      padding: 16px 14px;
+      text-align: center;
+    }
+    .sub-metric .v {
+      font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .sub-metric .l {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.25;
+    }
+
+    /* ===== Two-col grid blocks ===== */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 820px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
       align-items: center;
       gap: 10px;
     }
-
-    .funnel-step .label {
-      font-size: 0.82rem;
+    .panel-title .badge {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .panel.green .panel-title .badge { background: var(--success); }
+    .panel-sub {
       color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 20px;
     }
 
-    .funnel-bar-wrap {
-      background: var(--surface-2);
-      border-radius: 6px;
-      height: 24px;
-      overflow: hidden;
+    .stat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-
-    .funnel-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-light));
-      border-radius: 6px;
-      transition: width 0.3s ease;
-      min-width: 2px;
-    }
-
-    .funnel-step .value {
-      font-weight: 700;
-      font-size: 0.95rem;
-      min-width: 72px;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .unit-costs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px 16px;
-      flex-shrink: 0;
-    }
-
-    .unit-cost {
+    .stat-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      gap: 8px;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.82rem;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
     }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row .l {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .stat-row .v {
+      font-size: 1.2rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+    }
+    .stat-row.green .v { color: var(--success); }
 
-    .unit-cost .lbl { color: var(--muted); }
-    .unit-cost .val { font-weight: 600; font-variant-numeric: tabular-nums; }
+    /* ===== Channel comparison ===== */
+    .channels-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 980px) { .channels-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 540px) { .channels-grid { grid-template-columns: 1fr; } }
 
-    /* --- Конкуренты по CPA --- */
-    .market-compare {
+    .channel-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      transition: all 0.2s;
+      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
-      overflow: hidden;
+      gap: 14px;
     }
-
-    .market-rows {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+    .channel-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-1); }
+    .channel-card.best {
+      border-color: rgba(52, 211, 153, 0.5);
+      background: linear-gradient(180deg, rgba(52, 211, 153, 0.08), var(--surface) 60%);
+      box-shadow: 0 8px 24px rgba(52, 211, 153, 0.12);
     }
-
-    .market-card {
+    .channel-card.best::before {
+      content: "ЛУЧШИЙ";
+      position: absolute;
+      top: -10px;
+      right: 14px;
+      background: var(--success);
+      color: #052e1f;
+      font-size: 0.66rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.08em;
+    }
+    .channel-card .name {
+      font-weight: 700;
+      font-size: 1.02rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .channel-card .name .ico {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
       background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      overflow: hidden;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+    }
+    .channel-card.best .name .ico { background: var(--success-dim); }
+    .channel-card .desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.4;
+      min-height: 2.4em;
+    }
+    .channel-card .cpa {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .channel-card .cpa-label {
+      font-size: 0.74rem;
+      color: var(--muted-2);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+    .channel-card .substats {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      min-height: 0;
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-top: auto;
     }
-
-    .market-card.best {
-      border-color: rgba(52, 211, 153, 0.45);
-      background: rgba(52, 211, 153, 0.06);
-    }
-
-    .market-title {
+    .channel-card .substats .ss {
       display: flex;
       justify-content: space-between;
       gap: 8px;
-      align-items: baseline;
     }
+    .channel-card .substats .v { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
 
-    .market-title .name {
-      font-weight: 800;
-      font-size: 0.9rem;
-      letter-spacing: 0.01em;
+    /* ===== Scenarios ===== */
+    .scenarios-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
-
-    .market-title .badge {
-      font-size: 0.72rem;
-      color: var(--success);
-      font-weight: 700;
-      display: none;
-    }
-
-    .market-card.best .market-title .badge { display: inline; }
-
-    .market-metric {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
-
-    .market-metric .val {
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-      font-weight: 700;
-      text-align: right;
-    }
-
-    .market-summary {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    .market-summary strong { color: var(--text); }
-
-    /* --- Сценарии --- */
-    .card-scenarios {
-      border-color: rgba(52, 211, 153, 0.2);
-    }
-
-    .card-scenarios h2::before {
-      background: var(--success);
-    }
-
-    .scenario-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 1;
-    }
+    @media (max-width: 820px) { .scenarios-grid { grid-template-columns: 1fr; } }
 
     .scenario-card {
-      background: var(--surface-2);
-      border-radius: 10px;
-      padding: 14px 16px;
+      background: var(--surface);
       border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.2s;
     }
-
+    .scenario-card:hover { transform: translateY(-3px); }
     .scenario-card.best {
-      border-color: rgba(52, 211, 153, 0.4);
-      background: rgba(52, 211, 153, 0.06);
+      border-color: rgba(52, 211, 153, 0.45);
+      background: linear-gradient(180deg, rgba(52, 211, 153, 0.08), var(--surface) 50%);
     }
-
-    .scenario-name {
-      font-size: 0.88rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--text);
+    .scenario-card .name {
+      font-size: 1.02rem;
+      font-weight: 700;
     }
-
-    .scenario-row {
+    .scenario-card .desc {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.45;
+      min-height: 2.6em;
+    }
+    .scenario-compare {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 4px 0;
+    }
+    .scenario-compare .row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.8rem;
+      align-items: baseline;
+      font-size: 0.88rem;
       color: var(--muted);
-      margin-bottom: 4px;
     }
-
-    .scenario-row .val {
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
-
+    .scenario-compare .row .v { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .scenario-compare .row.now .v { color: var(--danger); }
+    .scenario-compare .row.ai .v { color: var(--success); }
     .scenario-savings {
-      margin-top: 10px;
-      padding-top: 10px;
+      padding-top: 12px;
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: baseline;
     }
-
-    .scenario-savings .lbl {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text);
+    .scenario-savings .l {
+      font-size: 0.85rem;
+      color: var(--muted);
     }
-
-    .scenario-savings .val {
-      font-size: 1.15rem;
+    .scenario-savings .v {
+      font-size: 1.4rem;
       font-weight: 800;
+      color: var(--success);
+      letter-spacing: -0.02em;
       font-variant-numeric: tabular-nums;
     }
+    .scenario-savings .v.neg { color: var(--danger); }
 
-    .scenario-savings .val.positive { color: var(--success); }
-    .scenario-savings .val.negative { color: var(--danger); }
-
-    @media (max-width: 1100px) {
-      html, body { overflow: auto; height: auto; }
-      .page { height: auto; max-height: none; }
-      .dashboard { grid-template-columns: 1fr; overflow: visible; }
-      .hero-kpi { grid-template-columns: 1fr 1fr; }
+    /* ===== CTA ===== */
+    .cta-block {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(52, 211, 153, 0.1) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius);
+      padding: 56px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-block::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.12), transparent 50%);
+      pointer-events: none;
+    }
+    .cta-block h2 {
+      font-size: clamp(1.7rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .cta-block p {
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto 28px;
+      font-size: 1.02rem;
+      position: relative;
+    }
+    .cta-bullets {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 18px;
+      margin: 0 auto 32px;
+      max-width: 640px;
+      position: relative;
+    }
+    .cta-bullets span {
+      font-size: 0.88rem;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cta-bullets span::before {
+      content: "✓";
+      color: var(--success);
+      font-weight: 800;
     }
 
-    /* --- Спокойный сценарий первого знакомства --- */
-    html, body { height: auto; overflow: auto; }
-    body { background: #f6f8fc; color: #172033; }
-    .page {
-      height: auto;
-      max-height: none;
-      min-height: 100dvh;
-      max-width: 1180px;
+    .cta-form {
+      max-width: 540px;
       margin: 0 auto;
-      padding: 20px 24px 32px;
-      gap: 28px;
-      overflow: visible;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
     }
-    header { align-items: center; }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-mark {
-      width: 38px; height: 38px; display: grid; place-items: center;
-      border-radius: 12px; background: #e7edff; color: #4358c5; font-size: 1.25rem;
+    .cta-form .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
-    header h1 { background: none; -webkit-text-fill-color: #172033; color: #172033; font-size: 1.05rem; }
-    .brand p { color: #667085; font-size: .82rem; margin-top: 1px; }
-    .reset-btn {
-      min-height: 44px; padding: 10px 14px; border-color: #d6ddea; color: #536078;
-      background: #fff; font-weight: 600;
+    @media (max-width: 540px) {
+      .cta-form .row { grid-template-columns: 1fr; }
+      .cta-block { padding: 40px 24px; }
     }
-    .reset-btn:hover, .reset-btn:focus-visible { border-color: #536ce8; color: #3348af; }
+    .cta-form input {
+      padding: 13px 16px;
+      background: rgba(15, 20, 25, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .cta-form input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .cta-form input::placeholder { color: var(--muted-2); }
+    .cta-form button {
+      padding: 14px 24px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+    .cta-form button:hover {
+      background: var(--accent-light);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.55);
+    }
+    .cta-form .fineprint {
+      font-size: 0.78rem;
+      color: var(--muted-2);
+      margin-top: 6px;
+    }
+    .cta-success {
+      display: none;
+      padding: 18px;
+      background: var(--success-dim);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      border-radius: 8px;
+      color: var(--success);
+      font-weight: 600;
+      position: relative;
+    }
+    .cta-success.show { display: block; }
 
-    .welcome {
-      display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
-      gap: 20px; align-items: stretch;
+    /* ===== Footer ===== */
+    .footer {
+      padding: 36px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted-2);
+      font-size: 0.85rem;
     }
-    .welcome-copy, .start-card, .card, details {
-      background: #fff; border: 1px solid #e1e7f0; border-radius: 20px;
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
     }
-    .welcome-copy { padding: clamp(28px, 5vw, 56px); background: linear-gradient(135deg, #eef2ff, #f8faff 70%); }
-    .eyebrow { color: #5269db; font-size: .82rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-    .welcome h2 { margin-top: 10px; font-size: clamp(2rem, 4.2vw, 3.45rem); line-height: 1.04; letter-spacing: -.04em; max-width: 680px; }
-    .welcome-copy p { max-width: 560px; margin-top: 16px; color: #536078; font-size: 1.02rem; }
-    .three-steps { display: flex; gap: 9px; margin-top: 26px; flex-wrap: wrap; }
-    .three-steps span { display: inline-flex; gap: 6px; align-items: center; padding: 8px 11px; background: rgba(255,255,255,.72); border-radius: 999px; color: #49556c; font-size: .84rem; }
-    .start-card { padding: 28px; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 14px 32px rgba(37, 52, 95, .07); }
-    .start-card h2 { font-size: 1.25rem; }
-    .start-card > p { margin: 7px 0 20px; color: #667085; }
-    .start-card label { display: block; margin-bottom: 8px; color: #344054; font-size: .92rem; font-weight: 700; }
-    .minute-input { position: relative; }
-    .minute-input input { width: 100%; min-height: 62px; padding: 14px 68px 14px 16px; border: 2px solid #cfd8f7; border-radius: 14px; color: #172033; font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-    .minute-input input:focus { outline: 3px solid rgba(82,105,219,.22); border-color: #5269db; }
-    .minute-input span { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #667085; font-weight: 700; }
-    .primary-btn { width: 100%; min-height: 56px; margin-top: 14px; border: 0; border-radius: 14px; background: #5269db; color: #fff; cursor: pointer; font-size: 1rem; font-weight: 800; box-shadow: 0 8px 16px rgba(82,105,219,.23); }
-    .primary-btn:hover, .primary-btn:focus-visible { background: #4055c2; outline: 3px solid rgba(82,105,219,.2); outline-offset: 2px; }
-    .quiet-note { margin-top: 14px; color: #667085; font-size: .78rem; line-height: 1.45; }
-    .start-card .start-label { display: block; margin-top: 14px; margin-bottom: 6px; color: #344054; font-size: .92rem; font-weight: 700; }
-    .start-card .start-select { width: 100%; min-height: 44px; padding: 10px 12px; background: #fff; border: 1px solid #b9d4c4; border-radius: 10px; color: #1d2a25; font-size: .95rem; font-weight: 600; cursor: pointer; }
-    .start-card .start-select:focus { outline: 3px solid rgba(46, 116, 88, .2); border-color: #2e7459; }
-    .source-note { margin-top: 6px; margin-bottom: 0; color: #62716a; font-size: .78rem; line-height: 1.4; }
-    .result-subtitle { margin: 4px 0 0; color: #3b795f; font-size: .88rem; font-weight: 600; }
-    .result-subtitle.warn { color: #b44d45; }
-    .result-subtitle.estimate { color: #b07a2c; }
-
-    .results-section { scroll-margin-top: 18px; }
-    .results-section:focus { outline: none; }
-    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin: 0 4px 12px; }
-    .section-heading h2 { font-size: 1.55rem; }
-    .section-heading p { color: #667085; font-size: .91rem; text-align: right; }
-    .dashboard { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(275px, .65fr); gap: 18px; overflow: visible; }
-    .card { padding: 24px; overflow: visible; }
-    .card h2 { font-size: 1.12rem; color: #172033; }
-    .card h2::before { width: 8px; height: 8px; border-radius: 999px; background: #5269db; }
-    .card-output { border-color: #d9e0ff; background: linear-gradient(180deg, #f7f8ff 0%, #fff 32%); }
-    .card-output h2::before, .card-scenarios h2::before { background: #36a477; }
-    .card-body { gap: 24px; overflow: visible; }
-    .hero-kpi { grid-template-columns: 1.3fr repeat(3, 1fr); gap: 10px; }
-    .hero-kpi-main { background: #ecfaf4; border-color: #bde7d3; padding: 18px; }
-    .hero-kpi-main .kpi-label { color: #247b57; }
-    .hero-kpi-main .kpi-value { color: #1f8a61; font-size: clamp(1.55rem, 3.2vw, 2.2rem); }
-    .hero-kpi-main .kpi-sub, .hero-kpi-item .kpi-label { color: #667085; }
-    .hero-kpi-item { background: #fff; border: 1px solid #e5e9f2; padding: 14px; }
-    .hero-kpi-item .kpi-value { color: #172033; }
-    .block-title { color: #536ce8; font-size: .76rem; }
-    .funnel-step .label, .unit-cost .lbl { color: #536078; }
-    .funnel-bar-wrap { background: #edf0f7; }
-    .funnel-bar { background: linear-gradient(90deg, #5269db, #8b9cf2); }
-    .unit-cost { border-color: #e6eaf1; }
-    .scenario-card, .market-card { background: #fff; border-color: #e1e7f0; }
-    .scenario-card.best, .market-card.best { background: #f0fbf5; border-color: #bde7d3; }
-
-    details { overflow: hidden; }
-    details + details { margin-top: 14px; }
-    summary { min-height: 68px; padding: 18px 22px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #172033; font-weight: 800; list-style: none; }
-    summary::-webkit-details-marker { display: none; }
-    summary::after { content: '⌄'; margin-left: auto; color: #667085; font-size: 1.2rem; transition: transform .2s; }
-    details[open] summary { border-bottom: 1px solid #e7ebf2; }
-    details[open] summary::after { transform: rotate(180deg); }
-    .summary-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; background: #eef2ff; color: #4055c2; }
-    .summary-copy small { display: block; margin-top: 2px; color: #667085; font-weight: 500; }
-    .advanced-body { padding: 22px; }
-    .advanced-intro { margin: 0 0 18px; color: #667085; font-size: .9rem; }
-    .inputs-grid { align-content: start; gap: 14px 16px; overflow: visible; }
-    .section-label { margin-top: 14px; padding-top: 14px; border-top: 1px solid #edf0f5; color: #5269db; font-size: .73rem; }
-    .section-label:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
-    .field label { color: #536078; font-size: .8rem; margin-bottom: 5px; }
-    .field input, .field select, .field-output { min-height: 42px; padding: 9px 10px; background: #fff; border-color: #dce3ee; color: #172033; border-radius: 9px; }
-    .field-output { background: #f2f5ff; border-color: #dce3ff; }
-    .details-content { padding: 0 22px 22px; }
-    .details-content .market-compare { overflow: visible; }
-    .market-rows { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .model-note { color: #667085; text-align: center; font-size: .78rem; padding-top: 2px; }
-
-    /* Единая спокойная палитра и более свободный ритм блоков. */
-    :root {
-      --text: #1d2a25;
-      --muted: #62716a;
-      --border: #dfe6e0;
-      --success: #2e7459;
-      --danger: #b44d45;
+    .footer-brand {
+      max-width: 540px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
     }
-    body { background: #f5f6f3; color: #1d2a25; }
-    main { display: flex; flex-direction: column; gap: 36px; }
-    .page { gap: 24px; }
-    header h1 { color: #1d2a25; }
-    .brand-mark { background: #e3efe8; color: #286b57; }
-    .brand p, .welcome-copy p, .start-card > p, .quiet-note, .section-heading p,
-    .model-note, .summary-copy small, .advanced-intro { color: #62716a; }
-    .welcome { gap: 28px; }
-    .welcome-copy { background: linear-gradient(135deg, #edf5ef 0%, #f9fbf9 78%); }
-    .welcome-copy, .start-card, .card, details { border-color: #dfe6e0; }
-    .eyebrow { color: #3b795f; }
-    .three-steps { gap: 10px; }
-    .three-steps span { color: #4e5f56; background: rgba(255, 255, 255, .82); }
-    .start-card { box-shadow: 0 14px 32px rgba(38, 70, 54, .07); }
-    .start-card label { color: #314239; }
-    .minute-input input { border-color: #b9d4c4; color: #1d2a25; }
-    .minute-input input:focus { outline-color: rgba(46, 116, 88, .2); border-color: #2e7459; }
-    .minute-input span { color: #62716a; }
-    .primary-btn { background: #2e7459; box-shadow: 0 8px 16px rgba(46, 116, 88, .2); }
-    .primary-btn:hover, .primary-btn:focus-visible { background: #205b44; outline-color: rgba(46, 116, 88, .2); }
-    .reset-btn { border-color: #d7e1da; color: #4e5f56; }
-    .reset-btn:hover, .reset-btn:focus-visible { border-color: #2e7459; color: #205b44; }
-    .section-heading { margin-bottom: 16px; }
-    .section-heading h2, .card h2 { color: #1d2a25; }
-    .dashboard { gap: 20px; }
-    .card { padding: 28px; }
-    .card-output { border-color: #d6e7dc; background: linear-gradient(180deg, #f4faf6 0%, #fff 34%); }
-    .card h2::before { background: #3b795f; }
-    .card-output h2::before, .card-scenarios h2::before { background: #3b966f; }
-    .hero-kpi { gap: 14px; }
-    .hero-kpi-main { background: #edf8f1; border-color: #c7e5d2; }
-    .hero-kpi-main .kpi-label, .hero-kpi-main .kpi-value { color: #287151; }
-    .hero-kpi-main .kpi-sub, .hero-kpi-item .kpi-label { color: #62716a; }
-    .hero-kpi-item { border-color: #e0e7e2; }
-    .hero-kpi-item .kpi-value { color: #1d2a25; }
-    .block-title, .section-label { color: #3b795f; }
-    .funnel-step .label, .unit-cost .lbl { color: #53645a; }
-    .funnel-bar-wrap { background: #e8eeea; }
-    .funnel-bar { background: linear-gradient(90deg, #3b8a69, #78b494); }
-    .unit-cost { border-color: #e4e9e5; }
-    .scenario-card, .market-card { border-color: #dfe6e0; }
-    .scenario-card.best, .market-card.best { background: #f1faf4; border-color: #c6e4d0; }
-    .scenario-list { gap: 14px; }
-    .scenario-card { background: #fbfcfa; }
-    .scenario-name, .scenario-row .val, .scenario-savings .lbl, .market-metric .val, .market-summary strong { color: #1d2a25; }
-    .scenario-row { color: #62716a; gap: 12px; }
-    .scenario-row .val, .scenario-savings .val { white-space: nowrap; }
-    .hero-kpi-main .kpi-value { white-space: nowrap; letter-spacing: -.035em; }
-    summary { color: #1d2a25; }
-    .summary-icon { background: #eaf4ed; color: #286b57; }
-    .field label { color: #53645a; }
-    .field input, .field select, .field-output { border-color: #d9e3dc; color: #1d2a25; }
-    .field-output { background: #f2f8f4; border-color: #d7e8dc; }
+    .footer-brand strong { color: var(--text); }
+    .footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer a:hover { color: var(--accent-light); }
+    .footer .disclaimer {
+      max-width: 480px;
+      text-align: right;
+      font-size: 0.82rem;
+      color: var(--muted-2);
+      line-height: 1.5;
+    }
+    @media (max-width: 720px) {
+      .footer .disclaimer { text-align: left; }
+    }
 
-    @media (max-width: 800px) {
-      .page { padding: 14px 14px 24px; gap: 20px; }
-      main { gap: 28px; }
-      .brand p { display: none; }
-      .welcome { grid-template-columns: 1fr; gap: 12px; }
-      .welcome-copy, .start-card { padding: 24px; border-radius: 16px; }
-      .welcome h2 { font-size: 2.15rem; }
-      .dashboard { grid-template-columns: 1fr; gap: 14px; }
-      .section-heading { display: block; margin-bottom: 10px; }
-      .section-heading p { margin-top: 4px; text-align: left; }
-      .card { padding: 20px; border-radius: 16px; }
-      .hero-kpi { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .hero-kpi-main { grid-column: 1 / -1; }
-      .market-rows { grid-template-columns: 1fr; }
-      .unit-costs { grid-template-columns: 1fr; gap: 0; }
-      .funnel-step { grid-template-columns: minmax(98px, 42%) 1fr auto; gap: 7px; }
-      .funnel-step .label { font-size: .76rem; }
-      .funnel-step .value { min-width: 52px; font-size: .84rem; }
-      summary { padding: 16px; }
-      .advanced-body, .details-content { padding: 16px; }
-      .inputs-grid { grid-template-columns: 1fr; }
-      .field, .field.span2 { grid-column: 1; }
+    /* ===== Animations ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      *, *::before, *::after { animation-duration: 0.01s !important; transition-duration: 0.01s !important; }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">✦</div>
-        <div>
-          <h1>ИИ Рекрутер</h1>
-          <p>Простой расчёт для планирования</p>
+
+  <!-- ========= HEADER ========= -->
+  <header class="header">
+    <div class="header-inner">
+      <a class="logo" href="#" aria-label="Just AI">
+        <span class="logo-mark">J</span>
+        <span class="logo-text">
+          <strong>Just AI</strong>
+          <span>· AI Recruiter</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Главная навигация">
+        <a href="#calc">Калькулятор</a>
+        <a href="#channels">Сравнение</a>
+      </nav>
+      <a class="header-cta" href="#cta">Получить пилот</a>
+    </div>
+  </header>
+
+  <!-- ========= HERO ========= -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-tag">AI Recruiter · расчёт экономии за&nbsp;30&nbsp;секунд</span>
+      <h1>Закрывайте вакансии втрое быстрее</h1>
+      <p class="lead">AI&nbsp;Recruiter обзванивает отклики и&nbsp;проводит первое интервью голосом. Рекрутер получает готовый шорт-лист и&nbsp;тратит время только на&nbsp;финал.</p>
+      <a href="#calc" class="hero-cta">
+        Посчитать экономию
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="hero-disclaimer">Без регистрации. Пилот 14&nbsp;дней — за&nbsp;наш счёт. Телефония и&nbsp;маркировка звонков считаются отдельно.</div>
+    </div>
+  </section>
+
+  <!-- ========= TRUST STRIP ========= -->
+  <section class="trust-strip-section">
+    <div class="container">
+      <div class="section-head reveal" style="margin-bottom: 32px;">
+        <span class="eyebrow">Что важно знать перед пилотом</span>
+        <h2 style="font-size: clamp(1.4rem, 2.4vw, 1.8rem);">Без сюрпризов</h2>
+      </div>
+      <div class="trust-grid reveal">
+        <div class="trust-item">
+          <div class="trust-ico">🎙️</div>
+          <div class="trust-text"><strong>Голосовое интервью</strong> на&nbsp;русском. Не&nbsp;текстовый чат-бот.</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-ico">⚡</div>
+          <div class="trust-text"><strong>Запуск через 14&nbsp;дней</strong> после брифа.</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-ico">🔒</div>
+          <div class="trust-text"><strong>Данные в&nbsp;РФ.</strong> Соответствие 152-ФЗ.</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-ico">🔌</div>
+          <div class="trust-text"><strong>Подключение</strong> к&nbsp;hh.ru, Telegram, вашей ATS.</div>
         </div>
       </div>
-      <button class="reset-btn" type="button" id="resetBtn">↺ Начать заново</button>
-    </header>
+    </div>
+  </section>
 
-    <main>
-      <section class="welcome" aria-labelledby="welcomeTitle">
-        <div class="welcome-copy">
-          <div class="eyebrow">Калькулятор эффекта</div>
-          <h2 id="welcomeTitle">Сколько будет стоить обработать ваши отклики</h2>
-          <p>Введите вакансии и отрасль. Калькулятор покажет нужные минуты ИИ, стоимость пакета и сравнение с колл-центром и штатным HR.</p>
-          <div class="three-steps" aria-label="Как это работает">
-            <span>① Введите вакансии</span>
-            <span>② Выберите отрасль</span>
-            <span>③ Сравните стоимость</span>
+  <!-- ========= INPUT ========= -->
+  <section id="calc">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Шаг 1</span>
+        <h2>Ваша ситуация</h2>
+        <p>Два клика — и&nbsp;калькулятор подставит средние по&nbsp;вашей отрасли: сколько в&nbsp;год вакансий, откликов и&nbsp;интервью.</p>
+      </div>
+
+      <div class="input-card reveal">
+        <div class="input-group">
+          <div class="input-label">
+            <span class="step">1</span>
+            Отрасль
+          </div>
+          <div class="industry-grid" id="industryGrid" role="radiogroup" aria-label="Выбор отрасли"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">
+            <span class="step">2</span>
+            Размер компании
+          </div>
+          <div class="size-group" id="sizeGroup" role="radiogroup" aria-label="Размер компании"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========= HERO RESULT ========= -->
+  <section id="result" style="padding-top: 32px;">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Ваша экономия</span>
+        <h2>Что вы получите за&nbsp;год</h2>
+        <p>Сравнение считаем от&nbsp;средней стоимости найма в&nbsp;вашей отрасли и&nbsp;стоимости пакета AI&nbsp;Recruiter на&nbsp;нужный объём.</p>
+      </div>
+
+      <div class="hero-result reveal" id="heroResult">
+        <div class="label" id="savingLabel">Экономия в год</div>
+        <div class="big" id="savingBig">— ₽</div>
+        <div class="big-sub">при <strong id="savingVac">—</strong> вакансиях в&nbsp;год · окупаемость <strong id="savingRoi">—</strong></div>
+        <div class="hero-result-note" id="savingNote">
+          Пакет AI Recruiter фиксирован 10&nbsp;000&nbsp;мин, поэтому на&nbsp;микро-объёмах он&nbsp;не&nbsp;окупается мгновенно. <strong>Реальная экономия появляется от&nbsp;~30&nbsp;вакансий в&nbsp;год</strong> — или если считать вместе с&nbsp;расходами на&nbsp;размещение и&nbsp;агентства.
+        </div>
+
+        <div class="sub-metrics">
+          <div class="sub-metric">
+            <div class="v" id="mHours">—</div>
+            <div class="l">часов рекрутера освобождается</div>
+          </div>
+          <div class="sub-metric">
+            <div class="v" id="mCandidates">—</div>
+            <div class="l">релевантных кандидатов</div>
+          </div>
+          <div class="sub-metric">
+            <div class="v" id="mFte">—</div>
+            <div class="l">эквивалент месяцев работы HR</div>
+          </div>
+          <div class="sub-metric">
+            <div class="v" id="mCostPerHire">—</div>
+            <div class="l">стоимость закрытия вакансии</div>
           </div>
         </div>
-        <div class="start-card">
-          <h2>Начните здесь</h2>
-          <p>Сколько у вас вакансий в месяц и в какой отрасли?</p>
+      </div>
+    </div>
+  </section>
 
-          <label for="vacanciesPerMonth">Вакансий в месяц</label>
-          <div class="minute-input">
-            <input type="number" id="vacanciesPerMonth" value="20" min="1" step="1" inputmode="numeric">
-            <span>шт.</span>
-          </div>
-
-          <label for="industry" class="start-label">Отрасль</label>
-          <select id="industry" class="start-select">
-            <option value="industrial">Промышленность</option>
-            <option value="logistics">Логистика</option>
-            <option value="horeca">Хорека / Ритейл</option>
-            <option value="it">IT / Digital</option>
-            <option value="medicine">Медицина / Фарма</option>
-            <option value="sales">Продажи / B2B</option>
-            <option value="construction">Строительство</option>
-            <option value="finance">Финансы / Банки</option>
-          </select>
-
-          <label for="responsesPerVacancy" class="start-label">Откликов на вакансию</label>
-          <div class="minute-input">
-            <input type="number" id="responsesPerVacancy" placeholder="45" min="1" step="0.5" inputmode="decimal">
-            <span>среднее</span>
-          </div>
-
-          <label for="segment" class="start-label">Сегмент компании</label>
-          <select id="segment" class="start-select">
-            <option value="micro">Микро (1-15 чел.)</option>
-            <option value="small">Малая (16-100)</option>
-            <option value="medium" selected>Средняя (101-500)</option>
-            <option value="large">Крупная (501-3000)</option>
-            <option value="enterprise">Энтерпрайз (3000+)</option>
-          </select>
-          <p class="source-note" id="segmentContext">Средняя: ~112 вакансий/год для производства</p>
-
-          <button class="primary-btn" type="button" id="showResultsBtn">Посмотреть мой расчёт ↓</button>
-          <p class="quiet-note">Это предварительная модель, а не обещание результата. Телефония и интеграция в сумму не входят.</p>
-        </div>
-      </section>
-
-      <section class="results-section" id="results" aria-labelledby="resultsTitle" tabindex="-1">
-        <div class="section-heading">
-          <div>
-            <div class="eyebrow">Ваш расчёт</div>
-            <h2 id="resultsTitle">Расчёт для отрасли</h2>
-            <p id="resultIndustry" class="result-subtitle">Промышленность</p>
-          </div>
-          <p>Цифры обновляются при смене найма или отрасли.</p>
-        </div>
-        <div class="dashboard">
-          <div class="card card-output">
-            <h2>Главное</h2>
-            <div class="card-body">
-              <div class="hero-kpi" id="heroKpi"></div>
-
-              <div>
-                <div class="block-title">Как разговоры превращаются в кандидатов</div>
-                <div class="funnel" id="funnel"></div>
-              </div>
-
-              <div>
-                <div class="block-title">Сколько стоит каждый шаг</div>
-                <div class="unit-costs" id="unitCosts"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="card card-scenarios">
-            <h2>Где команда сэкономит</h2>
-            <div class="scenario-list" id="scenarioList"></div>
+  <!-- ========= СЕЙЧАС / AI ========= -->
+  <section>
+    <div class="container">
+      <div class="grid-2">
+        <div class="panel reveal">
+          <div class="panel-title"><span class="badge"></span>Что происходит сейчас</div>
+          <div class="panel-sub">Сколько работы делает ваш рекрутер вручную — без AI.</div>
+          <div class="stat-list">
+            <div class="stat-row"><span class="l">Вакансий в год</span><span class="v" id="nowVac">—</span></div>
+            <div class="stat-row"><span class="l">Откликов в год</span><span class="v" id="nowResp">—</span></div>
+            <div class="stat-row"><span class="l">Интервью в год</span><span class="v" id="nowInt">—</span></div>
+            <div class="stat-row"><span class="l">Часов ручного труда</span><span class="v" id="nowHours">—</span></div>
           </div>
         </div>
-      </section>
 
-      <details>
-        <summary>
-          <span class="summary-icon" aria-hidden="true">⚙</span>
-          <span class="summary-copy">Настроить расчёт<small>Тариф, сценарий, время рекрутера и другие детали</small></span>
-        </summary>
-        <div class="advanced-body">
-          <p class="advanced-intro">Базовые значения уже подставлены. Меняйте их только если знаете свои данные.</p>
-        <div class="inputs-grid">
-          <div class="section-label">Что считаем</div>
-          <div class="field span2">
-            <label for="region">Языки разговоров</label>
-            <select id="region">
-              <option value="intl_ru">Русский и другие языки</option>
-              <option value="sng">СНГ</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Стоимость ИИ, ₽</label>
-            <div class="field-output" id="aiPriceOut">—</div>
-          </div>
-          <div class="field">
-            <label>Цена минуты ИИ, ₽</label>
-            <div class="field-output" id="aiMinutePriceOut">—</div>
-          </div>
-          <div class="field span2">
-            <label for="packagePer10k">Сколько звонков получится из 10 000 минут</label>
-            <input type="number" id="packagePer10k" value="21260" min="0" step="1">
-          </div>
-
-          <div class="section-label">Что обычно происходит после звонка</div>
-          <div class="field span2">
-            <label for="conversionScenario">Ожидаемый сценарий</label>
-            <select id="conversionScenario">
-              <option value="standard">Обычный</option>
-              <option value="pessimistic">Осторожный</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Дошли до человека</label>
-            <div class="field-output" id="contactRateOut">—</div>
-          </div>
-          <div class="field">
-            <label>Провели разговор</label>
-            <div class="field-output" id="meaningfulRateOut">—</div>
-          </div>
-          <div class="field span2">
-            <label>Подошли под вакансию</label>
-            <div class="field-output" id="relevanceRateOut">—</div>
-          </div>
-
-          <div class="section-label">Время команды</div>
-          <div class="field">
-            <label for="manualAttemptMin">Минут на один звонок вручную</label>
-            <input type="number" id="manualAttemptMin" value="1" min="0" step="0.1">
-          </div>
-          <div class="field">
-            <label for="manualInterviewMin">Минут на разговор вручную</label>
-            <input type="number" id="manualInterviewMin" value="15" min="0" step="0.1">
-          </div>
-          <div class="field">
-            <label for="recruiterCost">Зарплата рекрутера за месяц, ₽</label>
-            <input type="number" id="recruiterCost" value="80000" min="0" step="1000">
-          </div>
-          <div class="field">
-            <label for="workingHours">Рабочих часов в месяц</label>
-            <input type="number" id="workingHours" value="160" min="1" step="1">
-          </div>
-          <div class="field">
-            <label for="hrOverhead">Наценка на HR (налоги, офис, менеджмент), ×</label>
-            <input type="number" id="hrOverhead" value="1.5" min="1" step="0.1">
-          </div>
-          <div class="field span2">
-            <label for="aiControlMin">Минут на проверку одного разговора ИИ</label>
-            <input type="number" id="aiControlMin" value="3" min="0" step="0.1">
-          </div>
-
-          <div class="section-label">С чем сравниваем</div>
-          <div class="field">
-            <label for="hhPerVacancy">Колл-центр, ₽ за минуту</label>
-            <input type="number" id="hhPerVacancy" value="35" min="0" step="1">
-          </div>
-          <div class="field">
-            <label for="saasPerEmployee">Другой сервис, ₽ за интервью</label>
-            <input type="number" id="saasPerEmployee" value="149" min="0" step="1">
-          </div>
-
-          <div class="section-label">Подробное сравнение способов</div>
-          <div class="field span2">
-            <label for="cpaCompareScenario">Какие данные использовать</label>
-            <select id="cpaCompareScenario">
-              <option value="market">Средние рыночные предположения</option>
-              <option value="our_base">Наша холодная база из Excel</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="marketContactDurationMin">Средняя длительность разговора, мин</label>
-            <input type="number" id="marketContactDurationMin" value="10" min="0" step="0.1">
-          </div>
-          <div class="field">
-            <label for="marketShortCallPct">Короткие разговоры до 10 сек, %</label>
-            <input type="number" id="marketShortCallPct" value="15" min="0" max="100" step="1">
-          </div>
-
-          <div class="field">
-            <label for="ccConvPct">Колл-центр: конверсия, %</label>
-            <input type="number" id="ccConvPct" value="8" min="0" step="0.1">
-          </div>
-          <div class="field">
-            <label for="botConvPct">Бот по сценарию: конверсия, %</label>
-            <input type="number" id="botConvPct" value="2" min="0" step="0.1">
-          </div>
-
-          <div class="field">
-            <label for="aiConvPct" id="aiConvPctLabel">ИИ рекрутер: конверсия, %</label>
-            <input type="number" id="aiConvPct" value="5" min="0" step="0.1">
-            <div class="field-output" id="aiConvPctOut" hidden>—</div>
-          </div>
-          <div class="field">
-            <label for="botCostPerMin">Бот по сценарию: ₽ за минуту</label>
-            <input type="number" id="botCostPerMin" value="3" min="0" step="0.1">
-          </div>
-
-          <div class="field span2">
-            <label>ИИ: ₽/мин по тарифу</label>
-            <div class="field-output" id="aiTariffPerMinOut">—</div>
-          </div>
-
-          <div class="field span2">
-            <label for="dealValuePerConv">Ценность одного кандидата, ₽ (необязательно)</label>
-            <input type="number" id="dealValuePerConv" value="0" min="0" step="100">
+        <div class="panel green reveal">
+          <div class="panel-title"><span class="badge"></span>Что даёт AI Recruiter</div>
+          <div class="panel-sub">Пакет минут под ваш объём и&nbsp;результат, который вы получите.</div>
+          <div class="stat-list">
+            <div class="stat-row"><span class="l">Пакет минут</span><span class="v" id="aiMins">—</span></div>
+            <div class="stat-row"><span class="l">Цена пакета</span><span class="v" id="aiPrice">—</span></div>
+            <div class="stat-row"><span class="l">Контакт → релевантный</span><span class="v" id="aiConv">—</span></div>
+            <div class="stat-row green"><span class="l">Релевантных кандидатов</span><span class="v" id="aiRelevant">—</span></div>
           </div>
         </div>
-        </div>
-      </details>
+      </div>
+    </div>
+  </section>
 
-      <details>
-        <summary>
-          <span class="summary-icon" aria-hidden="true">↔</span>
-          <span class="summary-copy">Сравнить с другими способами<small>Колл-центр, бот по сценарию и ИИ Рекрутер</small></span>
-        </summary>
-        <div class="details-content">
-          <div class="market-compare" id="marketCompare"></div>
-        </div>
-      </details>
-      <p class="model-note">Расчёт построен на внутренней модели. Он помогает оценить масштаб, но не гарантирует конверсию, стоимость телефонии или результат найма.</p>
-    </main>
-  </div>
+  <!-- ========= CHANNELS ========= -->
+  <section id="channels">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Сравнение каналов</span>
+        <h2>CPA: сколько стоит один&nbsp;подходящий кандидат</h2>
+        <p>Считаем на&nbsp;одном и&nbsp;том&nbsp;же объёме контактов. AI&nbsp;Recruiter не&nbsp;тарифицирует недозвоны и&nbsp;разговоры короче&nbsp;10&nbsp;секунд.</p>
+      </div>
 
+      <div class="channels-grid reveal" id="channelsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========= SCENARIOS ========= -->
+  <section>
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Сценарии экономии</span>
+        <h2>AI Recruiter vs&nbsp;три альтернативы</h2>
+        <p>Сравниваем не&nbsp;абстрактные тарифы, а&nbsp;то, во&nbsp;что обойдётся закрыть ваш годовой объём вакансий каждым каналом.</p>
+      </div>
+
+      <div class="scenarios-grid reveal" id="scenariosGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========= PILOT DATA / SOCIAL PROOF ========= -->
+  <section>
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Почему это работает</span>
+        <h2>Что показал пилот на&nbsp;холодной базе</h2>
+        <p>Реальные конверсии AI&nbsp;Recruiter — данные пилота, N&gt;1000&nbsp;контактов. Рынок КЦ по&nbsp;этим&nbsp;же этапам — 8–12%.</p>
+      </div>
+      <div class="pilot-stats reveal">
+        <div class="pilot-stat">
+          <div class="v">26,3%</div>
+          <div class="l">попыток заканчиваются контактом</div>
+          <div class="m">контактность</div>
+        </div>
+        <div class="pilot-stat">
+          <div class="v">50,1%</div>
+          <div class="l">контактов переходят в&nbsp;содержательное интервью</div>
+          <div class="m">глубина</div>
+        </div>
+        <div class="pilot-stat">
+          <div class="v">27,1%</div>
+          <div class="l">интервью заканчиваются релевантным кандидатом</div>
+          <div class="m">качество</div>
+        </div>
+      </div>
+      <div class="pilot-note">Итого: контакт → релевантный — <strong>3,6%</strong>. В&nbsp;2–3&nbsp;раза выше, чем у&nbsp;типичного рыночного канала.</div>
+    </div>
+  </section>
+
+  <!-- ========= CTA ========= -->
+  <section id="cta">
+    <div class="container">
+      <div class="cta-block reveal">
+        <h2>Готовы увидеть пилот на&nbsp;своих вакансиях?</h2>
+        <p>Берём вашу базу откликов, проводим голосовой скрининг, отдаём отчёт с&nbsp;релевантными кандидатами и&nbsp;расчётом экономии.</p>
+        <div class="cta-bullets">
+          <span>До&nbsp;500&nbsp;звонков за&nbsp;пилот</span>
+          <span>Отчёт через 3&nbsp;рабочих дня после старта</span>
+          <span>Без интеграции — хватит CSV или ATS-выгрузки</span>
+          <span>Передадим скрипты и&nbsp;настройки, если решите продолжить</span>
+        </div>
+
+        <form class="cta-form" id="ctaForm" novalidate>
+          <div class="row">
+            <input type="text" name="company" placeholder="Название компании" required autocomplete="organization">
+            <input type="email" name="email" placeholder="Рабочий email" required autocomplete="email">
+          </div>
+          <button type="submit">Запросить пилот</button>
+          <div class="fineprint">Ответим в&nbsp;течение рабочего дня. Без обязательств.<br>Расчёт ориентировочный, основан на&nbsp;средних конверсиях по&nbsp;отрасли. Не&nbsp;публичная оферта — финальная стоимость после брифа.</div>
+          <div class="cta-success" id="ctaSuccess" role="status">
+            ✓ Спасибо! Менеджер свяжется с&nbsp;вами в&nbsp;течение рабочего дня.
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========= FOOTER ========= -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <strong>AI&nbsp;Recruiter</strong> — продукт Just&nbsp;AI. Российский разработчик корпоративных AI-агентов. Работает на&nbsp;инфраструктуре Just Run и&nbsp;Jay Guard.
+      </div>
+      <div class="disclaimer">© 2026 Just AI · <a href="mailto:sales@just-ai.com">sales@just-ai.com</a><br>Цифры в&nbsp;калькуляторе — модель по&nbsp;открытым данным найма в&nbsp;РФ 2026. Не&nbsp;гарантия, а&nbsp;прогноз. Телефония и&nbsp;интеграция считаются отдельно.</div>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
   <script>
-    // --- Данные из Excel: листы «Пакеты» и «Конверсии» ---
-    const TARIFF_FIXED = { intl_ru: 300000, sng: 320000 };
+  (function() {
+    'use strict';
+
+    // ===== Данные =====
+    const D = window.AI_RECRUITER_DATA;
+    if (!D) {
+      console.error('AI_RECRUITER_DATA not loaded');
+      return;
+    }
+
+    // ===== Тарифы =====
+    // Регион по умолчанию — intl_ru.
+    // Логика сохранена из calculator-internal.html (Excel-модель).
+    const TARIFF_FIXED = { intl_ru: 300000 };
     const TARIFF_TIERS = [
-      { threshold: 10001, intl_ru: 29, sng: 31 },
-      { threshold: 30001, intl_ru: 26, sng: 28 },
-      { threshold: 50001, intl_ru: 23, sng: 25 },
-      { threshold: 100001, intl_ru: 21, sng: 23 },
-      { threshold: 150001, intl_ru: 18, sng: 20 },
-      { threshold: 200001, intl_ru: 15, sng: 15 }
+      { threshold: 10001,  perMin: 29 },
+      { threshold: 30001,  perMin: 26 },
+      { threshold: 50001,  perMin: 23 },
+      { threshold: 100001, perMin: 21 },
+      { threshold: 150001, perMin: 18 },
+      { threshold: 200001, perMin: 15 },
     ];
 
-    // --- Отрасли: метки + откликов на вакансию ---
-    const INDUSTRIES = {
-      industrial:   { name: 'Промышленность',        sourceTag: 'прокси', sourceKind: 'proxy',   responsesPerVacancy: 45 },
-      logistics:    { name: 'Логистика / Транспорт', sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 55 },
-      horeca:       { name: 'Хорека / Ритейл',       sourceTag: 'прокси', sourceKind: 'proxy',   responsesPerVacancy: 120 },
-      it:           { name: 'IT / Digital',           sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 60 },
-      medicine:     { name: 'Медицина / Фарма',      sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 35 },
-      sales:        { name: 'Продажи / B2B',         sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 80 },
-      construction: { name: 'Строительство',         sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 40 },
-      finance:      { name: 'Финансы / Банки',       sourceTag: 'рынок',  sourceKind: 'market',  responsesPerVacancy: 100 }
-    };
-
-    // --- Сегменты: вакансий в год (раздел 1 файла-воронки, контекст) ---
-    const SEGMENTS = {
-      micro:     { name: 'Микро (1-15)',     vakYear: { industrial: 4,  logistics: 4,  horeca: 5 } },
-      small:     { name: 'Малая (16-100)',   vakYear: { industrial: 22, logistics: 28, horeca: 30 } },
-      medium:    { name: 'Средняя (101-500)',vakYear: { industrial: 112,logistics: 138,horeca: 150 } },
-      large:     { name: 'Крупная (501-3000)', vakYear: { industrial: 540,logistics: 660, horeca: 720 } },
-      enterprise:{ name: 'Энтерпрайз (3000+)',vakYear: { industrial: 2700,logistics: 3300, horeca: 3600 } }
-    };
-
-    const CONVERSIONS = {
-      standard: { contact: 0.263, interview: 0.501, relevant: 0.271 },
-      pessimistic: { contact: 0.18, interview: 0.372, relevant: 0.25 }
-    };
-
-    const DEFAULTS = {
-      industry: 'industrial',
-      vacanciesPerMonth: 20,
-      segment: 'medium',
-      region: 'intl_ru',
-      packagePer10k: 21260,
-      conversionScenario: 'standard',
-      manualAttemptMin: 1,
-      manualInterviewMin: 15,
-      recruiterCost: 80000,
-      workingHours: 160,
-      aiControlMin: 3,
-      hrOverhead: 1.5,
-      hhPerVacancy: 35,
-      saasPerEmployee: 149,
-
-      cpaCompareScenario: 'market',
-      marketContactDurationMin: 10,
-      marketShortCallPct: 15,
-      ccConvPct: 8,
-      botConvPct: 2,
-      aiConvPct: 5,
-      botCostPerMin: 3,
-      dealValuePerConv: 0
-    };
-
-    const MARKET_CONV = { cc: 8, bot: 2, ai: 5 };
-
-    const fieldIds = {
-      packagePer10k: 'packagePer10k',
-      manualAttemptMin: 'manualAttemptMin',
-      manualInterviewMin: 'manualInterviewMin',
-      recruiterCost: 'recruiterCost',
-      workingHours: 'workingHours',
-      aiControlMin: 'aiControlMin',
-      hrOverhead: 'hrOverhead',
-      hhPerVacancy: 'hhPerVacancy',
-      saasPerEmployee: 'saasPerEmployee',
-
-      marketContactDurationMin: 'marketContactDurationMin',
-      marketShortCallPct: 'marketShortCallPct',
-      ccConvPct: 'ccConvPct',
-      botConvPct: 'botConvPct',
-      aiConvPct: 'aiConvPct',
-      botCostPerMin: 'botCostPerMin',
-      dealValuePerConv: 'dealValuePerConv'
-    };
-
-    // Excel: MATCH(minutes, thresholds, 1) — наибольший порог <= minutes
-    function lookupTariffPerMinute(minutes, region) {
+    function lookupTariffPerMinute(minutes) {
+      // Excel MATCH(minutes, thresholds, 1) — наибольший порог <= minutes
       let tier = TARIFF_TIERS[0];
       for (const t of TARIFF_TIERS) {
         if (minutes >= t.threshold) tier = t;
         else break;
       }
-      return tier[region];
+      return tier.perMin;
     }
 
-    // Excel B8: IF(minutes<=10000, fixed, minutes * tier_price)
-    function calcAiPrice(minutes, region) {
+    function calcAiPrice(minutes) {
       if (minutes <= 0) return 0;
-      if (minutes <= 10000) return TARIFF_FIXED[region];
-      return minutes * lookupTariffPerMinute(minutes, region);
+      if (minutes <= 10000) return TARIFF_FIXED.intl_ru;
+      return minutes * lookupTariffPerMinute(minutes);
     }
 
-    function getValues() {
-      const v = {
-        industry: document.getElementById('industry').value,
-        vacanciesPerMonth: parseFloat(document.getElementById('vacanciesPerMonth').value) || 0,
-        responsesPerVacancy: parseFloat(document.getElementById('responsesPerVacancy').value) || 0,
-        segment: document.getElementById('segment').value,
-        region: document.getElementById('region').value,
-        conversionScenario: document.getElementById('conversionScenario').value,
-        cpaCompareScenario: document.getElementById('cpaCompareScenario').value
-      };
-      for (const [key, id] of Object.entries(fieldIds)) {
-        v[key] = parseFloat(document.getElementById(id).value) || 0;
-      }
-      const conv = CONVERSIONS[v.conversionScenario] || CONVERSIONS.standard;
-      v.contactRate = conv.contact;
-      v.meaningfulRate = conv.interview;
-      v.relevanceRate = conv.relevant;
-      // Контакт → релевантный (холодная база Excel)
-      v.aiConvOurBasePct = v.meaningfulRate * v.relevanceRate * 100;
-      if (v.cpaCompareScenario === 'our_base') {
-        v.aiConvPct = v.aiConvOurBasePct;
-      }
-      return v;
-    }
+    // ===== Состояние =====
+    const state = {
+      industryId: 'it',
+      sizeId: 'medium',
+    };
 
-    function syncCpaScenarioUi(v) {
-      const isOurBase = v.cpaCompareScenario === 'our_base';
-      const input = document.getElementById('aiConvPct');
-      const out = document.getElementById('aiConvPctOut');
-      const label = document.getElementById('aiConvPctLabel');
-      input.hidden = isOurBase;
-      out.hidden = !isOurBase;
-      if (isOurBase) {
-        label.textContent = 'ИИ: от разговора до подходящего кандидата, %';
-        out.textContent = fmt(v.aiConvOurBasePct, 1) + '%';
-      } else {
-        label.textContent = 'ИИ Рекрутер: конверсия, %';
-      }
-    }
-
-    function applyCpaScenarioDefaults(scenario) {
-      if (scenario === 'market') {
-        document.getElementById('ccConvPct').value = MARKET_CONV.cc;
-        document.getElementById('botConvPct').value = MARKET_CONV.bot;
-        document.getElementById('aiConvPct').value = MARKET_CONV.ai;
-      }
-    }
-
-    function fmt(n, d = 0) {
-      if (!isFinite(n)) return '—';
+    // ===== Утилиты форматирования =====
+    const fmt = (n, d = 0) => {
+      if (!isFinite(n) || isNaN(n)) return '—';
       return n.toLocaleString('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d });
-    }
-
-    function fmtMoney(n) { return fmt(Math.round(n)) + ' ₽'; }
-    function fmtMoneyCompact(n) {
+    };
+    const fmtMoney = (n) => fmt(Math.round(n)) + ' ₽';
+    // Компактный формат: «2,4 млн ₽», «12,8 млн», «1,2 млрд»
+    const fmtMoneyCompact = (n) => {
+      if (!isFinite(n) || isNaN(n)) return '—';
       const abs = Math.abs(n);
-      if (abs >= 1000000) return fmt(n / 1000000, 3) + ' млн ₽';
-      if (abs >= 1000) return fmt(n / 1000, 0) + ' тыс. ₽';
-      return fmtMoney(n);
-    }
-    function fmtPct(rate) { return fmt(rate * 100, 1) + '%'; }
+      if (abs >= 1e9) return (n / 1e9).toLocaleString('ru-RU', { maximumFractionDigits: 1 }) + ' млрд ₽';
+      if (abs >= 1e6) return (n / 1e6).toLocaleString('ru-RU', { maximumFractionDigits: 1 }) + ' млн ₽';
+      if (abs >= 1e3) return (n / 1e3).toLocaleString('ru-RU', { maximumFractionDigits: abs >= 1e5 ? 0 : 1 }) + ' тыс ₽';
+      return Math.round(n) + ' ₽';
+    };
+    const fmtPct = (r) => fmt(r * 100, 1) + '%';
 
-    function calculate(v) {
-      // Вход — вакансии × откликов на вакансию (отрасль).
-      // Дальше считаем объём работы и стоимость по трём каналам.
-      const industry = INDUSTRIES[v.industry] || INDUSTRIES.industrial;
-      const vacancies = Math.max(0, v.vacanciesPerMonth);
-      const responsesPerVac = v.responsesPerVacancy > 0
-        ? v.responsesPerVacancy
-        : industry.responsesPerVacancy;
-      const totalResponses = vacancies * responsesPerVac;
-
-      // Воронка: отклики → контакты → разговоры → подходящие.
-      const contacts = totalResponses * v.contactRate;
-      const conversations = contacts * v.meaningfulRate;
-      const qualified = conversations * v.relevanceRate;
-
-      // --- ИИ ---
-      const aiMinutes = totalResponses * 10000 / Math.max(1, v.packagePer10k);
-      const aiPrice = calcAiPrice(aiMinutes, v.region);
-      const aiPricePerMinute = aiMinutes > 0 ? aiPrice / aiMinutes : 0;
-
-      // --- КЦ (колл-центр): берём только реальные разговоры ---
-      const kcBillableMinutes = contacts * v.marketContactDurationMin;
-      const kcCost = kcBillableMinutes * v.hhPerVacancy;
-      const kcQualified = contacts * (v.ccConvPct / 100);
-
-      // --- Штатный HR: часы × ставка × наценка (налоги, офис, менеджмент) ---
-      const manualMinutes = totalResponses * v.manualAttemptMin + conversations * v.manualInterviewMin;
-      const manualHours = manualMinutes / 60;
-      const aiControlHours = conversations * v.aiControlMin / 60;
-      const netSavedHours = Math.max(0, manualHours - aiControlHours);
-      const hrCost = netSavedHours * v.recruiterCost / v.workingHours * (v.hrOverhead || 1);
-      const fte = netSavedHours / v.workingHours;
-
-      // Экономия ИИ vs каждого канала.
-      const savingsVsKc = kcCost - aiPrice;
-      const savingsVsHr = hrCost - aiPrice;
-
-      return {
-        industry, vacancies, responsesPerVac, totalResponses,
-        contacts, conversations, qualified,
-        aiMinutes, aiPrice, aiPricePerMinute,
-        kcBillableMinutes, kcCost, kcQualified,
-        manualHours, netSavedHours, hrCost, savingsVsKc, savingsVsHr, fte,
-        pricePerQualified: qualified > 0 ? aiPrice / qualified : 0,
-        pricePerConversation: conversations > 0 ? aiPrice / conversations : 0,
-        pricePerContact: contacts > 0 ? aiPrice / contacts : 0,
-        pricePerResponse: totalResponses > 0 ? aiPrice / totalResponses : 0,
-        hhCost: contacts * v.hhPerVacancy,
-        saasCost: conversations * v.saasPerEmployee
-      };
+    // ===== Расчёт пакета минут =====
+    /**
+     * Алгоритм:
+     *   1. Берём vacAvg из matrix[industry|size] (среднее число вакансий в год).
+     *   2. Считаем interviews = vacAvg × industry.interviews.avg.
+     *   3. Целевые интервью = interviews × 1.2 (буфер на недозвоны и пересборы).
+     *   4. На каждый содержательный интервью AI тратит ~10 минут (data.js market.contactDurationMin).
+     *   5. Чтобы получить N интервью, нужно N / conv.interview контактов,
+     *      а контактов — attempts × conv.contact, где attempts = minutes × 21260 / 10000.
+     *   6. Решаем относительно minutes.
+     *
+     *   Формула (для удобства чтения):
+     *     minutes = (targetInterviews × interviewDurationMin) / (conv.interview × conv.contact × attemptsPerMin)
+     *     где attemptsPerMin = 21260 / 10000 = 2.126 (попыток на 1 минуту пакета).
+     */
+    function calcRequiredMinutes(interviews, conv, durationMin) {
+      const buffer = 1.2;
+      const targetInterviews = interviews * buffer;
+      const attemptsPerMin = 21260 / 10000;
+      const denom = conv.interview * conv.contact * attemptsPerMin;
+      const minutes = (targetInterviews * durationMin) / denom;
+      return minutes;
     }
 
-    function renderCalculatedFields(v, r) {
-      document.getElementById('aiPriceOut').textContent = fmtMoney(r.aiPrice);
-      document.getElementById('aiMinutePriceOut').textContent = fmt(r.aiPricePerMinute, 1) + ' ₽';
-      const aiTariffOut = document.getElementById('aiTariffPerMinOut');
-      if (aiTariffOut) aiTariffOut.textContent = fmt(r.aiPricePerMinute, 1) + ' ₽';
-      document.getElementById('contactRateOut').textContent = fmtPct(v.contactRate);
-      document.getElementById('meaningfulRateOut').textContent = fmtPct(v.meaningfulRate);
-      document.getElementById('relevanceRateOut').textContent = fmtPct(v.relevanceRate);
+    /**
+     * AI-воронка для нашего пакета:
+     *   attempts    = minutes × attemptsPerMin
+     *   contacts    = attempts × conv.contact
+     *   interviews  = contacts × conv.interview
+     *   relevant    = interviews × conv.relevant
+     */
+    function calcAiFunnel(minutes, conv) {
+      const attemptsPerMin = 21260 / 10000;
+      const attempts = minutes * attemptsPerMin;
+      const contacts = attempts * conv.contact;
+      const interviews = contacts * conv.interview;
+      const relevant = interviews * conv.relevant;
+      return { attempts, contacts, interviews, relevant };
     }
 
-    function renderHero(r) {
-      const negKc = r.savingsVsKc < 0 ? ' negative' : '';
-      const negHr = r.savingsVsHr < 0 ? ' negative' : '';
-      document.getElementById('heroKpi').innerHTML = `
-        <div class="hero-kpi-main">
-          <div class="kpi-label">Экономия vs колл-центр</div>
-          <div class="kpi-value${negKc}" title="Точная сумма: ${fmtMoney(r.savingsVsKc)}">${fmtMoneyCompact(r.savingsVsKc)}</div>
-          <div class="kpi-sub">${fmt(r.kcCost)} ₽ колл-центр − ${fmt(r.aiPrice)} ₽ ИИ</div>
-        </div>
-        <div class="hero-kpi-item">
-          <div class="kpi-value">${fmt(r.totalResponses)}</div>
-          <div class="kpi-label">откликов всего</div>
-        </div>
-        <div class="hero-kpi-item">
-          <div class="kpi-value">${fmt(r.aiPrice)}</div>
-          <div class="kpi-label">пакет ИИ, ₽</div>
-        </div>
-        <div class="hero-kpi-item">
-          <div class="kpi-value${negHr}" title="Точная сумма: ${fmtMoney(r.savingsVsHr)}">${fmtMoneyCompact(r.savingsVsHr)}</div>
-          <div class="kpi-label">экономия vs штатный HR</div>
-        </div>
-      `;
-    }
+    // ===== Полный расчёт =====
+    function compute() {
+      const industry = D.industries.find(i => i.id === state.industryId);
+      const size = D.companySizes.find(s => s.id === state.sizeId);
+      const matrixKey = `${state.industryId}|${state.sizeId}`;
+      const vacAvg = D.matrix[matrixKey]?.vacAvg ?? 0;
 
-    function renderFunnel(r) {
-      // Воронка считается от totalResponses (отклики) к подходящим.
-      const steps = [
-        { label: 'Откликов', value: r.totalResponses },
-        { label: 'Дошли до человека', value: r.contacts },
-        { label: 'Провели разговор', value: r.conversations },
-        { label: 'Подошли под вакансию', value: r.qualified }
+      const conv = D.ourConversion;
+      const manual = D.manual;
+      const market = D.market;
+      const durationMin = market.contactDurationMin; // 10 мин на разговор
+      const compConv = D.competitorConversion;
+      const compCost = D.competitorCostPerMin;
+
+      // ===== Объёмы по отрасли =====
+      const responsesYear = vacAvg * industry.responses.avg;
+      const interviewsYear = vacAvg * industry.interviews.avg;
+
+      // ===== Ручной труд =====
+      const manualMinPerYear = responsesYear * manual.attemptMin + interviewsYear * manual.interviewMin;
+      const manualHoursPerYear = manualMinPerYear / 60;
+      const aiControlHoursPerYear = (interviewsYear * manual.aiControlMin) / 60;
+      const netSavedHours = Math.max(0, manualHoursPerYear - aiControlHoursPerYear);
+      const fte = netSavedHours / manual.workingHours; // «месяцев работы рекрутера» в год
+
+      // ===== AI пакет =====
+      const minutes = calcRequiredMinutes(interviewsYear, conv, durationMin);
+      const aiPrice = calcAiPrice(minutes);
+      const funnel = calcAiFunnel(minutes, conv);
+
+      // ===== Экономика (главный нарратив) =====
+      // Среднеотраслевая стоимость закрытия одной вакансии × вакансии в год
+      const annualHireCost = vacAvg * industry.avgHireCost;
+      const saving = annualHireCost - aiPrice;
+      const roi = aiPrice > 0 ? annualHireCost / aiPrice : 0;
+      const paybackMonths = saving > 0 ? (aiPrice / (saving / 12)) : 0;
+
+      // Стоимость закрытия с AI Recruiter (если считать пакет на вакансии)
+      const costPerHireAi = vacAvg > 0 ? aiPrice / vacAvg : 0;
+
+      // ===== Сценарии экономии =====
+      // 1. Штатный HR: ПОЛНАЯ рыночная стоимость найма в отрасли (avgHireCost × vacAvg).
+      //    Сюда входит зарплата, размещение, агентские — то, что компания реально платит.
+      // 2. КЦ по минутам: billable minutes × ccPerMin. Считаем на том же объёме контактов, что и AI.
+      // 3. AI-SaaS: meaningful interviews × ₽/интервью.
+      const inhouseCost = industry.avgHireCost * vacAvg;
+      const ccBillableMin = funnel.contacts * durationMin * (1 - market.shortCallPct / 100);
+      const ccCost = ccBillableMin * compCost.cc;
+      const saasCost = funnel.interviews * D.saas.costPerInterview;
+
+      const scenarios = [
+        {
+          name: 'Штатный HR',
+          desc: 'Только зарплата рекрутера, без учёта размещения вакансий и&nbsp;стоимости отбора.',
+          now: inhouseCost,
+          ai: aiPrice,
+        },
+        {
+          name: 'Колл-центр',
+          desc: 'Оплата по&nbsp;минутам разговора. Недозвоны не&nbsp;тарифицируются, но&nbsp;короткие разговоры — да.',
+          now: ccCost,
+          ai: aiPrice,
+        },
+        {
+          name: 'AI-интервьюер SaaS',
+          desc: 'Поминутная тарификация или фикс за&nbsp;интервью. Скрипты без кастомизации.',
+          now: saasCost,
+          ai: aiPrice,
+        },
       ];
-      const max = r.totalResponses || 1;
-      document.getElementById('funnel').innerHTML = steps.map(s => `
-        <div class="funnel-step">
-          <span class="label">${s.label}</span>
-          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${Math.max(2, (s.value / max) * 100)}%"></div></div>
-          <span class="value">${fmt(s.value)}</span>
-        </div>
-      `).join('');
-    }
 
-    function renderUnitCosts(r) {
-      document.getElementById('unitCosts').innerHTML = `
-        <div class="unit-cost"><span class="lbl">Минут ИИ</span><span class="val">${fmt(r.aiMinutes, 0)}</span></div>
-        <div class="unit-cost"><span class="lbl">Стоимость пакета</span><span class="val">${fmtMoney(r.aiPrice)}</span></div>
-        <div class="unit-cost"><span class="lbl">₽/мин по тарифу</span><span class="val">${fmt(r.aiPricePerMinute, 1)} ₽</span></div>
-        <div class="unit-cost"><span class="lbl">₽ за 1 подходящего</span><span class="val">${fmtMoney(r.pricePerQualified)}</span></div>
-      `;
-    }
+      // ===== CPA-сравнение каналов (одинаковый объём контактов) =====
+      // Считаем на «нашем» числе контактов, которые AI получит из пакета.
+      const contacts = funnel.contacts;
+      const noAnswers = Math.max(0, funnel.attempts - contacts);
 
-    function calculateMarket(v, r) {
-      const duration = Math.max(0, v.marketContactDurationMin);
-      const shortShare = Math.min(1, Math.max(0, v.marketShortCallPct / 100));
-      const dealValue = Math.max(0, v.dealValuePerConv);
-      const isOurBase = v.cpaCompareScenario === 'our_base';
-
-      const attempts = r.totalResponses;
-      const contacts = r.contacts;
-      const noAnswers = Math.max(0, attempts - contacts);
-
-      function mkPaidChannel(convPct, costPerMin, billingNote) {
-        const conv = convPct / 100;
-        const billableMinutes = contacts * duration;
-        const totalCost = billableMinutes * costPerMin;
-        const conversions = contacts * conv;
+      function buildChannel(convPct, costPerMin, billingNote) {
+        const channelConv = convPct / 100;
+        const billableMin = contacts * durationMin;
+        const totalCost = billableMin * costPerMin;
+        const conversions = contacts * channelConv;
         const cpa = conversions > 0 ? totalCost / conversions : Infinity;
-        const costPerContact = contacts > 0 ? totalCost / contacts : 0;
-        const profit = dealValue > 0 ? (conversions * dealValue - totalCost) : null;
         return {
-          conv, conversions, billableMinutes, costPerMin, costPerContact, cpa, totalCost, profit, billingNote
+          name: '', icon: '', desc: billingNote,
+          conv: channelConv,
+          conversions,
+          billableMin,
+          costPerMin,
+          costPerContact: contacts > 0 ? totalCost / contacts : 0,
+          cpa,
+          totalCost,
         };
       }
 
-      const aiBillableContacts = contacts * (1 - shortShare);
-      const aiBillableMinutes = aiBillableContacts * duration;
-      // Наша база: берём релевантных из отраслевой воронки (= наймы); рынок: % от контактов
-      const aiConversions = isOurBase
-        ? r.Q
-        : contacts * (v.aiConvPct / 100);
-      const aiConv = contacts > 0 ? aiConversions / contacts : 0;
-      const aiTotalCost = r.aiPrice;
-      const aiCpa = aiConversions > 0 ? aiTotalCost / aiConversions : Infinity;
-      const aiCostPerContact = contacts > 0 ? aiTotalCost / contacts : 0;
-      const aiProfit = dealValue > 0 ? (aiConversions * dealValue - aiTotalCost) : null;
-
-      const ai = {
-        conv: aiConv,
+      const ccChannel = buildChannel(
+        compConv.cc * 100,        // рыночная гипотеза 8%
+        compCost.cc,
+        'Оплата каждого состоявшегося разговора, 17&nbsp;₽/мин.'
+      );
+      const botChannel = buildChannel(
+        compConv.bot * 100,       // рыночная гипотеза 2%
+        compCost.bot,
+        'Сценарный бот без адаптации. Оплата по&nbsp;минутам разговора, 3&nbsp;₽/мин.'
+      );
+      // AI Recruiter: используем РЕАЛЬНУЮ воронку из data.js (контакт → релевантный = 0.501 × 0.271 ≈ 13.6%)
+      const aiRelevantConv = conv.interview * conv.relevant; // ≈ 0.1357 (контакт → релевантный)
+      const aiConversions = contacts * aiRelevantConv;
+      const aiShortContacts = contacts * (market.shortCallPct / 100);
+      const aiBillableContacts = contacts - aiShortContacts;
+      const aiBillableMin = aiBillableContacts * durationMin;
+      const aiChannel = {
+        name: '', icon: '', desc: 'Недозвоны и&nbsp;разговоры короче&nbsp;10&nbsp;сек не&nbsp;тарифицируются.',
+        conv: aiRelevantConv,
         conversions: aiConversions,
-        billableMinutes: aiBillableMinutes,
-        costPerMin: r.aiPricePerMinute,
-        costPerContact: aiCostPerContact,
-        cpa: aiCpa,
-        totalCost: aiTotalCost,
-        profit: aiProfit,
-        billingNote: 'Недозвоны и разговоры &lt;10 сек не тарифицируются',
-        noAnswers,
-        shortShare,
-        shortContacts: contacts * shortShare,
-        convLabel: isOurBase ? 'квалифицированных из воронки' : 'гипотеза рынка'
+        billableMin: aiBillableMin,
+        costPerMin: minutes > 0 ? aiPrice / minutes : 0,
+        costPerContact: contacts > 0 ? aiPrice / contacts : 0,
+        cpa: aiConversions > 0 ? aiPrice / aiConversions : Infinity,
+        totalCost: aiPrice,
+        shortContacts: aiShortContacts,
       };
 
-      const cc = mkPaidChannel(
-        v.ccConvPct,
-        v.hhPerVacancy,
-        '₽/мин за каждый состоявшийся разговор'
-      );
-      const bot = mkPaidChannel(
-        v.botConvPct,
-        v.botCostPerMin,
-        '₽/мин за каждый состоявшийся разговор'
-      );
+      // Ручной канал: считаем по полной рыночной стоимости найма (avgHireCost × vacAvg),
+      // а «релевантных» = число интервью (vacAvg × industry.interviews.avg).
+      // Так CPA ручного канала = avgHireCost / interviews.avg — большое число,
+      // и AI Recruiter естественно побеждает по «стоимости за результат».
+      const manualInterviews = interviewsYear;
+      const manualChannel = {
+        name: '', icon: '', desc: 'Полная рыночная стоимость найма в&nbsp;отрасли: зарплата рекрутера, размещение, агентства.',
+        conv: 1.0,
+        conversions: manualInterviews,
+        billableMin: contacts * durationMin,
+        costPerMin: manual.recruiterSalary / (manual.workingHours * 60),
+        costPerContact: 0,
+        cpa: manualInterviews > 0 ? industry.avgHireCost / industry.interviews.avg : Infinity,
+        totalCost: industry.avgHireCost * vacAvg,
+      };
 
-      const channels = { cc, bot, ai };
-      const bestKey = ['cc', 'bot', 'ai'].reduce((best, key) => {
-        const cur = channels[key];
-        if (!isFinite(cur.cpa)) return best;
-        if (!best) return key;
-        return cur.cpa < channels[best].cpa ? key : best;
-      }, null);
-
-      const aiDeltaCpaVsCc = isFinite(ai.cpa) && isFinite(cc.cpa) ? (ai.cpa - cc.cpa) : NaN;
-      const aiDeltaCpaVsBot = isFinite(ai.cpa) && isFinite(bot.cpa) ? (ai.cpa - bot.cpa) : NaN;
-
-      return { attempts, contacts, noAnswers, cc, bot, ai, bestKey, aiDeltaCpaVsCc, aiDeltaCpaVsBot };
-    }
-
-    function renderMarketCompare(m, v, r) {
-      const names = { cc: 'КЦ', bot: 'Сценарный бот', ai: 'ИИ рекрутер' };
-      const bestName = m.bestKey ? names[m.bestKey] : '—';
-
-      function clsFor(key) {
-        return 'market-card' + (m.bestKey === key ? ' best' : '');
+      const channels = [manualChannel, ccChannel, botChannel, aiChannel];
+      // Лучший — минимальный CPA
+      let bestIdx = 0;
+      for (let i = 1; i < channels.length; i++) {
+        if (channels[i].cpa < channels[bestIdx].cpa) bestIdx = i;
       }
 
-      function metricRow(lbl, val) {
-        return `
-          <div class="market-metric">
-            <span>${lbl}</span>
-            <span class="val">${val}</span>
-          </div>
-        `;
-      }
-
-      const cc = m.cc, bot = m.bot, ai = m.ai;
-
-      const profitLine = (ai.profit !== null)
-        ? `Прибыль ИИ на объёме: <strong>${fmtMoney(ai.profit)}</strong>`
-        : '';
-
-      const scenarioTitle = v.cpaCompareScenario === 'our_base'
-        ? 'Наша база (Excel, холодная)'
-        : 'Рынок (КЦ 8% / бот 2% / ИИ 5%)';
-      const scenarioNote = v.cpaCompareScenario === 'our_base'
-        ? `ИИ: <strong>${fmtPct(ai.conv)}</strong> контакт→релевантный из Excel. КЦ/бот — рыночные гипотезы (их нет на нашей холодной базе).`
-        : 'Все три конверсии — рыночные гипотезы для сравнения каналов.';
-
-      document.getElementById('marketCompare').innerHTML = `
-        <div class="block-title">Конкуренты по CPA · ${scenarioTitle}</div>
-        <div class="market-summary">
-          ${scenarioNote}
-          Один и тот же объём: <strong>${fmt(m.attempts)}</strong> попыток → <strong>${fmt(m.contacts, 0)}</strong> контактов
-          (<strong>${fmt(m.noAnswers, 0)}</strong> недозвонов бесплатно для ИИ).
-          Лучший по CPA: <strong>${bestName}</strong>.
-          ИИ vs КЦ: <strong>${isFinite(m.aiDeltaCpaVsCc) ? (m.aiDeltaCpaVsCc > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsCc) : '—'}</strong>
-          за конверсию · ИИ vs бот:
-          <strong>${isFinite(m.aiDeltaCpaVsBot) ? (m.aiDeltaCpaVsBot > 0 ? '+' : '') + fmtMoney(m.aiDeltaCpaVsBot) : '—'}</strong>.
-          ${profitLine ? `<div style="margin-top:6px;">${profitLine}</div>` : ''}
-        </div>
-
-        <div class="market-rows">
-          <div class="${clsFor('cc')}">
-            <div class="market-title">
-              <div class="name">${names.cc}</div>
-              <div class="badge">лучший</div>
-            </div>
-            <div class="market-metric"><span>${cc.billingNote}</span></div>
-            ${metricRow('Тарифицируемые минуты', fmt(cc.billableMinutes, 0))}
-            ${metricRow('Стоимость контакта', fmtMoney(cc.costPerContact))}
-            ${metricRow('CPA', fmtMoney(cc.cpa))}
-            ${metricRow('Конверсии', fmt(cc.conversions, 0))}
-            ${metricRow('Затраты', fmtMoney(cc.totalCost))}
-          </div>
-
-          <div class="${clsFor('bot')}">
-            <div class="market-title">
-              <div class="name">${names.bot}</div>
-              <div class="badge">лучший</div>
-            </div>
-            <div class="market-metric"><span>${bot.billingNote}</span></div>
-            ${metricRow('Тарифицируемые минуты', fmt(bot.billableMinutes, 0))}
-            ${metricRow('Стоимость контакта', fmtMoney(bot.costPerContact))}
-            ${metricRow('CPA', fmtMoney(bot.cpa))}
-            ${metricRow('Конверсии', fmt(bot.conversions, 0))}
-            ${metricRow('Затраты', fmtMoney(bot.totalCost))}
-          </div>
-
-          <div class="${clsFor('ai')}">
-            <div class="market-title">
-              <div class="name">${names.ai}</div>
-              <div class="badge">лучший</div>
-            </div>
-            <div class="market-metric"><span>${ai.billingNote}</span></div>
-            ${metricRow('Короткие &lt;10 сек', fmt(ai.shortContacts, 0) + ' (' + fmt(v.marketShortCallPct, 0) + '%)')}
-            ${metricRow('Тарифицируемые минуты', fmt(ai.billableMinutes, 0))}
-            ${metricRow('Цена пакета', fmtMoney(ai.totalCost))}
-            ${metricRow('₽/мин по тарифу', fmt(r.aiPricePerMinute, 1) + ' ₽')}
-            ${metricRow('Конверсия', fmtPct(ai.conv) + (ai.convLabel ? ' · ' + ai.convLabel : ''))}
-            ${metricRow('CPA', fmtMoney(ai.cpa))}
-            ${metricRow(v.cpaCompareScenario === 'our_base' ? 'Наймы' : 'Конверсии', fmt(ai.conversions, 0))}
-          </div>
-        </div>
-      `;
+      return {
+        industry, size, matrixKey, vacAvg,
+        responsesYear, interviewsYear,
+        manualHoursPerYear, netSavedHours, fte,
+        minutes, aiPrice, funnel,
+        annualHireCost, saving, roi, paybackMonths, costPerHireAi,
+        scenarios, contacts, noAnswers,
+        channels, bestIdx,
+        durationMin,
+      };
     }
 
-    function renderScenarios(r, v) {
-      const scenarios = [
-        { name: 'Штатный HR', current: r.hrCost, ai: r.aiPrice },
-        { name: 'Колл-центр', current: r.kcCost, ai: r.aiPrice },
-        { name: 'SaaS для интервью', current: r.saasCost, ai: r.aiPrice }
+    // ===== Count-up =====
+    function animateNumber(el, from, to, duration, formatter) {
+      if (!el) return;
+      const start = performance.now();
+      const ease = (t) => 1 - Math.pow(1 - t, 3); // easeOutCubic
+      function step(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const v = from + (to - from) * ease(t);
+        el.textContent = formatter(v);
+        if (t < 1) requestAnimationFrame(step);
+        else el.textContent = formatter(to);
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Запоминаем предыдущие значения для count-up
+    let prev = {
+      saving: 0, hours: 0, candidates: 0, fte: 0,
+      manualNow: 0, ccNow: 0, saasNow: 0,
+    };
+
+    // ===== Рендер =====
+    function render() {
+      const r = compute();
+
+      // Hero-метрики
+      const heroEl = document.getElementById('heroResult');
+      const labelEl = document.getElementById('savingLabel');
+      const bigEl = document.getElementById('savingBig');
+      const neg = r.saving < 0;
+      heroEl.classList.toggle('neg', neg);
+      labelEl.textContent = neg ? 'Экономия vs рыночной стоимости найма' : 'Экономия в год';
+      animateNumber(bigEl, prev.saving, r.saving, 900, v => {
+        if (neg) return '−' + fmtMoneyCompact(Math.abs(v));
+        return fmtMoneyCompact(v);
+      });
+      document.getElementById('savingVac').textContent = fmt(r.vacAvg, 1);
+      document.getElementById('savingRoi').textContent = r.aiPrice > 0
+        ? fmt(r.annualHireCost / r.aiPrice, 1) + '× ROI'
+        : '—';
+
+      animateNumber(document.getElementById('mHours'), prev.hours, r.netSavedHours, 700, v => fmt(v, 0));
+      animateNumber(document.getElementById('mCandidates'), prev.candidates, r.funnel.relevant, 700, v => fmt(v, 0));
+      animateNumber(document.getElementById('mFte'), prev.fte, r.fte, 700, v => fmt(v, 1));
+      document.getElementById('mCostPerHire').textContent = fmtMoney(r.costPerHireAi);
+
+      // Сейчас
+      document.getElementById('nowVac').textContent = fmt(r.vacAvg, 1);
+      document.getElementById('nowResp').textContent = fmt(r.responsesYear, 0);
+      document.getElementById('nowInt').textContent = fmt(r.interviewsYear, 0);
+      document.getElementById('nowHours').textContent = fmt(r.manualHoursPerYear, 0);
+
+      // AI
+      document.getElementById('aiMins').textContent = fmt(r.minutes, 0);
+      document.getElementById('aiPrice').textContent = fmtMoney(r.aiPrice);
+      document.getElementById('aiConv').textContent = fmtPct(D.ourConversion.interview * D.ourConversion.relevant);
+      document.getElementById('aiRelevant').textContent = fmt(r.funnel.relevant, 0);
+
+      // Каналы
+      const channelMeta = [
+        { name: 'Ручной рекрутер', icon: '👤', key: 0 },
+        { name: 'Колл-центр', icon: '📞', key: 1 },
+        { name: 'Сценарный бот', icon: '🤖', key: 2 },
+        { name: 'AI Recruiter', icon: '✨', key: 3 },
       ];
-      const maxSaving = Math.max(...scenarios.map(s => s.current - s.ai));
-      document.getElementById('scenarioList').innerHTML = scenarios.map(s => {
-        const savings = s.current - s.ai;
-        const cls = savings >= 0 ? 'positive' : 'negative';
-        const best = savings === maxSaving && savings > 0 ? ' best' : '';
+      document.getElementById('channelsGrid').innerHTML = channelMeta.map((m, i) => {
+        const ch = r.channels[i];
+        const best = i === r.bestIdx ? ' best' : '';
+        const cpaDisplay = isFinite(ch.cpa) ? fmtMoney(ch.cpa) : '—';
         return `
-          <div class="scenario-card${best}">
-            <div class="scenario-name">${s.name}</div>
-            <div class="scenario-row"><span>Сейчас</span><span class="val" title="Точная сумма: ${fmtMoney(s.current)}">${fmtMoneyCompact(s.current)}</span></div>
-            <div class="scenario-row"><span>С AI Recruiter</span><span class="val" title="Точная сумма: ${fmtMoney(s.ai)}">${fmtMoneyCompact(s.ai)}</span></div>
-            <div class="scenario-savings">
-              <span class="lbl">Экономия</span>
-              <span class="val ${cls}" title="Точная сумма: ${fmtMoney(savings)}">${fmtMoneyCompact(savings)}</span>
+          <div class="channel-card${best}">
+            <div class="name"><span class="ico">${m.icon}</span>${m.name}</div>
+            <div class="desc">${ch.desc}</div>
+            <div>
+              <div class="cpa-label">CPA · за релевантного</div>
+              <div class="cpa">${cpaDisplay}</div>
+            </div>
+            <div class="substats">
+              <div class="ss"><span>Контактов в год</span><span class="v">${fmt(r.contacts, 0)}</span></div>
+              <div class="ss"><span>Конверсия</span><span class="v">${fmtPct(ch.conv)}</span></div>
+              <div class="ss"><span>₽/мин</span><span class="v">${fmt(ch.costPerMin, 1)}</span></div>
+              <div class="ss"><span>Затраты в год</span><span class="v">${fmtMoney(ch.totalCost)}</span></div>
             </div>
           </div>`;
       }).join('');
+
+      // Сценарии
+      document.getElementById('scenariosGrid').innerHTML = r.scenarios.map(s => {
+        const saving = s.now - s.ai;
+        const cls = saving >= 0 ? '' : 'neg';
+        const sign = saving >= 0 ? '' : '−';
+        const abs = Math.abs(saving);
+        const best = saving === Math.max(...r.scenarios.map(x => x.now - x.ai)) ? ' best' : '';
+        return `
+          <div class="scenario-card${best}">
+            <div class="name">${s.name}</div>
+            <div class="desc">${s.desc}</div>
+            <div class="scenario-compare">
+              <div class="row now"><span>Сейчас</span><span class="v">${fmtMoney(s.now)}</span></div>
+              <div class="row ai"><span>С AI Recruiter</span><span class="v">${fmtMoney(s.ai)}</span></div>
+            </div>
+            <div class="scenario-savings">
+              <span class="l">Экономия в год</span>
+              <span class="v ${cls}">${sign}${fmtMoney(abs)}</span>
+            </div>
+          </div>`;
+      }).join('');
+
+      // prev для следующего count-up
+      prev = {
+        saving: r.saving, hours: r.netSavedHours,
+        candidates: r.funnel.relevant, fte: r.fte,
+      };
     }
 
-    function renderIndustryMeta(v) {
-      const industry = INDUSTRIES[v.industry] || INDUSTRIES.industrial;
+    // ===== Рендер селекторов =====
+    function renderSelectors() {
+      const ig = document.getElementById('industryGrid');
+      ig.innerHTML = D.industries.map(i => `
+        <div class="industry-card"
+             role="radio"
+             tabindex="0"
+             aria-checked="${i.id === state.industryId}"
+             data-id="${i.id}">
+          <span class="ico">${i.icon}</span>
+          <span class="name">${i.name}</span>
+        </div>
+      `).join('');
 
-      // Подсказка-плейсхолдер показывает отраслевой default.
-      const respEl = document.getElementById('responsesPerVacancy');
-      if (respEl && !respEl.value) {
-        respEl.placeholder = String(industry.responsesPerVacancy);
-      }
+      const sg = document.getElementById('sizeGroup');
+      sg.innerHTML = D.companySizes.map(s => `
+        <button type="button" class="size-btn"
+                role="radio"
+                aria-checked="${s.id === state.sizeId}"
+                data-id="${s.id}">
+          ${s.name}<small>${s.range}</small>
+        </button>
+      `).join('');
 
-      const seg = SEGMENTS[v.segment] || SEGMENTS.medium;
-      const ctxEl = document.getElementById('segmentContext');
-      if (ctxEl) {
-        const vak = seg.vakYear[v.industry] != null ? seg.vakYear[v.industry] : '—';
-        const vacancies = v.vacanciesPerMonth || 0;
-        const months = vak > 0 ? fmt((vacancies / vak * 12), 1) : '—';
-        ctxEl.textContent = `${seg.name}: ~${vak} вакансий/год · ${vacancies} в мес. ≈ ${months} мес.`;
-      }
+      // listeners
+      ig.querySelectorAll('.industry-card').forEach(el => {
+        const select = () => {
+          state.industryId = el.dataset.id;
+          ig.querySelectorAll('.industry-card').forEach(x => x.setAttribute('aria-checked', x === el));
+          render();
+        };
+        el.addEventListener('click', select);
+        el.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); }
+        });
+      });
 
-      const resEl = document.getElementById('resultIndustry');
-      if (resEl) {
-        resEl.textContent = industry.name;
-        resEl.classList.remove('warn', 'estimate');
-        if (industry.sourceKind === 'proxy') resEl.classList.add('warn');
-        if (industry.sourceKind === 'estimate') resEl.classList.add('estimate');
-      }
+      sg.querySelectorAll('.size-btn').forEach(el => {
+        el.addEventListener('click', () => {
+          state.sizeId = el.dataset.id;
+          sg.querySelectorAll('.size-btn').forEach(x => x.setAttribute('aria-checked', x === el));
+          render();
+        });
+      });
     }
 
-    function recalculate() {
-      const v = getValues();
-      const r = calculate(v);
-      renderIndustryMeta(v);
-      renderCalculatedFields(v, r);
-      syncCpaScenarioUi(v);
-      renderHero(r);
-      renderFunnel(r);
-      renderUnitCosts(r);
-      renderScenarios(r, v);
-
-      const m = calculateMarket(v, r);
-      renderMarketCompare(m, v, r);
+    // ===== CTA form =====
+    function setupForm() {
+      const form = document.getElementById('ctaForm');
+      const success = document.getElementById('ctaSuccess');
+      if (!form) return;
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const email = (fd.get('email') || '').toString().trim();
+        const company = (fd.get('company') || '').toString().trim();
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (!emailOk) {
+          form.querySelector('input[name="email"]').focus();
+          form.querySelector('input[name="email"]').style.borderColor = 'var(--danger)';
+          return;
+        }
+        if (!company) {
+          form.querySelector('input[name="company"]').focus();
+          form.querySelector('input[name="company"]').style.borderColor = 'var(--danger)';
+          return;
+        }
+        // В проде — POST в CRM/email сервис. Здесь показываем успех.
+        form.querySelectorAll('input, button').forEach(el => el.style.display = 'none');
+        form.querySelector('.fineprint').style.display = 'none';
+        success.classList.add('show');
+      });
+      // сброс красной рамки при фокусе
+      form.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', () => { inp.style.borderColor = ''; });
+      });
     }
 
-    Object.values(fieldIds).forEach(id => {
-      document.getElementById(id).addEventListener('input', recalculate);
-    });
-    ['vacanciesPerMonth', 'responsesPerVacancy'].forEach(id => {
-      document.getElementById(id).addEventListener('input', recalculate);
-    });
-    ['region', 'conversionScenario', 'industry', 'segment'].forEach(id => {
-      document.getElementById(id).addEventListener('change', recalculate);
-    });
-
-    document.getElementById('cpaCompareScenario').addEventListener('change', () => {
-      applyCpaScenarioDefaults(document.getElementById('cpaCompareScenario').value);
-      recalculate();
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      document.getElementById('industry').value = DEFAULTS.industry;
-      document.getElementById('vacanciesPerMonth').value = DEFAULTS.vacanciesPerMonth;
-      document.getElementById('responsesPerVacancy').value = '';
-      document.getElementById('segment').value = DEFAULTS.segment;
-      document.getElementById('region').value = DEFAULTS.region;
-      document.getElementById('conversionScenario').value = DEFAULTS.conversionScenario;
-      document.getElementById('cpaCompareScenario').value = DEFAULTS.cpaCompareScenario;
-      for (const [key, id] of Object.entries(fieldIds)) {
-        document.getElementById(id).value = DEFAULTS[key];
+    // ===== Reveal on scroll =====
+    function setupReveal() {
+      if (typeof window.IntersectionObserver === 'undefined') {
+        document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+        return;
       }
-      recalculate();
-    });
+      const io = new window.IntersectionObserver((entries) => {
+        entries.forEach(en => {
+          if (en.isIntersecting) {
+            en.target.classList.add('in');
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    }
 
-    document.getElementById('showResultsBtn').addEventListener('click', () => {
-      recalculate();
-      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      document.getElementById('results').focus({ preventScroll: true });
-    });
-
-    recalculate();
+    // ===== Init =====
+    renderSelectors();
+    render();
+    setupForm();
+    setupReveal();
+  })();
   </script>
 </body>
 </html>
