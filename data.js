@@ -108,62 +108,54 @@ window.AI_RECRUITER_DATA = {
     },
   ],
 
-  // 5 размеров компаний. vacanciesPerYear — сколько вакансий в год в ОДНОЙ компании такого размера.
+  // 4 размера компаний. vacanciesPerYear — сколько вакансий в год в ОДНОЙ компании такого размера.
+  // Микро убран — пакет 300к фикс делает AI Recruiter экономически невыгодным при 1-3 вакансиях в год.
   companySizes: [
-    { id: 'micro',     name: 'Микро',      range: '1-15 чел.',     vacanciesPerYear: { min: 0.2, avg: 2.5, max: 7 } },
     { id: 'small',     name: 'Малая',      range: '16-100 чел.',   vacancyPerYear: { min: 4.5, avg: 20, max: 45 } },
     { id: 'medium',    name: 'Средняя',    range: '101-500 чел.',  vacancyPerYear: { min: 30, avg: 90, max: 220 } },
     { id: 'large',     name: 'Крупная',    range: '501-3000 чел.', vacancyPerYear: { min: 150, avg: 500, max: 1400 } },
     { id: 'enterprise',name: 'Энтерпрайз', range: '3000+ чел.',    vacancyPerYear: { min: 800, avg: 2500, max: 7000 } },
   ],
 
-  // Полная матрица "отрасль × размер" (40 комбинаций).
+  // Полная матрица "отрасль × размер" (32 комбинации).
   // vacanciesPerYear — точечная средняя (avg) для комбинации.
   // Источник: HR_analytics_RF_2026.docx, раздел 4 (vacYear avg).
   matrix: {
-    'it|micro':         { vacAvg: 1.8 },
     'it|small':         { vacAvg: 11.5 },
     'it|medium':        { vacAvg: 57.5 },
     'it|large':         { vacAvg: 276 },
     'it|enterprise':    { vacAvg: 1380 },
 
-    'retail|micro':     { vacAvg: 4.8 },
     'retail|small':     { vacAvg: 30 },
     'retail|medium':    { vacAvg: 150 },
     'retail|large':     { vacAvg: 720 },
     'retail|enterprise':{ vacAvg: 3600 },
 
-    'production|micro': { vacAvg: 3.6 },
     'production|small': { vacAvg: 22.5 },
     'production|medium':{ vacAvg: 112.5 },
     'production|large': { vacAvg: 540 },
     'production|enterprise':{ vacAvg: 2700 },
 
-    'sales|micro':      { vacAvg: 4.0 },
     'sales|small':      { vacAvg: 25 },
     'sales|medium':     { vacAvg: 125 },
     'sales|large':      { vacAvg: 600 },
     'sales|enterprise': { vacAvg: 3000 },
 
-    'finance|micro':    { vacAvg: 2.2 },
     'finance|small':    { vacAvg: 13.5 },
     'finance|medium':   { vacAvg: 67.5 },
     'finance|large':    { vacAvg: 324 },
     'finance|enterprise':{ vacAvg: 1620 },
 
-    'medicine|micro':   { vacAvg: 2.0 },
     'medicine|small':   { vacAvg: 12.5 },
     'medicine|medium':  { vacAvg: 62.5 },
     'medicine|large':   { vacAvg: 300 },
     'medicine|enterprise':{ vacAvg: 1500 },
 
-    'construction|micro':   { vacAvg: 3.4 },
     'construction|small':   { vacAvg: 21.5 },
     'construction|medium':  { vacAvg: 107.5 },
     'construction|large':   { vacAvg: 516 },
     'construction|enterprise':{ vacAvg: 2580 },
 
-    'logistics|micro':  { vacAvg: 4.4 },
     'logistics|small':  { vacAvg: 27.5 },
     'logistics|medium': { vacAvg: 137.5 },
     'logistics|large':  { vacAvg: 660 },
