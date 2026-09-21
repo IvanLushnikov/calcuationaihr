@@ -1057,7 +1057,6 @@
   </footer>
 
   <script>
-/* INLINE data.js */
 window.AI_RECRUITER_DATA = {
   // 8 отраслей. icon — эмодзи для превью; в проде заменим на SVG.
   industries: [
@@ -1283,10 +1282,10 @@ window.AI_RECRUITER_DATA = {
     contactDurationMin: 10,  // средняя длительность разговора
     shortCallPct: 15,        // % разговоров <10 сек (не тарифицируются у AI)
   },
-}
-</script>
-  <script>
-  (function() {
+};
+
+(function() {
+
     'use strict';
 
     // ===== Данные =====
@@ -1758,7 +1757,8 @@ window.AI_RECRUITER_DATA = {
     renderSelectors();
     render();
     setupReveal();
-  })();
-  </script>
+  
+})();
+</script>
 </body>
 </html>
