@@ -452,14 +452,14 @@
     /* size segmented */
     .size-group {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       background: var(--surface-2);
       padding: 6px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border);
     }
-    @media (max-width: 900px) { .size-group { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 900px) { .size-group { grid-template-columns: repeat(3, 1fr); } }
     .size-btn {
       padding: 10px 8px;
       background: transparent;
@@ -962,12 +962,12 @@
 
         <div class="panel green reveal">
           <div class="panel-title"><span class="badge"></span>Что даёт ИИ&nbsp;Рекрутер</div>
-          <div class="panel-sub">Пакет минут под&nbsp;ваш объём и&nbsp;эффект на&nbsp;выходе.</div>
+          <div class="panel-sub">Сколько работы ИИ&nbsp;делает за&nbsp;вас и&nbsp;что вы&nbsp;получаете на&nbsp;выходе.</div>
           <div class="stat-list">
-            <div class="stat-row"><span class="l">Пакет минут</span><span class="v" id="aiMins">—</span></div>
-            <div class="stat-row"><span class="l">Цена пакета</span><span class="v" id="aiPrice">—</span></div>
-            <div class="stat-row"><span class="l">Контакт → релевантный</span><span class="v" id="aiConv">—</span></div>
-            <div class="stat-row green"><span class="l">Релевантных кандидатов</span><span class="v" id="aiRelevant">—</span></div>
+            <div class="stat-row"><span class="l">Разговоров с&nbsp;кандидатами</span><span class="v" id="aiMins">—</span></div>
+            <div class="stat-row"><span class="l">Из&nbsp;них состоялось контактов</span><span class="v" id="aiContacts">—</span></div>
+            <div class="stat-row green"><span class="l">Релевантных кандидатов на&nbsp;финал</span><span class="v" id="aiRelevant">—</span></div>
+            <div class="stat-row green"><span class="l">Часов HR&nbsp;освобождается</span><span class="v" id="aiHrHours">—</span></div>
           </div>
         </div>
       </div>
@@ -1022,7 +1022,7 @@
           <div class="m">качество</div>
         </div>
       </div>
-      <div class="pilot-note">Итого: контакт → релевантный — <strong>3,6%</strong>.</div>
+      <div class="pilot-note">Итого: попытка → релевантный кандидат — <strong>3,6%</strong> (вся воронка ИИ&nbsp;Рекрутера).</div>
     </div>
   </section>
 
@@ -1034,7 +1034,7 @@
   </footer>
 
   <script>
-/* === INLINE data.js (для WordPress / standalone) === */
+/* INLINE data.js */
 window.AI_RECRUITER_DATA = {
   // 8 отраслей. icon — эмодзи для превью; в проде заменим на SVG.
   industries: [
@@ -1157,10 +1157,10 @@ window.AI_RECRUITER_DATA = {
     },
   ],
 
-  // 4 размера компаний. vacanciesPerYear — сколько вакансий в год в ОДНОЙ компании такого размера.
-  // Микро убран — пакет 300к фикс делает AI Recruiter экономически невыгодным при 1-3 вакансиях в год.
+  // 3 размера компаний. vacanciesPerYear — сколько вакансий в год в ОДНОЙ компании такого размера.
+  // Микро и Малая убраны: микро — пакет 300к фикс невыгоден при 1-3 вакансиях,
+  // малая (16-100) — экономия на AI ниже порога ощутимости.
   companySizes: [
-    { id: 'small',     name: 'Малая',      range: '16-100 чел.',   vacancyPerYear: { min: 4.5, avg: 20, max: 45 } },
     { id: 'medium',    name: 'Средняя',    range: '101-500 чел.',  vacancyPerYear: { min: 30, avg: 90, max: 220 } },
     { id: 'large',     name: 'Крупная',    range: '501-3000 чел.', vacancyPerYear: { min: 150, avg: 500, max: 1400 } },
     { id: 'enterprise',name: 'Энтерпрайз', range: '3000+ чел.',    vacancyPerYear: { min: 800, avg: 2500, max: 7000 } },
@@ -1170,47 +1170,38 @@ window.AI_RECRUITER_DATA = {
   // vacanciesPerYear — точечная средняя (avg) для комбинации.
   // Источник: HR_analytics_RF_2026.docx, раздел 4 (vacYear avg).
   matrix: {
-    'it|small':         { vacAvg: 11.5 },
-    'it|medium':        { vacAvg: 57.5 },
-    'it|large':         { vacAvg: 276 },
-    'it|enterprise':    { vacAvg: 1380 },
+    'it|medium':        { vacAvg: 50 },
+    'it|large':         { vacAvg: 240 },
+    'it|enterprise':    { vacAvg: 1200 },
 
-    'retail|small':     { vacAvg: 30 },
     'retail|medium':    { vacAvg: 150 },
     'retail|large':     { vacAvg: 720 },
     'retail|enterprise':{ vacAvg: 3600 },
 
-    'production|small': { vacAvg: 22.5 },
     'production|medium':{ vacAvg: 112.5 },
     'production|large': { vacAvg: 540 },
     'production|enterprise':{ vacAvg: 2700 },
 
-    'sales|small':      { vacAvg: 25 },
     'sales|medium':     { vacAvg: 125 },
     'sales|large':      { vacAvg: 600 },
     'sales|enterprise': { vacAvg: 3000 },
 
-    'finance|small':    { vacAvg: 13.5 },
     'finance|medium':   { vacAvg: 67.5 },
     'finance|large':    { vacAvg: 324 },
     'finance|enterprise':{ vacAvg: 1620 },
 
-    'medicine|small':   { vacAvg: 12.5 },
     'medicine|medium':  { vacAvg: 62.5 },
     'medicine|large':   { vacAvg: 300 },
     'medicine|enterprise':{ vacAvg: 1500 },
 
-    'construction|small':   { vacAvg: 21.5 },
     'construction|medium':  { vacAvg: 107.5 },
     'construction|large':   { vacAvg: 516 },
     'construction|enterprise':{ vacAvg: 2580 },
 
-    'logistics|small':  { vacAvg: 27.5 },
     'logistics|medium': { vacAvg: 137.5 },
     'logistics|large':  { vacAvg: 660 },
     'logistics|enterprise':{ vacAvg: 3300 },
 
-    'education|small':  { vacAvg: 18 },
     'education|medium': { vacAvg: 75 },
     'education|large':  { vacAvg: 360 },
     'education|enterprise':{ vacAvg: 1800 },
@@ -1404,11 +1395,18 @@ window.AI_RECRUITER_DATA = {
       const aiPrice = calcAiPrice(minutes);
       const funnel = calcAiFunnel(minutes, conv);
 
+      // ===== Штатный HR: считаем «Сейчас» от ФОТ рекрутеров =====
+      // На одного рекрутера ~40 вакансий/год.
+      const recruitersNeeded = Math.max(1, Math.ceil(vacAvg / 40));
+      const recruiterSalaryYear = 70000 * 12 * 1.43;
+      const recruiterFot = recruiterSalaryYear * recruitersNeeded;
+
       // ===== Экономика (главный нарратив) =====
-      // Среднеотраслевая стоимость закрытия одной вакансии × вакансии в год
+      // Hero «Экономия в год» = ФОТ рекрутеров - ИИ = то, что ИИ экономит.
+      // Согласовано со сценарием «Штатный HR», где «Сейчас» = recruiterFot.
       const annualHireCost = vacAvg * industry.avgHireCost;
-      const saving = annualHireCost - aiPrice;
-      const roi = aiPrice > 0 ? annualHireCost / aiPrice : 0;
+      const saving = recruiterFot - aiPrice;
+      const roi = aiPrice > 0 ? recruiterFot / aiPrice : 0;
       const paybackMonths = saving > 0 ? (aiPrice / (saving / 12)) : 0;
 
       // Стоимость закрытия с ИИ&nbsp;Рекрутером (если считать пакет на вакансии)
@@ -1424,11 +1422,17 @@ window.AI_RECRUITER_DATA = {
       const ccCost = ccBillableMin * compCost.cc;
       const saasCost = funnel.interviews * D.saas.costPerInterview;
 
+      // На одного рекрутера ~40 вакансий/год. XX = сколько нужно на объём пользователя.
+      // «Сейчас» для Штатного HR = полная стоимость найма (annualHireCost × vacAvg), как и в hero-блоке.
+      // В desc — разбивка: зарплатная часть + остальное (налоги, размещение, агентства).
+      const recruitersNeeded = Math.max(1, Math.ceil(vacAvg / 40));
+      const recruiterSalaryYear = 70000 * 12 * 1.43;
+
       const scenarios = [
         {
           name: 'Штатный HR',
-          desc: 'Только зарплата рекрутера, без учёта размещения вакансий и&nbsp;стоимости отбора.',
-          now: inhouseCost,
+          desc: `Полный цикл найма: <strong>${fmt(inhouseCost)}&nbsp;₽/год</strong>. Из&nbsp;них зарплата <strong>${recruitersNeeded}&nbsp;${recruitersNeeded === 1 ? 'рекрутера' : recruitersNeeded < 5 ? 'рекрутеров' : 'рекрутеров'}</strong> × 70&nbsp;000&nbsp;₽/мес × 1.43 (НДФЛ + взносы) = ${fmt(recruiterFot)}&nbsp;₽/год на&nbsp;ФОТ&nbsp;+ налоги, размещение вакансий, агентства. ИИ закрывает первый этап (звонки) — финал остаётся за&nbsp;человеком.`,
+          now: recruiterFot,
           ai: aiPrice,
         },
         {
@@ -1502,7 +1506,7 @@ window.AI_RECRUITER_DATA = {
       // и ИИ&nbsp;Рекрутер естественно побеждает по «стоимости за результат».
       const manualInterviews = interviewsYear;
       const manualChannel = {
-        name: '', icon: '', desc: 'Полная рыночная стоимость найма в&nbsp;отрасли: зарплата рекрутера, размещение, агентства.',
+        name: '', icon: '', desc: 'Полный цикл найма в&nbsp;отрасли: зарплата, налоги, размещение вакансий, агентства. ИИ&nbsp;экономит только звонки — финал остаётся за&nbsp;человеком.',
         conv: 1.0,
         conversions: manualInterviews,
         billableMin: contacts * durationMin,
@@ -1587,9 +1591,10 @@ window.AI_RECRUITER_DATA = {
 
       // AI
       document.getElementById('aiMins').textContent = fmt(r.minutes, 0);
-      document.getElementById('aiPrice').textContent = fmtMoney(r.aiPrice);
-      document.getElementById('aiConv').textContent = fmtPct(D.ourConversion.interview * D.ourConversion.relevant);
+      document.getElementById('aiContacts').textContent = fmt(r.funnel.contacts, 0);
       document.getElementById('aiRelevant').textContent = fmt(r.funnel.relevant, 0);
+      // Сколько часов ИИ закрывает за HR (по той же формуле, что manualHoursPerYear в compute).
+      document.getElementById('aiHrHours').textContent = fmt(r.manualHoursPerYear, 0);
 
       // Каналы
       const channelMeta = [

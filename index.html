@@ -452,14 +452,14 @@
     /* size segmented */
     .size-group {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       background: var(--surface-2);
       padding: 6px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border);
     }
-    @media (max-width: 900px) { .size-group { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 900px) { .size-group { grid-template-columns: repeat(3, 1fr); } }
     .size-btn {
       padding: 10px 8px;
       background: transparent;
@@ -962,12 +962,12 @@
 
         <div class="panel green reveal">
           <div class="panel-title"><span class="badge"></span>Что даёт ИИ&nbsp;Рекрутер</div>
-          <div class="panel-sub">Пакет минут под&nbsp;ваш объём и&nbsp;эффект на&nbsp;выходе.</div>
+          <div class="panel-sub">Сколько работы ИИ&nbsp;делает за&nbsp;вас и&nbsp;что вы&nbsp;получаете на&nbsp;выходе.</div>
           <div class="stat-list">
-            <div class="stat-row"><span class="l">Пакет минут</span><span class="v" id="aiMins">—</span></div>
-            <div class="stat-row"><span class="l">Цена пакета</span><span class="v" id="aiPrice">—</span></div>
-            <div class="stat-row"><span class="l">Контакт → релевантный</span><span class="v" id="aiConv">—</span></div>
-            <div class="stat-row green"><span class="l">Релевантных кандидатов</span><span class="v" id="aiRelevant">—</span></div>
+            <div class="stat-row"><span class="l">Разговоров с&nbsp;кандидатами</span><span class="v" id="aiMins">—</span></div>
+            <div class="stat-row"><span class="l">Из&nbsp;них состоялось контактов</span><span class="v" id="aiContacts">—</span></div>
+            <div class="stat-row green"><span class="l">Релевантных кандидатов на&nbsp;финал</span><span class="v" id="aiRelevant">—</span></div>
+            <div class="stat-row green"><span class="l">Часов HR&nbsp;освобождается</span><span class="v" id="aiHrHours">—</span></div>
           </div>
         </div>
       </div>
@@ -1022,7 +1022,7 @@
           <div class="m">качество</div>
         </div>
       </div>
-      <div class="pilot-note">Итого: контакт → релевантный — <strong>3,6%</strong>.</div>
+      <div class="pilot-note">Итого: попытка → релевантный кандидат — <strong>3,6%</strong> (вся воронка ИИ&nbsp;Рекрутера).</div>
     </div>
   </section>
 
@@ -1167,11 +1167,18 @@
       const aiPrice = calcAiPrice(minutes);
       const funnel = calcAiFunnel(minutes, conv);
 
+      // ===== Штатный HR: считаем «Сейчас» от ФОТ рекрутеров =====
+      // На одного рекрутера ~40 вакансий/год.
+      const recruitersNeeded = Math.max(1, Math.ceil(vacAvg / 40));
+      const recruiterSalaryYear = 70000 * 12 * 1.43;
+      const recruiterFot = recruiterSalaryYear * recruitersNeeded;
+
       // ===== Экономика (главный нарратив) =====
-      // Среднеотраслевая стоимость закрытия одной вакансии × вакансии в год
+      // Hero «Экономия в год» = ФОТ рекрутеров - ИИ = то, что ИИ экономит.
+      // Согласовано со сценарием «Штатный HR», где «Сейчас» = recruiterFot.
       const annualHireCost = vacAvg * industry.avgHireCost;
-      const saving = annualHireCost - aiPrice;
-      const roi = aiPrice > 0 ? annualHireCost / aiPrice : 0;
+      const saving = recruiterFot - aiPrice;
+      const roi = aiPrice > 0 ? recruiterFot / aiPrice : 0;
       const paybackMonths = saving > 0 ? (aiPrice / (saving / 12)) : 0;
 
       // Стоимость закрытия с ИИ&nbsp;Рекрутером (если считать пакет на вакансии)
@@ -1187,11 +1194,17 @@
       const ccCost = ccBillableMin * compCost.cc;
       const saasCost = funnel.interviews * D.saas.costPerInterview;
 
+      // На одного рекрутера ~40 вакансий/год. XX = сколько нужно на объём пользователя.
+      // «Сейчас» для Штатного HR = полная стоимость найма (annualHireCost × vacAvg), как и в hero-блоке.
+      // В desc — разбивка: зарплатная часть + остальное (налоги, размещение, агентства).
+      const recruitersNeeded = Math.max(1, Math.ceil(vacAvg / 40));
+      const recruiterSalaryYear = 70000 * 12 * 1.43;
+
       const scenarios = [
         {
           name: 'Штатный HR',
-          desc: 'Только зарплата рекрутера, без учёта размещения вакансий и&nbsp;стоимости отбора.',
-          now: inhouseCost,
+          desc: `Полный цикл найма: <strong>${fmt(inhouseCost)}&nbsp;₽/год</strong>. Из&nbsp;них зарплата <strong>${recruitersNeeded}&nbsp;${recruitersNeeded === 1 ? 'рекрутера' : recruitersNeeded < 5 ? 'рекрутеров' : 'рекрутеров'}</strong> × 70&nbsp;000&nbsp;₽/мес × 1.43 (НДФЛ + взносы) = ${fmt(recruiterFot)}&nbsp;₽/год на&nbsp;ФОТ&nbsp;+ налоги, размещение вакансий, агентства. ИИ закрывает первый этап (звонки) — финал остаётся за&nbsp;человеком.`,
+          now: recruiterFot,
           ai: aiPrice,
         },
         {
@@ -1265,7 +1278,7 @@
       // и ИИ&nbsp;Рекрутер естественно побеждает по «стоимости за результат».
       const manualInterviews = interviewsYear;
       const manualChannel = {
-        name: '', icon: '', desc: 'Полная рыночная стоимость найма в&nbsp;отрасли: зарплата рекрутера, размещение, агентства.',
+        name: '', icon: '', desc: 'Полный цикл найма в&nbsp;отрасли: зарплата, налоги, размещение вакансий, агентства. ИИ&nbsp;экономит только звонки — финал остаётся за&nbsp;человеком.',
         conv: 1.0,
         conversions: manualInterviews,
         billableMin: contacts * durationMin,
@@ -1350,9 +1363,10 @@
 
       // AI
       document.getElementById('aiMins').textContent = fmt(r.minutes, 0);
-      document.getElementById('aiPrice').textContent = fmtMoney(r.aiPrice);
-      document.getElementById('aiConv').textContent = fmtPct(D.ourConversion.interview * D.ourConversion.relevant);
+      document.getElementById('aiContacts').textContent = fmt(r.funnel.contacts, 0);
       document.getElementById('aiRelevant').textContent = fmt(r.funnel.relevant, 0);
+      // Сколько часов ИИ закрывает за HR (по той же формуле, что manualHoursPerYear в compute).
+      document.getElementById('aiHrHours').textContent = fmt(r.manualHoursPerYear, 0);
 
       // Каналы
       const channelMeta = [
