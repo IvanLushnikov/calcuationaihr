@@ -16,23 +16,6 @@ window.AI_RECRUITER_DATA = {
       convResponseToHire: 2.38,
       hrScreeningRate: 0.133, // 8/60 — отклик → HR-интервью прошёл
       avgHireCost: 180000,
-      hrScreeningRate: 0.133,
-      avgSalary: 250000,
-    },
-    {
-      id: 'retail',
-      name: 'Ритейл / Массовый найм',
-      // Средние отклики и интервью на 1 вакансию
-      responses: { min: 15, avg: 60, max: 250 },
-      interviews: { min: 2, avg: 4, max: 8 },
-      // Воронка на 1 среднюю вакансию (абсолютные числа)
-      funnel: { responses: 60, screening: 18, hrInterview: 8, final: 3, offer: 1.8, hire: 1.4 },
-      // Конверсии (%)
-      convResponseToOffer: 3.0,
-      convResponseToHire: 2.38,
-      // Средняя стоимость закрытия 1 вакансии (₽) — отраслевая оценка, классический канал (КЦ + рекрутер)
-      avgHireCost: 180000,
-      // Средняя зарплата закрытой вакансии (₽) — для ROI
       avgSalary: 250000,
     },
     {
@@ -126,6 +109,19 @@ window.AI_RECRUITER_DATA = {
       hrScreeningRate: 0.218, // 12/55
       avgSalary: 85000,
     },
+    {
+      id: 'education',
+      name: 'Образование / EdTech',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5L2 9z"/><path d="M5 11v5c0 1 3 2.5 7 2.5s7-1.5 7-2.5v-5M22 9v5"/></svg>',
+      responses: { min: 15, avg: 50, max: 180 },
+      interviews: { min: 2, avg: 4, max: 7 },
+      funnel: { responses: 50, screening: 20, hrInterview: 10, final: 6, offer: 3.5, hire: 2.4 },
+      convResponseToOffer: 7.0,
+      convResponseToHire: 4.8,
+      avgHireCost: 110000,
+      hrScreeningRate: 0.20, // 10/50
+      avgSalary: 130000,
+    },
   ],
 
   // 4 размера компаний. vacanciesPerYear — сколько вакансий в год в ОДНОЙ компании такого размера.
@@ -180,6 +176,11 @@ window.AI_RECRUITER_DATA = {
     'logistics|medium': { vacAvg: 137.5 },
     'logistics|large':  { vacAvg: 660 },
     'logistics|enterprise':{ vacAvg: 3300 },
+
+    'education|small':  { vacAvg: 18 },
+    'education|medium': { vacAvg: 75 },
+    'education|large':  { vacAvg: 360 },
+    'education|enterprise':{ vacAvg: 1800 },
   },
 
   // Тарифы AI Recruiter (₽). Регион по умолчанию — intl_ru (иностранные языки + РФ).

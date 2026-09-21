@@ -361,11 +361,11 @@
     /* ===== Calculator-row: выбор слева + эффект справа, на одном экране ===== */
     .calculator-row {
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
       gap: 18px;
       align-items: stretch;
     }
-    @media (max-width: 960px) {
+    @media (max-width: 1100px) {
       .calculator-row { grid-template-columns: 1fr; }
     }
     .calculator-eyebrow {
@@ -406,7 +406,7 @@
     /* industry cards */
     .industry-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
     }
     @media (max-width: 900px) { .industry-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -414,12 +414,17 @@
       background: var(--surface-2);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 11px 10px;
+      padding: 14px 10px 10px;
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
       user-select: none;
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-height: 92px;
     }
     .industry-card:hover {
       border-color: var(--accent);
@@ -912,14 +917,14 @@
           <div class="input-group">
             <div class="input-label">
               <span class="step">1</span>
-              Отрасль
+              Выберите отрасль
             </div>
             <div class="industry-grid" id="industryGrid" role="radiogroup" aria-label="Выбор отрасли"></div>
           </div>
           <div class="input-group">
             <div class="input-label">
               <span class="step">2</span>
-              Размер компании
+              Ваш размер компании
             </div>
             <div class="size-group" id="sizeGroup" role="radiogroup" aria-label="Размер компании"></div>
           </div>
