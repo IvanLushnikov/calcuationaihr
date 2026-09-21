@@ -959,7 +959,7 @@
           <div class="stat-list">
             <div class="stat-row"><span class="l">Вакансий в&nbsp;год</span><span class="v" id="nowVac">—</span></div>
             <div class="stat-row"><span class="l">Откликов в&nbsp;год</span><span class="v" id="nowResp">—</span></div>
-            <div class="stat-row"><span class="l">Потенциальных интервью</span><span class="v" id="nowInt">—</span></div>
+            <div class="stat-row"><span class="l">HR-интервью</span><span class="v" id="nowInt">—</span></div>
             <div class="stat-row"><span class="l">Релевантных на&nbsp;финал</span><span class="v" id="nowRelevant">—</span></div>
             <div class="stat-row"><span class="l">Часов ручного труда</span><span class="v" id="nowHours">—</span></div>
           </div>
@@ -971,7 +971,7 @@
           <div class="stat-list">
             <div class="stat-row"><span class="l">Вакансий в&nbsp;год</span><span class="v" id="aiVac">—</span></div>
             <div class="stat-row"><span class="l">Откликов в&nbsp;год</span><span class="v" id="aiResp">—</span></div>
-            <div class="stat-row"><span class="l">Потенциальных интервью</span><span class="v" id="aiInt">—</span></div>
+            <div class="stat-row"><span class="l">AI-контактов</span><span class="v" id="aiInt">—</span></div>
             <div class="stat-row green"><span class="l">Релевантных на&nbsp;финал</span><span class="v" id="aiRelevant">—</span></div>
             <div class="stat-row green"><span class="l">Часов HR&nbsp;освобождается</span><span class="v" id="aiHrHours">—</span></div>
           </div>
@@ -1367,14 +1367,16 @@
       const hrRelevantYear = (r.industry?.funnel?.final || 0) * r.vacAvg;
       document.getElementById('nowVac').textContent = fmt(r.vacAvg, 1);
       document.getElementById('nowResp').textContent = fmt(r.responsesYear, 0);
-      document.getElementById('nowInt').textContent = fmt(r.responsesYear, 0); // «потенциальных» = все отклики
+      // HR реально проводит hrInterview × vacAvg интервью (а не все r.responsesYear).
+      document.getElementById('nowInt').textContent = fmt((r.industry?.funnel?.hrInterview || 0) * r.vacAvg, 0);
       document.getElementById('nowRelevant').textContent = fmt(hrRelevantYear, 0);
       document.getElementById('nowHours').textContent = fmt(r.manualHoursPerYear, 0);
 
       // AI
       document.getElementById('aiVac').textContent = fmt(r.vacAvg, 1);
       document.getElementById('aiResp').textContent = fmt(r.responsesYear, 0);
-      document.getElementById('aiInt').textContent = fmt(r.responsesYear, 0); // тот же потенциал
+      // AI обрабатывает все отклики (= responsesYear) — звонки и первичный скрининг.
+      document.getElementById('aiInt').textContent = fmt(r.responsesYear, 0);
       document.getElementById('aiRelevant').textContent = fmt(r.funnel.relevant, 0);
       // Сколько часов ИИ закрывает за HR (по той же формуле, что manualHoursPerYear в compute).
       document.getElementById('aiHrHours').textContent = fmt(r.manualHoursPerYear, 0);
