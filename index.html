@@ -295,7 +295,7 @@
       font-size: 0.92rem;
     }
 
-    /* ===== Dashboard-head: тонкий заголовок с live-pill для дашбордов ===== */
+    /* ===== Dashboard-head: тонкий заголовок дашбордов ===== */
     .dashboard-head {
       display: flex;
       align-items: center;
@@ -315,30 +315,6 @@
       line-height: 1.45;
       margin: 0 0 14px;
     }
-    .live-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px 4px 8px;
-      background: rgba(52, 211, 153, 0.1);
-      border: 1px solid rgba(52, 211, 153, 0.3);
-      border-radius: 100px;
-      color: var(--success);
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-      text-transform: lowercase;
-    }
-    .live-pill .live-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25);
-      animation: pulse 2s infinite;
-    }
-
     /* ===== Inputs / выбор отрасли и размера ===== */
     .input-card {
       background: var(--surface);
@@ -924,7 +900,7 @@
           <div class="input-group">
             <div class="input-label">
               <span class="step">2</span>
-              Ваш размер компании
+              Размер вашей компании
             </div>
             <div class="size-group" id="sizeGroup" role="radiogroup" aria-label="Размер компании"></div>
           </div>
@@ -967,7 +943,6 @@
     <div class="container">
       <div class="dashboard-head reveal">
         <h2>Сейчас vs с&nbsp;ИИ&nbsp;Рекрутером</h2>
-        <span class="live-pill"><span class="live-dot"></span>обновляется при выборе</span>
       </div>
 
       <div class="grid-2">
@@ -996,12 +971,11 @@
     </div>
   </section>
 
-  <!-- ========= CHANNELS (дашборд, обновляется при выборе) ========= -->
+  <!-- ========= CHANNELS (дашборд) ========= -->
   <section id="channels">
     <div class="container">
       <div class="dashboard-head reveal">
         <h2>CPA: сколько стоит один&nbsp;подходящий кандидат</h2>
-        <span class="live-pill"><span class="live-dot"></span>обновляется при выборе</span>
       </div>
       <p class="dashboard-note">Считаем на&nbsp;одном и&nbsp;том&nbsp;же объёме контактов. ИИ&nbsp;Рекрутер не&nbsp;тарифицирует недозвоны и&nbsp;разговоры короче&nbsp;10&nbsp;секунд.</p>
 
@@ -1009,12 +983,11 @@
     </div>
   </section>
 
-  <!-- ========= SCENARIOS (дашборд, обновляется при выборе) ========= -->
+  <!-- ========= SCENARIOS (дашборд) ========= -->
   <section>
     <div class="container">
       <div class="dashboard-head reveal">
         <h2>ИИ&nbsp;Рекрутер vs&nbsp;три альтернативы</h2>
-        <span class="live-pill"><span class="live-dot"></span>обновляется при выборе</span>
       </div>
       <p class="dashboard-note">Показываем, во&nbsp;что обойдётся закрыть ваш годовой объём каждым каналом.</p>
 
@@ -1028,7 +1001,7 @@
       <div class="dashboard-head reveal">
         <h2>Текущие метрики ИИ&nbsp;Рекрутера</h2>
       </div>
-      <p class="dashboard-note">Данные с&nbsp;холодной базы, N&gt;1000&nbsp;контактов. Рынок КЦ на&nbsp;этих&nbsp;же этапах&nbsp;— 8–12%.</p>
+      <p class="dashboard-note">Данные по&nbsp;холодной базе, более 500&nbsp;000 контактов.</p>
       <div class="pilot-stats reveal">
         <div class="pilot-stat">
           <div class="v">26,3%</div>
@@ -1046,7 +1019,7 @@
           <div class="m">качество</div>
         </div>
       </div>
-      <div class="pilot-note">Итого: контакт → релевантный — <strong>3,6%</strong>. В&nbsp;2–3&nbsp;раза выше, чем у&nbsp;типичного рыночного канала.</div>
+      <div class="pilot-note">Итого: контакт → релевантный — <strong>3,6%</strong>.</div>
     </div>
   </section>
 
