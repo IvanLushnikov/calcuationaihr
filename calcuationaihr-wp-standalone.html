@@ -1404,7 +1404,6 @@ window.AI_RECRUITER_DATA = {
       // ===== Экономика (главный нарратив) =====
       // Hero «Экономия в год» = ФОТ рекрутеров - ИИ = то, что ИИ экономит.
       // Согласовано со сценарием «Штатный HR», где «Сейчас» = recruiterFot.
-      const annualHireCost = vacAvg * industry.avgHireCost;
       const saving = recruiterFot - aiPrice;
       const roi = aiPrice > 0 ? recruiterFot / aiPrice : 0;
       const paybackMonths = saving > 0 ? (aiPrice / (saving / 12)) : 0;
@@ -1413,25 +1412,18 @@ window.AI_RECRUITER_DATA = {
       const costPerHireAi = vacAvg > 0 ? aiPrice / vacAvg : 0;
 
       // ===== Сценарии экономии =====
-      // 1. Штатный HR: ПОЛНАЯ рыночная стоимость найма в отрасли (avgHireCost × vacAvg).
-      //    Сюда входит зарплата, размещение, агентские — то, что компания реально платит.
+      // 1. Штатный HR: ФОТ рекрутеров (зарплата + НДФЛ + взносы) — то, что ИИ может заменить.
       // 2. КЦ по минутам: billable minutes × ccPerMin. Считаем на том же объёме контактов, что и AI.
       // 3. AI-SaaS: meaningful interviews × ₽/интервью.
-      const inhouseCost = industry.avgHireCost * vacAvg;
       const ccBillableMin = funnel.contacts * durationMin * (1 - market.shortCallPct / 100);
       const ccCost = ccBillableMin * compCost.cc;
       const saasCost = funnel.interviews * D.saas.costPerInterview;
 
-      // На одного рекрутера ~40 вакансий/год. XX = сколько нужно на объём пользователя.
-      // «Сейчас» для Штатного HR = полная стоимость найма (annualHireCost × vacAvg), как и в hero-блоке.
-      // В desc — разбивка: зарплатная часть + остальное (налоги, размещение, агентства).
-      const recruitersNeeded = Math.max(1, Math.ceil(vacAvg / 40));
-      const recruiterSalaryYear = 70000 * 12 * 1.43;
-
+      // Сценарии экономии. (recruitersNeeded и recruiterSalaryYear определены выше в hero-секции.)
       const scenarios = [
         {
           name: 'Штатный HR',
-          desc: `Полный цикл найма: <strong>${fmt(inhouseCost)}&nbsp;₽/год</strong>. Из&nbsp;них зарплата <strong>${recruitersNeeded}&nbsp;${recruitersNeeded === 1 ? 'рекрутера' : recruitersNeeded < 5 ? 'рекрутеров' : 'рекрутеров'}</strong> × 70&nbsp;000&nbsp;₽/мес × 1.43 (НДФЛ + взносы) = ${fmt(recruiterFot)}&nbsp;₽/год на&nbsp;ФОТ&nbsp;+ налоги, размещение вакансий, агентства. ИИ закрывает первый этап (звонки) — финал остаётся за&nbsp;человеком.`,
+          desc: `На&nbsp;ваш объём (<strong>${fmt(vacAvg, 0)}&nbsp;вакансий</strong>) нужно <strong>${recruitersNeeded}&nbsp;${recruitersNeeded === 1 ? 'рекрутера' : recruitersNeeded < 5 ? 'рекрутеров' : 'рекрутеров'}</strong> × 70&nbsp;000&nbsp;₽/мес × 1.43 (НДФЛ + взносы) = <strong>${fmt(recruiterFot)}&nbsp;₽/год</strong> на&nbsp;ФОТ. ИИ&nbsp;закрывает эти звонки — финал остаётся за&nbsp;человеком.`,
           now: recruiterFot,
           ai: aiPrice,
         },
@@ -1528,7 +1520,8 @@ window.AI_RECRUITER_DATA = {
         responsesYear, interviewsYear,
         manualHoursPerYear, netSavedHours, fte,
         minutes, aiPrice, funnel,
-        annualHireCost, saving, roi, paybackMonths, costPerHireAi,
+        annualHireCost: vacAvg * industry.avgHireCost, // legacy, не используется в UI
+        saving, roi, paybackMonths, costPerHireAi,
         scenarios, contacts, noAnswers,
         channels, bestIdx,
         durationMin,
@@ -1572,8 +1565,8 @@ window.AI_RECRUITER_DATA = {
         return fmtMoneyCompact(v);
       });
       document.getElementById('savingVac').textContent = fmt(r.vacAvg, 1);
-      document.getElementById('savingRoi').textContent = r.aiPrice > 0
-        ? fmt(r.annualHireCost / r.aiPrice, 1) + '× ROI'
+      document.getElementById('savingRoi').textContent = r.roi > 0
+        ? fmt(r.roi, 1) + '× ROI'
         : '—';
 
       animateNumber(document.getElementById('mHours'), prev.hours, r.netSavedHours, 700, v => fmt(v, 0));
