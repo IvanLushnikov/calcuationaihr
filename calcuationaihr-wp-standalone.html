@@ -594,7 +594,10 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
     }
+    .panel .stat-list { flex: 1; }
     .panel-title {
       font-size: 0.98rem;
       font-weight: 700;
@@ -750,6 +753,7 @@
       gap: 10px;
       transition: all 0.2s;
     }
+    .scenario-card .scenario-savings { margin-top: auto; }
     .scenario-card:hover { transform: translateY(-3px); }
     .scenario-card.best {
       border-color: rgba(52, 211, 153, 0.45);
@@ -953,9 +957,10 @@
           <div class="panel-title"><span class="badge"></span>Что происходит сейчас</div>
           <div class="panel-sub">Сколько работы делает ваш рекрутер вручную — без ИИ&nbsp;Рекрутера.</div>
           <div class="stat-list">
-            <div class="stat-row"><span class="l">Вакансий в год</span><span class="v" id="nowVac">—</span></div>
-            <div class="stat-row"><span class="l">Откликов в год</span><span class="v" id="nowResp">—</span></div>
-            <div class="stat-row"><span class="l">Интервью в год</span><span class="v" id="nowInt">—</span></div>
+            <div class="stat-row"><span class="l">Вакансий в&nbsp;год</span><span class="v" id="nowVac">—</span></div>
+            <div class="stat-row"><span class="l">Откликов в&nbsp;год</span><span class="v" id="nowResp">—</span></div>
+            <div class="stat-row"><span class="l">Потенциальных интервью</span><span class="v" id="nowInt">—</span></div>
+            <div class="stat-row"><span class="l">Релевантных на&nbsp;финал</span><span class="v" id="nowRelevant">—</span></div>
             <div class="stat-row"><span class="l">Часов ручного труда</span><span class="v" id="nowHours">—</span></div>
           </div>
         </div>
@@ -964,9 +969,10 @@
           <div class="panel-title"><span class="badge"></span>Что даёт ИИ&nbsp;Рекрутер</div>
           <div class="panel-sub">Сколько работы ИИ&nbsp;делает за&nbsp;вас и&nbsp;что вы&nbsp;получаете на&nbsp;выходе.</div>
           <div class="stat-list">
-            <div class="stat-row"><span class="l">Разговоров с&nbsp;кандидатами</span><span class="v" id="aiMins">—</span></div>
-            <div class="stat-row"><span class="l">Из&nbsp;них состоялось контактов</span><span class="v" id="aiContacts">—</span></div>
-            <div class="stat-row green"><span class="l">Релевантных кандидатов на&nbsp;финал</span><span class="v" id="aiRelevant">—</span></div>
+            <div class="stat-row"><span class="l">Вакансий в&nbsp;год</span><span class="v" id="aiVac">—</span></div>
+            <div class="stat-row"><span class="l">Откликов в&nbsp;год</span><span class="v" id="aiResp">—</span></div>
+            <div class="stat-row"><span class="l">Потенциальных интервью</span><span class="v" id="aiInt">—</span></div>
+            <div class="stat-row green"><span class="l">Релевантных на&nbsp;финал</span><span class="v" id="aiRelevant">—</span></div>
             <div class="stat-row green"><span class="l">Часов HR&nbsp;освобождается</span><span class="v" id="aiHrHours">—</span></div>
           </div>
         </div>
@@ -1402,10 +1408,15 @@ window.AI_RECRUITER_DATA = {
       const recruiterFot = recruiterSalaryYear * recruitersNeeded;
 
       // ===== Экономика (главный нарратив) =====
-      // Hero «Экономия в год» = ФОТ рекрутеров - ИИ = то, что ИИ экономит.
-      // Согласовано со сценарием «Штатный HR», где «Сейчас» = recruiterFot.
-      const saving = recruiterFot - aiPrice;
-      const roi = aiPrice > 0 ? recruiterFot / aiPrice : 0;
+      // AI Рекрутер закрывает этап первичного скрининга и звонков.
+      // По отраслевым бенчмаркам (LinkedIn, SHRM, Lever, Jobvite) — это 25-40% рабочего
+      // времени рекрутера. Используем 35% — середина диапазона.
+      // Остальные 65% (финальные интервью, оффер, адаптация, hr-задачи) остаются за человеком.
+      // «Сейчас» = ФОТ (зарплата + НДФЛ + взносы на всех этапах).
+      // «Экономия» = 35% ФОТ - пакет ИИ (то, что ИИ может реально заменить).
+      const screeningShare = 0.35;
+      const saving = recruiterFot * screeningShare - aiPrice;
+      const roi = aiPrice > 0 ? (recruiterFot * screeningShare) / aiPrice : 0;
       const paybackMonths = saving > 0 ? (aiPrice / (saving / 12)) : 0;
 
       // Стоимость закрытия с ИИ&nbsp;Рекрутером (если считать пакет на вакансии)
@@ -1423,7 +1434,7 @@ window.AI_RECRUITER_DATA = {
       const scenarios = [
         {
           name: 'Штатный HR',
-          desc: `На&nbsp;ваш объём (<strong>${fmt(vacAvg, 0)}&nbsp;вакансий</strong>) нужно <strong>${recruitersNeeded}&nbsp;${recruitersNeeded === 1 ? 'рекрутера' : recruitersNeeded < 5 ? 'рекрутеров' : 'рекрутеров'}</strong> × 70&nbsp;000&nbsp;₽/мес × 1.43 (НДФЛ + взносы) = <strong>${fmt(recruiterFot)}&nbsp;₽/год</strong> на&nbsp;ФОТ. ИИ&nbsp;закрывает эти звонки — финал остаётся за&nbsp;человеком.`,
+          desc: `На&nbsp;ваш объём (<strong>${fmt(vacAvg, 0)}&nbsp;вакансий</strong>) нужно <strong>${recruitersNeeded}&nbsp;${recruitersNeeded === 1 ? 'рекрутера' : recruitersNeeded < 5 ? 'рекрутеров' : 'рекрутеров'}</strong> × 70&nbsp;000&nbsp;₽/мес × 1.43 (НДФЛ + взносы) = <strong>${fmt(recruiterFot)}&nbsp;₽/год</strong> полного ФОТ. Из&nbsp;них ИИ&nbsp;закрывает этап первичного скрининга и&nbsp;звонков — это примерно 35%&nbsp;работы рекрутера (по&nbsp;бенчмаркам LinkedIn, SHRM, Lever, Jobvite). Остальные 65% (финальные интервью, оффер, адаптация, hr-задачи) остаются за&nbsp;человеком.`,
           now: recruiterFot,
           ai: aiPrice,
         },
@@ -1577,14 +1588,20 @@ window.AI_RECRUITER_DATA = {
       document.getElementById('mHrConv').textContent = fmtPct(r.industry.hrScreeningRate || 0);
 
       // Сейчас
+      // Симметричные строки в обеих панелях. «Потенциальных интервью» = все отклики (т.е. с кем
+      // в принципе можно провести интервью до отсева). У HR и у ИИ — одинаковый потенциал, разная конверсия.
+      // HR «релевантных на финал» = industry.funnel.final × vacAvg (до финального интервью после HR-скрининга).
+      const hrRelevantYear = (r.industry?.funnel?.final || 0) * r.vacAvg;
       document.getElementById('nowVac').textContent = fmt(r.vacAvg, 1);
       document.getElementById('nowResp').textContent = fmt(r.responsesYear, 0);
-      document.getElementById('nowInt').textContent = fmt(r.interviewsYear, 0);
+      document.getElementById('nowInt').textContent = fmt(r.responsesYear, 0); // «потенциальных» = все отклики
+      document.getElementById('nowRelevant').textContent = fmt(hrRelevantYear, 0);
       document.getElementById('nowHours').textContent = fmt(r.manualHoursPerYear, 0);
 
       // AI
-      document.getElementById('aiMins').textContent = fmt(r.minutes, 0);
-      document.getElementById('aiContacts').textContent = fmt(r.funnel.contacts, 0);
+      document.getElementById('aiVac').textContent = fmt(r.vacAvg, 1);
+      document.getElementById('aiResp').textContent = fmt(r.responsesYear, 0);
+      document.getElementById('aiInt').textContent = fmt(r.responsesYear, 0); // тот же потенциал
       document.getElementById('aiRelevant').textContent = fmt(r.funnel.relevant, 0);
       // Сколько часов ИИ закрывает за HR (по той же формуле, что manualHoursPerYear в compute).
       document.getElementById('aiHrHours').textContent = fmt(r.manualHoursPerYear, 0);
