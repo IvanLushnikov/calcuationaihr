@@ -1377,8 +1377,13 @@
       animateNumber(document.getElementById('mCandidates'), prev.candidates, r.funnel.relevant, 700, v => fmt(v, 0));
       document.getElementById('mCostPerHire').textContent = fmtMoney(r.costPerHireAi);
       const aiConv = D.ourConversion.contact * D.ourConversion.interview * D.ourConversion.relevant;
+      // sub-metric «конверсия ИИ vs HR» — единая логика с CPA-блоком:
+      // обе конверсии = «доля релевантных от контактов», чтобы не путать клиента.
+      // ИИ: r.funnel.relevant / r.contacts (= 13,6% для IT/Средняя)
+      // HR: final × vacAvg / contacts (= manualRelevant / contacts)
       document.getElementById('mAiConv').textContent = fmtPct(aiConv);
-      document.getElementById('mHrConv').textContent = fmtPct(r.industry.hrScreeningRate || 0);
+      const hrConv = r.contacts > 0 ? manualRelevant / r.contacts : 0;
+      document.getElementById('mHrConv').textContent = fmtPct(hrConv);
 
       // Сейчас
       // Симметричные строки в обеих панелях. «Потенциальных интервью» = все отклики (т.е. с кем
@@ -1469,7 +1474,7 @@
              tabindex="0"
              aria-checked="${i.id === state.industryId}"
              data-id="${i.id}"
-             title="Откликов на вакансию: ${i.responses.avg} · стоимость закрытия: ${fmtMoney(i.avgHireCost)} · HR-скрининг: ${fmtPct(i.hrScreeningRate || 0)}">
+             title="Откликов на вакансию: ${i.responses.avg} · стоимость закрытия: ${fmtMoney(i.avgHireCost)} · HR доводит до финала: ${fmtPct((i.funnel?.final || 0) / (i.interviews?.avg || 1))}">
           <span class="check" aria-hidden="true"><svg viewBox="0 0 16 16"><polyline points="3,8 7,12 13,4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           <span class="ico">${i.icon}</span>
           <span class="name">${i.name}</span>
