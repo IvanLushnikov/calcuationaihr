@@ -1206,9 +1206,10 @@
       const scenarios = [
         {
           name: 'Штатный HR',
-          desc: `На&nbsp;ваш объём (<strong>${fmt(vacAvg, 0)}&nbsp;вакансий</strong>) нужно <strong>${recruitersNeeded}&nbsp;${recruitersNeeded === 1 ? 'рекрутера' : recruitersNeeded < 5 ? 'рекрутеров' : 'рекрутеров'}</strong> × 70&nbsp;000&nbsp;₽/мес × 1.43 (НДФЛ + взносы) = <strong>${fmt(recruiterFot)}&nbsp;₽/год</strong> полного ФОТ. Из&nbsp;них ИИ&nbsp;закрывает этап первичного скрининга и&nbsp;звонков — это примерно 35%&nbsp;работы рекрутера (по&nbsp;бенчмаркам LinkedIn, SHRM, Lever, Jobvite). Остальные 65% (финальные интервью, оффер, адаптация, hr-задачи) остаются за&nbsp;человеком.`,
+          desc: `На&nbsp;ваш объём (<strong>${fmt(vacAvg, 0)}&nbsp;вакансий</strong>) нужно <strong>${recruitersNeeded}&nbsp;${recruitersNeeded === 1 ? 'рекрутера' : recruitersNeeded < 5 ? 'рекрутеров' : 'рекрутеров'}</strong>. Из&nbsp;них ИИ&nbsp;закрывает этап первичного скрининга — это примерно 35%`,
           now: recruiterFot,
           ai: aiPrice,
+          screeningShare: 0.35,
         },
         {
           name: 'Колл-центр',
@@ -1408,7 +1409,10 @@
 
       // Сценарии — без подсветки «ЛУЧШИЙ» (контринтуитивно: max savings обычно у штатного HR)
       document.getElementById('scenariosGrid').innerHTML = r.scenarios.map(s => {
-        const saving = s.now - s.ai;
+        // Если у сценария есть screeningShare — это HR-сценарий, ИИ заменяет только эту долю.
+        // «Сейчас» показываем как 35% × ФОТ (то, что реально заменяется).
+        const sNow = s.screeningShare ? s.now * s.screeningShare : s.now;
+        const saving = sNow - s.ai;
         const cls = saving >= 0 ? '' : 'neg';
         const sign = saving >= 0 ? '' : '−';
         const abs = Math.abs(saving);
@@ -1417,7 +1421,7 @@
             <div class="name">${s.name}</div>
             <div class="desc">${s.desc}</div>
             <div class="scenario-compare">
-              <div class="row now"><span>Сейчас</span><span class="v">${fmtMoney(s.now)}</span></div>
+              <div class="row now"><span>Сейчас</span><span class="v">${fmtMoney(sNow)}</span></div>
               <div class="row ai"><span>С ИИ&nbsp;Рекрутером</span><span class="v">${fmtMoney(s.ai)}</span></div>
             </div>
             <div class="scenario-savings">
