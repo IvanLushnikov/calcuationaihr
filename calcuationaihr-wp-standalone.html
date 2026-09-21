@@ -1130,6 +1130,10 @@
   </footer>
 
   <script>
+// Источник истины для лендинга AI Recruiter.
+// Собрано на основе HR_analytics_RF_2026.docx (данные рынка найма РФ, 04.06.2026)
+// + тарифы AI Recruiter из существующего index.html (см. TARIFF_FIXED / TARIFF_TIERS).
+
 window.AI_RECRUITER_DATA = {
   // 8 отраслей. icon — эмодзи для превью; в проде заменим на SVG.
   industries: [
@@ -1356,9 +1360,9 @@ window.AI_RECRUITER_DATA = {
     shortCallPct: 15,        // % разговоров <10 сек (не тарифицируются у AI)
   },
 };
-
-(function() {
-
+</script>
+  <script>
+  (function() {
     'use strict';
 
     // ===== Данные =====
@@ -1842,8 +1846,7 @@ window.AI_RECRUITER_DATA = {
     renderSelectors();
     render();
     setupReveal();
-  
-})();
-</script>
+  })();
+  </script>
 </body>
 </html>
