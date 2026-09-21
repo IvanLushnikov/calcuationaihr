@@ -1356,7 +1356,7 @@
       const aiBillableMin = aiBillableContacts * durationMin;
       // Конверсия AI в CPA: от attempts до relevant (вся воронка) = ~3,6%, а не только contact→relevant.
       // Это согласовано с тем, как считаем в других блоках (где воронка «попытка→релевантный»).
-      const aiFullConv = attempts > 0 ? r.funnel.relevant / attempts : 0;
+      const aiFullConv = r.funnel.attempts > 0 ? r.funnel.relevant / r.funnel.attempts : 0;
       const aiChannel = {
         name: '', icon: '', desc: 'Недозвоны и&nbsp;разговоры короче&nbsp;10&nbsp;сек не&nbsp;тарифицируются.',
         conv: aiFullConv,
