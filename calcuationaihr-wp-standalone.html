@@ -1525,9 +1525,12 @@ window.AI_RECRUITER_DATA = {
       // Сравниваем с CPA ИИ Рекрутера (= aiPrice / r.funnel.relevant).
       const manualCost = recruiterFot * screeningShare;
       const manualRelevant = (industry?.funnel?.final || 0) * vacAvg; // HR выводит на финал = final × vacAvg
+      // Конверсия HR = manualRelevant / contacts (сколько % контактов доходит до финала).
+      // Должна быть < 100% — HR тоже отсеивает на этапе скрининга/интервью.
+      const manualConv = contacts > 0 ? manualRelevant / contacts : 0;
       const manualChannel = {
         name: '', icon: '', desc: 'Полный цикл найма в&nbsp;отрасли: зарплата, налоги, размещение вакансий, агентства. ИИ&nbsp;экономит только звонки — финал остаётся за&nbsp;человеком.',
-        conv: 1.0,
+        conv: manualConv,
         conversions: manualRelevant,
         billableMin: contacts * durationMin,
         costPerMin: manual.recruiterSalary / (manual.workingHours * 60),
