@@ -772,6 +772,67 @@
     }
     .scenario-card .scenario-savings { margin-top: auto; }
     .scenario-card:hover { transform: translateY(-3px); }
+    .scenario-why {
+      max-width: 880px;
+      margin: 28px auto 0;
+      padding: 28px 32px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(52, 211, 153, 0.10) 100%);
+      border: 1.5px solid rgba(99, 102, 241, 0.35);
+      border-radius: var(--radius);
+      text-align: left;
+    }
+    .scenario-why .why-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .scenario-why h3 {
+      font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+      font-weight: 800;
+      margin: 0 0 12px;
+      color: var(--text);
+    }
+    .scenario-why p {
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin: 0 0 12px;
+    }
+    .scenario-why p.why-result {
+      color: var(--success);
+      font-weight: 600;
+      background: var(--success-dim);
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+    .scenario-why ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 8px;
+    }
+    .scenario-why ul li {
+      position: relative;
+      padding: 4px 0 4px 22px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    .scenario-why ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 4px;
+      color: var(--success);
+      font-weight: 800;
+    }
     .scenario-card.best {
       border-color: rgba(52, 211, 153, 0.45);
       background: linear-gradient(180deg, rgba(52, 211, 153, 0.08), var(--surface) 50%);
@@ -1018,6 +1079,18 @@
       <p class="dashboard-note">Показываем, во&nbsp;что обойдётся закрыть ваш годовой объём каждым каналом.</p>
 
       <div class="scenarios-grid reveal" id="scenariosGrid"></div>
+
+      <div class="scenario-why reveal">
+        <div class="why-badge">Почему ИИ&nbsp;Рекрутер</div>
+        <h3>Остальные 65% — за&nbsp;человеком</h3>
+        <p>ИИ&nbsp;закрывает <strong>35% работы рекрутера</strong> — первичный скрининг и&nbsp;звонки. Остальные <strong>65%</strong> (финальные интервью, оффер, адаптация, hr-бренд) <strong>остаются за&nbsp;человеком</strong>:</p>
+        <ul>
+          <li>HR-бренд и&nbsp;коммуникация с&nbsp;кандидатом&nbsp;— это живое общение.</li>
+          <li>Финальное интервью требует оценки по&nbsp;culture fit и&nbsp;рискам, которые видит только человек.</li>
+          <li>Оффер и&nbsp;переговоры&nbsp;— контекстная задача, не&nbsp;автоматизируемая скриптом.</li>
+        </ul>
+        <p class="why-result">ИИ&nbsp;не&nbsp;заменяет рекрутера. ИИ&nbsp;снимает с&nbsp;него рутину, чтобы он&nbsp;тратил время на&nbsp;людей, а&nbsp;не&nbsp;на&nbsp;звонки.</p>
+      </div>
     </div>
   </section>
 
@@ -1235,7 +1308,7 @@
           ai: aiPrice,
         },
         {
-          name: 'AI-интервьюер SaaS',
+          name: 'Конкуренты',
           desc: 'Поминутная тарификация или фикс за&nbsp;интервью. Скрипты без кастомизации.',
           now: saasCost,
           ai: aiPrice,
@@ -1281,9 +1354,12 @@
       const aiShortContacts = contacts * (market.shortCallPct / 100);
       const aiBillableContacts = contacts - aiShortContacts;
       const aiBillableMin = aiBillableContacts * durationMin;
+      // Конверсия AI в CPA: от attempts до relevant (вся воронка) = ~3,6%, а не только contact→relevant.
+      // Это согласовано с тем, как считаем в других блоках (где воронка «попытка→релевантный»).
+      const aiFullConv = attempts > 0 ? r.funnel.relevant / attempts : 0;
       const aiChannel = {
         name: '', icon: '', desc: 'Недозвоны и&nbsp;разговоры короче&nbsp;10&nbsp;сек не&nbsp;тарифицируются.',
-        conv: aiRelevantConv,
+        conv: aiFullConv,
         conversions: aiConversions,
         billableMin: aiBillableMin,
         costPerMin: minutes > 0 ? aiPrice / minutes : 0,
@@ -1430,7 +1506,7 @@
               <div class="ss"><span>Контактов в год</span><span class="v">${fmt(r.contacts, 0)}</span></div>
               <div class="ss"><span>Конверсия</span><span class="v">${fmtPct(ch.conv)}</span></div>
               <div class="ss"><span>₽/мин</span><span class="v">${fmt(ch.costPerMin, 1)}</span></div>
-              <div class="ss"><span>Затраты в год</span><span class="v">${fmtMoney(ch.totalCost)}</span></div>
+              <!-- "Затраты в год" убрано по требованию руководства: не нужна, есть в сценариях -->
             </div>
           </div>`;
       }).join('');
