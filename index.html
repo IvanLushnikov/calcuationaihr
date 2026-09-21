@@ -315,6 +315,23 @@
       line-height: 1.45;
       margin: 0 0 14px;
     }
+    .dashboard-note.highlight {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.12), rgba(52, 211, 153, 0.12));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .dashboard-note.highlight::before {
+      content: "★";
+      color: var(--accent-light);
+      font-size: 1.1rem;
+    }
     /* ===== Inputs / выбор отрасли и размера ===== */
     .input-card {
       background: var(--surface);
@@ -1010,7 +1027,7 @@
       <div class="dashboard-head reveal">
         <h2>Текущие метрики ИИ&nbsp;Рекрутера</h2>
       </div>
-      <p class="dashboard-note">Данные по&nbsp;холодной базе, более 500&nbsp;000 контактов.</p>
+      <p class="dashboard-note highlight">Данные по&nbsp;холодной базе, более 500&nbsp;000 контактов.</p>
       <div class="pilot-stats reveal">
         <div class="pilot-stat">
           <div class="v">26,3%</div>
@@ -1276,20 +1293,20 @@
         shortContacts: aiShortContacts,
       };
 
-      // Ручной канал: считаем по полной рыночной стоимости найма (avgHireCost × vacAvg),
-      // а «релевантных» = число интервью (vacAvg × industry.interviews.avg).
-      // Так CPA ручного канала = avgHireCost / interviews.avg — большое число,
-      // и ИИ&nbsp;Рекрутер естественно побеждает по «стоимости за результат».
-      const manualInterviews = interviewsYear;
+      // Ручной канал: считаем затраты = 35% × ФОТ (то, что ИИ может заменить).
+      // CPA = затраты / релевантных на финал (т.е. стоимость одного релевантного для HR).
+      // Сравниваем с CPA ИИ Рекрутера (= aiPrice / r.funnel.relevant).
+      const manualCost = recruiterFot * screeningShare;
+      const manualRelevant = (r.industry?.funnel?.final || 0) * r.vacAvg; // HR выводит на финал = final × vacAvg
       const manualChannel = {
         name: '', icon: '', desc: 'Полный цикл найма в&nbsp;отрасли: зарплата, налоги, размещение вакансий, агентства. ИИ&nbsp;экономит только звонки — финал остаётся за&nbsp;человеком.',
         conv: 1.0,
-        conversions: manualInterviews,
+        conversions: manualRelevant,
         billableMin: contacts * durationMin,
         costPerMin: manual.recruiterSalary / (manual.workingHours * 60),
         costPerContact: 0,
-        cpa: manualInterviews > 0 ? industry.avgHireCost / industry.interviews.avg : Infinity,
-        totalCost: industry.avgHireCost * vacAvg,
+        cpa: manualRelevant > 0 ? manualCost / manualRelevant : Infinity,
+        totalCost: manualCost,
       };
 
       const channels = [manualChannel, ccChannel, botChannel, aiChannel];
