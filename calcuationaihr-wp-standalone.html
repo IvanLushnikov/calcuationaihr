@@ -1605,7 +1605,7 @@ window.AI_RECRUITER_DATA = {
       document.getElementById('mCostPerHire').textContent = fmtMoney(r.costPerHireAi);
       const aiConv = D.ourConversion.contact * D.ourConversion.interview * D.ourConversion.relevant;
       document.getElementById('mAiConv').textContent = fmtPct(aiConv);
-      const hrConv = r.contacts > 0 ? manualRelevant / r.contacts : 0;
+      const hrConv = r.contacts > 0 ? (r.industry?.funnel?.final || 0) * r.vacAvg / r.contacts : 0;
       document.getElementById('mHrConv').textContent = fmtPct(hrConv);
 
       // Сейчас

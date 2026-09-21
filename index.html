@@ -1382,7 +1382,8 @@
       // ИИ: r.funnel.relevant / r.contacts (= 13,6% для IT/Средняя)
       // HR: final × vacAvg / contacts (= manualRelevant / contacts)
       document.getElementById('mAiConv').textContent = fmtPct(aiConv);
-      const hrConv = r.contacts > 0 ? manualRelevant / r.contacts : 0;
+      // HR конверсия = (industry.funnel.final × vacAvg) / contacts — без обращения к manualRelevant (не в return)
+      const hrConv = r.contacts > 0 ? (r.industry?.funnel?.final || 0) * r.vacAvg / r.contacts : 0;
       document.getElementById('mHrConv').textContent = fmtPct(hrConv);
 
       // Сейчас
